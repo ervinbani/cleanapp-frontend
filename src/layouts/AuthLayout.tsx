@@ -1,5 +1,5 @@
-import type { ReactNode } from 'react';
-import styles from './AuthLayout.module.css';
+import type { ReactNode } from "react";
+import styles from "./AuthLayout.module.css";
 
 interface AuthLayoutProps {
   children: ReactNode;

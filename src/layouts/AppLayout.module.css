@@ -58,7 +58,9 @@
   color: #4b5563;
   font-size: 0.9rem;
   font-weight: 500;
-  transition: background 0.15s ease, color 0.15s ease;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
 }
 
 .navItem:hover {
@@ -144,7 +146,9 @@
   font-weight: 600;
   color: #6b7280;
   cursor: pointer;
-  transition: background 0.15s, color 0.15s;
+  transition:
+    background 0.15s,
+    color 0.15s;
 }
 
 .langBtn:hover {
@@ -192,7 +196,9 @@
   color: #9ca3af;
   padding: 0.25rem;
   border-radius: 6px;
-  transition: color 0.15s, background 0.15s;
+  transition:
+    color 0.15s,
+    background 0.15s;
 }
 
 .logoutBtn:hover {

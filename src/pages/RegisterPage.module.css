@@ -17,7 +17,9 @@
   font-weight: 600;
   color: #6b7280;
   cursor: pointer;
-  transition: background 0.15s, color 0.15s;
+  transition:
+    background 0.15s,
+    color 0.15s;
 }
 
 .langBtn:hover {
@@ -74,7 +76,9 @@
   font-size: 0.95rem;
   color: #111827;
   background: #fff;
-  transition: border-color 0.15s, box-shadow 0.15s;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
   outline: none;
 }
 
@@ -116,7 +120,9 @@
   font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.15s, transform 0.1s;
+  transition:
+    background 0.15s,
+    transform 0.1s;
 }
 
 .submitBtn:hover:not(:disabled) {

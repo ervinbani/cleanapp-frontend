@@ -1,14 +1,14 @@
-export type Language = 'en' | 'es';
-export type UserRole = 'owner' | 'manager' | 'staff' | 'cleaner';
+export type Language = "en" | "es";
+export type UserRole = "owner" | "manager" | "staff" | "cleaner";
 export type JobStatus =
-  | 'scheduled'
-  | 'confirmed'
-  | 'in_progress'
-  | 'completed'
-  | 'canceled'
-  | 'no_show';
-export type InvoiceStatus = 'draft' | 'sent' | 'paid' | 'overdue' | 'void';
-export type CustomerStatus = 'lead' | 'active' | 'inactive';
+  | "scheduled"
+  | "confirmed"
+  | "in_progress"
+  | "completed"
+  | "canceled"
+  | "no_show";
+export type InvoiceStatus = "draft" | "sent" | "paid" | "overdue" | "void";
+export type CustomerStatus = "lead" | "active" | "inactive";
 
 export interface User {
   _id: string;
@@ -47,8 +47,8 @@ export interface Tenant {
     country?: string;
   };
   subscription: {
-    plan: 'trial' | 'basic' | 'pro' | 'enterprise';
-    status: 'active' | 'past_due' | 'canceled';
+    plan: "trial" | "basic" | "pro" | "enterprise";
+    status: "active" | "past_due" | "canceled";
     renewalDate?: string;
   };
   createdAt: string;
@@ -74,7 +74,7 @@ export interface Customer {
   notes?: string;
   tags: string[];
   status: CustomerStatus;
-  source: 'manual' | 'website' | 'phone' | 'referral' | 'facebook' | 'google';
+  source: "manual" | "website" | "phone" | "referral" | "facebook" | "google";
   createdAt: string;
   updatedAt: string;
 }
@@ -140,7 +140,7 @@ export interface Invoice {
   status: InvoiceStatus;
   dueDate?: string;
   paidAt?: string;
-  paymentMethod?: 'cash' | 'card' | 'bank_transfer' | 'stripe' | 'other';
+  paymentMethod?: "cash" | "card" | "bank_transfer" | "stripe" | "other";
   createdAt: string;
   updatedAt: string;
 }

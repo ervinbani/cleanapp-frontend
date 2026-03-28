@@ -1,14 +1,14 @@
-import { createBrowserRouter, Navigate } from 'react-router-dom';
-import AppLayout from './layouts/AppLayout';
-import PrivateRoute from './components/PrivateRoute';
-import LoginPage from './pages/LoginPage';
-import RegisterPage from './pages/RegisterPage';
-import DashboardPage from './pages/DashboardPage';
+import { createBrowserRouter, Navigate } from "react-router-dom";
+import AppLayout from "./layouts/AppLayout";
+import PrivateRoute from "./components/PrivateRoute";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
+import DashboardPage from "./pages/DashboardPage";
 
 const router = createBrowserRouter([
   // Public routes
-  { path: '/login', element: <LoginPage /> },
-  { path: '/register', element: <RegisterPage /> },
+  { path: "/login", element: <LoginPage /> },
+  { path: "/register", element: <RegisterPage /> },
 
   // Protected routes
   {
@@ -17,7 +17,7 @@ const router = createBrowserRouter([
       {
         element: <AppLayout />,
         children: [
-          { path: '/', element: <DashboardPage /> },
+          { path: "/", element: <DashboardPage /> },
           // More pages will be added here
         ],
       },
@@ -25,7 +25,7 @@ const router = createBrowserRouter([
   },
 
   // Catch-all
-  { path: '*', element: <Navigate to="/" replace /> },
+  { path: "*", element: <Navigate to="/" replace /> },
 ]);
 
 export default router;
