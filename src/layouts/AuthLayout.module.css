@@ -1,0 +1,43 @@
+.wrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #f0f4fb;
+  padding: 1rem;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.logo {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.brandName {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #2563eb;
+  letter-spacing: -0.5px;
+}
+
+.card {
+  width: 100%;
+  max-width: 420px;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(37, 99, 235, 0.1);
+  padding: 2rem 2.5rem;
+}
+
+@media (max-width: 480px) {
+  .card {
+    padding: 1.5rem 1.25rem;
+  }
+}
