@@ -11,7 +11,7 @@ export type InvoiceStatus = "draft" | "sent" | "paid" | "overdue" | "void";
 export type CustomerStatus = "lead" | "active" | "inactive";
 
 export interface User {
-  _id: string;
+  id: string;
   tenantId: string;
   firstName: string;
   lastName: string;
