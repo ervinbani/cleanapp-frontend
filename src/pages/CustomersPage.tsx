@@ -148,11 +148,16 @@ export default function CustomersPage() {
   const displayed = customers.filter((c) => {
     const name = `${c.firstName} ${c.lastName}`.toLowerCase();
     if (colName && !name.includes(colName.toLowerCase())) return false;
-    if (colEmail && !(c.email ?? "").toLowerCase().includes(colEmail.toLowerCase()))
+    if (
+      colEmail &&
+      !(c.email ?? "").toLowerCase().includes(colEmail.toLowerCase())
+    )
       return false;
     if (
       colCountry &&
-      !(c.address?.country ?? "").toLowerCase().includes(colCountry.toLowerCase())
+      !(c.address?.country ?? "")
+        .toLowerCase()
+        .includes(colCountry.toLowerCase())
     )
       return false;
     if (colStatus && c.status !== colStatus) return false;
@@ -173,7 +178,11 @@ export default function CustomersPage() {
       {/* Toolbar: global search + API filters */}
       <div className={styles.toolbar}>
         <div className={styles.searchWrap}>
-          <svg className={styles.searchIcon} viewBox="0 0 20 20" fill="currentColor">
+          <svg
+            className={styles.searchIcon}
+            viewBox="0 0 20 20"
+            fill="currentColor"
+          >
             <path
               fillRule="evenodd"
               d="M9 3a6 6 0 100 12A6 6 0 009 3zM1 9a8 8 0 1114.32 4.906l3.387 3.387a1 1 0 01-1.414 1.414l-3.387-3.387A8 8 0 011 9z"
@@ -318,7 +327,9 @@ export default function CustomersPage() {
                     )}
                   </td>
                   <td>
-                    <span className={`${styles.badge} ${styles[`badge_${c.status}`]}`}>
+                    <span
+                      className={`${styles.badge} ${styles[`badge_${c.status}`]}`}
+                    >
                       {c.status}
                     </span>
                   </td>

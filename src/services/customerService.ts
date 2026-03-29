@@ -29,7 +29,9 @@ export interface CustomersResponse {
 
 export const customerService = {
   getAll: async (params?: CustomersQuery): Promise<CustomersResponse> => {
-    const res = await apiClient.get<CustomersResponse>("/customers", { params });
+    const res = await apiClient.get<CustomersResponse>("/customers", {
+      params,
+    });
     return res.data;
   },
 

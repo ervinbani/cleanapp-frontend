@@ -137,9 +137,14 @@ export default function ServicesPage() {
 
   const displayed = services.filter((s) => {
     const name = (s.name?.[lang] ?? s.name?.en ?? "").toLowerCase();
-    const desc = (s.description?.[lang] ?? s.description?.en ?? "").toLowerCase();
+    const desc = (
+      s.description?.[lang] ??
+      s.description?.en ??
+      ""
+    ).toLowerCase();
     if (colName && !name.includes(colName.toLowerCase())) return false;
-    if (colDescription && !desc.includes(colDescription.toLowerCase())) return false;
+    if (colDescription && !desc.includes(colDescription.toLowerCase()))
+      return false;
     if (colStatus === "active" && !s.isActive) return false;
     if (colStatus === "inactive" && s.isActive) return false;
     return true;
@@ -158,7 +163,11 @@ export default function ServicesPage() {
       {/* Toolbar */}
       <div className={styles.toolbar}>
         <div className={styles.searchWrap}>
-          <svg className={styles.searchIcon} viewBox="0 0 20 20" fill="currentColor">
+          <svg
+            className={styles.searchIcon}
+            viewBox="0 0 20 20"
+            fill="currentColor"
+          >
             <path
               fillRule="evenodd"
               d="M9 3a6 6 0 100 12A6 6 0 009 3zM1 9a8 8 0 1114.32 4.906l3.387 3.387a1 1 0 01-1.414 1.414l-3.387-3.387A8 8 0 011 9z"
@@ -222,11 +231,15 @@ export default function ServicesPage() {
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan={6} className={styles.empty}>{l.loading}</td>
+                <td colSpan={6} className={styles.empty}>
+                  {l.loading}
+                </td>
               </tr>
             ) : displayed.length === 0 ? (
               <tr>
-                <td colSpan={6} className={styles.empty}>{l.noResults}</td>
+                <td colSpan={6} className={styles.empty}>
+                  {l.noResults}
+                </td>
               </tr>
             ) : (
               displayed.map((s) => (
@@ -238,13 +251,17 @@ export default function ServicesPage() {
                     {s.description?.[lang] ?? s.description?.en ?? "—"}
                   </td>
                   <td className={styles.durationCell}>
-                    {s.durationMinutes != null ? `${s.durationMinutes} ${l.min}` : "—"}
+                    {s.durationMinutes != null
+                      ? `${s.durationMinutes} ${l.min}`
+                      : "—"}
                   </td>
                   <td className={styles.priceCell}>
                     {s.basePrice != null ? `$${s.basePrice.toFixed(2)}` : "—"}
                   </td>
                   <td>
-                    <span className={`${styles.badge} ${s.isActive ? styles.badge_active : styles.badge_inactive}`}>
+                    <span
+                      className={`${styles.badge} ${s.isActive ? styles.badge_active : styles.badge_inactive}`}
+                    >
                       {s.isActive ? l.active : l.inactive}
                     </span>
                   </td>
@@ -299,7 +316,9 @@ export default function ServicesPage() {
         <div className={styles.pageNumbers}>
           {pageRange.map((p, i) =>
             p === "…" ? (
-              <span key={`e-${i}`} className={styles.ellipsis}>…</span>
+              <span key={`e-${i}`} className={styles.ellipsis}>
+                …
+              </span>
             ) : (
               <button
                 key={p}
