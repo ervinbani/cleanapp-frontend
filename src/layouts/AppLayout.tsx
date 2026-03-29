@@ -6,6 +6,7 @@ import styles from "./AppLayout.module.css";
 
 const navItems = [
   { path: "/", label: "Dashboard", labelEs: "Inicio", icon: "⊞" },
+  { path: "/users", label: "Users", labelEs: "Usuarios", icon: "👥" },
   { path: "/customers", label: "Clients", labelEs: "Clientes", icon: "👤" },
   { path: "/jobs", label: "Jobs", labelEs: "Trabajos", icon: "🧹" },
   { path: "/services", label: "Services", labelEs: "Servicios", icon: "✨" },

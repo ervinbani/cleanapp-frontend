@@ -6,6 +6,7 @@ import RegisterPage from "./pages/RegisterPage";
 import DashboardPage from "./pages/DashboardPage";
 import CustomersPage from "./pages/CustomersPage";
 import ServicesPage from "./pages/ServicesPage";
+import UsersPage from "./pages/UsersPage";
 
 const router = createBrowserRouter([
   // Public routes
@@ -20,6 +21,7 @@ const router = createBrowserRouter([
         element: <AppLayout />,
         children: [
           { path: "/", element: <DashboardPage /> },
+          { path: "/users", element: <UsersPage /> },
           { path: "/customers", element: <CustomersPage /> },
           { path: "/services", element: <ServicesPage /> },
         ],

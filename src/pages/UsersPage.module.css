@@ -1,0 +1,356 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  height: 100%;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+
+.title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+}
+
+.addBtn {
+  padding: 0.55rem 1.1rem;
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+
+.addBtn:hover {
+  background: #1d4ed8;
+}
+
+/* ─── Toolbar ─────────────────────────────────────────────────── */
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+}
+
+.searchWrap {
+  position: relative;
+  flex: 1;
+  min-width: 220px;
+  max-width: 380px;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 0.7rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  color: #9ca3af;
+  pointer-events: none;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 0.5rem 0.75rem 0.5rem 2.2rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  color: #374151;
+  background: #fff;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.15s;
+}
+
+.searchInput:focus {
+  border-color: #2563eb;
+}
+
+.filterSelect {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  color: #374151;
+  background: #fff;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+.filterSelect:focus {
+  border-color: #2563eb;
+}
+
+/* ─── Table ───────────────────────────────────────────────────── */
+.tableWrap {
+  flex: 1;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  overflow: auto;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.headRow th {
+  padding: 0.75rem 1rem 0.4rem;
+  text-align: left;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: #f9fafb;
+  border-bottom: 1px solid #f0f0f0;
+  white-space: nowrap;
+}
+
+.filterRow th {
+  padding: 0.35rem 0.6rem 0.55rem;
+  background: #f9fafb;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.colFilter {
+  width: 100%;
+  padding: 0.3rem 0.5rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  color: #374151;
+  background: #fff;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.15s;
+}
+
+.colFilter:focus {
+  border-color: #2563eb;
+}
+
+.bodyRow td {
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid #f3f4f6;
+  color: #374151;
+  vertical-align: middle;
+}
+
+.bodyRow:last-child td {
+  border-bottom: none;
+}
+
+.bodyRow:hover td {
+  background: #f8faff;
+}
+
+/* ─── Avatar row ──────────────────────────────────────────────── */
+.avatarRow {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-weight: 600;
+  color: #111827;
+  white-space: nowrap;
+}
+
+.avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #2563eb;
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+.nameCell {
+  white-space: nowrap;
+}
+
+.emailCell {
+  color: #6b7280;
+}
+
+.phoneCell {
+  color: #6b7280;
+  white-space: nowrap;
+}
+
+.dateCell {
+  color: #9ca3af;
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+.empty {
+  text-align: center;
+  padding: 2.5rem !important;
+  color: #9ca3af;
+  font-size: 0.9rem;
+}
+
+/* ─── Role badges ─────────────────────────────────────────────── */
+.roleBadge {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.role_owner   { background: #ede9fe; color: #5b21b6; }
+.role_manager { background: #dbeafe; color: #1e40af; }
+.role_staff   { background: #fef3c7; color: #92400e; }
+.role_cleaner { background: #d1fae5; color: #065f46; }
+
+/* ─── Status badges ───────────────────────────────────────────── */
+.badge {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.badge_active   { background: #d1fae5; color: #065f46; }
+.badge_inactive { background: #f3f4f6; color: #6b7280; }
+
+/* ─── Actions ─────────────────────────────────────────────────── */
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.btnView, .btnUpdate, .btnDelete {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.3rem 0.65rem;
+  border-radius: 6px;
+  border: 1px solid;
+  font-size: 0.78rem;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s, color 0.15s;
+}
+
+.btnView svg, .btnUpdate svg, .btnDelete svg {
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+}
+
+.btnView   { background: #fff; border-color: #d1d5db; color: #374151; }
+.btnView:hover { background: #f3f4f6; }
+
+.btnUpdate { background: #fff; border-color: #d1d5db; color: #374151; }
+.btnUpdate:hover { background: #f3f4f6; }
+
+.btnDelete { background: #fff; border-color: #fca5a5; color: #ef4444; padding: 0.3rem 0.5rem; }
+.btnDelete:hover { background: #fef2f2; }
+
+/* ─── Pagination ──────────────────────────────────────────────── */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+  padding-bottom: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.pageBtn {
+  padding: 0.4rem 0.85rem;
+  border: 1px solid #d1d5db;
+  border-radius: 7px;
+  background: #fff;
+  color: #374151;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.pageBtn:hover:not(:disabled) {
+  background: #eff6ff;
+  color: #2563eb;
+  border-color: #93c5fd;
+}
+
+.pageBtn:disabled { opacity: 0.4; cursor: default; }
+
+.pageNumbers {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.pageNum {
+  min-width: 32px;
+  height: 32px;
+  padding: 0 0.35rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  background: #fff;
+  color: #374151;
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.pageNum:hover {
+  background: #eff6ff;
+  color: #2563eb;
+  border-color: #93c5fd;
+}
+
+.pageNumActive {
+  background: #2563eb !important;
+  color: #fff !important;
+  border-color: #2563eb !important;
+  font-weight: 700;
+}
+
+.ellipsis {
+  padding: 0 0.25rem;
+  color: #9ca3af;
+  font-size: 0.85rem;
+  user-select: none;
+}
+
+.pageInfo {
+  font-size: 0.8rem;
+  color: #9ca3af;
+  margin-left: 0.5rem;
+}
