@@ -4,6 +4,8 @@ import PrivateRoute from "./components/PrivateRoute";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import DashboardPage from "./pages/DashboardPage";
+import CustomersPage from "./pages/CustomersPage";
+import ServicesPage from "./pages/ServicesPage";
 
 const router = createBrowserRouter([
   // Public routes
@@ -18,7 +20,8 @@ const router = createBrowserRouter([
         element: <AppLayout />,
         children: [
           { path: "/", element: <DashboardPage /> },
-          // More pages will be added here
+          { path: "/customers", element: <CustomersPage /> },
+          { path: "/services", element: <ServicesPage /> },
         ],
       },
     ],

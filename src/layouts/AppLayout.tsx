@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import { useLang } from "../contexts/LangContext";
 import styles from "./AppLayout.module.css";
 
 const navItems = [
   { path: "/", label: "Dashboard", labelEs: "Inicio", icon: "⊞" },
   { path: "/customers", label: "Clients", labelEs: "Clientes", icon: "👤" },
   { path: "/jobs", label: "Jobs", labelEs: "Trabajos", icon: "🧹" },
+  { path: "/services", label: "Services", labelEs: "Servicios", icon: "✨" },
   { path: "/calendar", label: "Calendar", labelEs: "Calendario", icon: "📅" },
   { path: "/invoices", label: "Invoices", labelEs: "Facturas", icon: "✉️" },
   { path: "/messages", label: "Messages", labelEs: "Mensajes", icon: "💬" },
@@ -21,7 +23,7 @@ const navItems = [
 export default function AppLayout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const [lang, setLang] = useState<"en" | "es">("en");
+  const { lang, setLang } = useLang();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const handleLogout = () => {
