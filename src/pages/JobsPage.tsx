@@ -186,7 +186,10 @@ export default function JobsPage() {
   };
 
   const displayed = jobs.filter((j) => {
-    if (colTitle && !(j.title ?? "").toLowerCase().includes(colTitle.toLowerCase()))
+    if (
+      colTitle &&
+      !(j.title ?? "").toLowerCase().includes(colTitle.toLowerCase())
+    )
       return false;
     const customer = getCustomer(j);
     const customerName = customer
@@ -211,7 +214,11 @@ export default function JobsPage() {
       {/* Toolbar */}
       <div className={styles.toolbar}>
         <div className={styles.searchWrap}>
-          <svg className={styles.searchIcon} viewBox="0 0 20 20" fill="currentColor">
+          <svg
+            className={styles.searchIcon}
+            viewBox="0 0 20 20"
+            fill="currentColor"
+          >
             <path
               fillRule="evenodd"
               d="M9 3a6 6 0 100 12A6 6 0 009 3zM1 9a8 8 0 1114.32 4.906l3.387 3.387a1 1 0 01-1.414 1.414l-3.387-3.387A8 8 0 011 9z"
@@ -400,7 +407,7 @@ export default function JobsPage() {
               >
                 {p}
               </button>
-            )
+            ),
           )}
         </div>
         <button
