@@ -158,9 +158,15 @@ export default function UsersPage() {
   const displayed = users.filter((u) => {
     const name = `${u.firstName} ${u.lastName}`.toLowerCase();
     if (colName && !name.includes(colName.toLowerCase())) return false;
-    if (colEmail && !(u.email ?? "").toLowerCase().includes(colEmail.toLowerCase()))
+    if (
+      colEmail &&
+      !(u.email ?? "").toLowerCase().includes(colEmail.toLowerCase())
+    )
       return false;
-    if (colPhone && !(u.phone ?? "").toLowerCase().includes(colPhone.toLowerCase()))
+    if (
+      colPhone &&
+      !(u.phone ?? "").toLowerCase().includes(colPhone.toLowerCase())
+    )
       return false;
     if (colRole && u.role !== colRole) return false;
     if (colStatus === "active" && !u.isActive) return false;
@@ -181,7 +187,11 @@ export default function UsersPage() {
       {/* Toolbar */}
       <div className={styles.toolbar}>
         <div className={styles.searchWrap}>
-          <svg className={styles.searchIcon} viewBox="0 0 20 20" fill="currentColor">
+          <svg
+            className={styles.searchIcon}
+            viewBox="0 0 20 20"
+            fill="currentColor"
+          >
             <path
               fillRule="evenodd"
               d="M9 3a6 6 0 100 12A6 6 0 009 3zM1 9a8 8 0 1114.32 4.906l3.387 3.387a1 1 0 01-1.414 1.414l-3.387-3.387A8 8 0 011 9z"
@@ -280,11 +290,15 @@ export default function UsersPage() {
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan={7} className={styles.empty}>{l.loading}</td>
+                <td colSpan={7} className={styles.empty}>
+                  {l.loading}
+                </td>
               </tr>
             ) : displayed.length === 0 ? (
               <tr>
-                <td colSpan={7} className={styles.empty}>{l.noResults}</td>
+                <td colSpan={7} className={styles.empty}>
+                  {l.noResults}
+                </td>
               </tr>
             ) : (
               displayed.map((u) => (
@@ -292,7 +306,8 @@ export default function UsersPage() {
                   <td className={styles.nameCell}>
                     <div className={styles.avatarRow}>
                       <span className={styles.avatar}>
-                        {u.firstName[0]}{u.lastName[0]}
+                        {u.firstName[0]}
+                        {u.lastName[0]}
                       </span>
                       {u.firstName} {u.lastName}
                     </div>
@@ -300,12 +315,16 @@ export default function UsersPage() {
                   <td className={styles.emailCell}>{u.email}</td>
                   <td className={styles.phoneCell}>{u.phone ?? "—"}</td>
                   <td>
-                    <span className={`${styles.roleBadge} ${styles[`role_${u.role}`]}`}>
+                    <span
+                      className={`${styles.roleBadge} ${styles[`role_${u.role}`]}`}
+                    >
                       {u.role}
                     </span>
                   </td>
                   <td>
-                    <span className={`${styles.badge} ${u.isActive ? styles.badge_active : styles.badge_inactive}`}>
+                    <span
+                      className={`${styles.badge} ${u.isActive ? styles.badge_active : styles.badge_inactive}`}
+                    >
                       {u.isActive ? l.active : l.inactive}
                     </span>
                   </td>
@@ -363,7 +382,9 @@ export default function UsersPage() {
         <div className={styles.pageNumbers}>
           {pageRange.map((p, i) =>
             p === "…" ? (
-              <span key={`e-${i}`} className={styles.ellipsis}>…</span>
+              <span key={`e-${i}`} className={styles.ellipsis}>
+                …
+              </span>
             ) : (
               <button
                 key={p}

@@ -225,10 +225,22 @@
   text-transform: capitalize;
 }
 
-.role_owner   { background: #ede9fe; color: #5b21b6; }
-.role_manager { background: #dbeafe; color: #1e40af; }
-.role_staff   { background: #fef3c7; color: #92400e; }
-.role_cleaner { background: #d1fae5; color: #065f46; }
+.role_owner {
+  background: #ede9fe;
+  color: #5b21b6;
+}
+.role_manager {
+  background: #dbeafe;
+  color: #1e40af;
+}
+.role_staff {
+  background: #fef3c7;
+  color: #92400e;
+}
+.role_cleaner {
+  background: #d1fae5;
+  color: #065f46;
+}
 
 /* ─── Status badges ───────────────────────────────────────────── */
 .badge {
@@ -239,8 +251,14 @@
   font-weight: 600;
 }
 
-.badge_active   { background: #d1fae5; color: #065f46; }
-.badge_inactive { background: #f3f4f6; color: #6b7280; }
+.badge_active {
+  background: #d1fae5;
+  color: #065f46;
+}
+.badge_inactive {
+  background: #f3f4f6;
+  color: #6b7280;
+}
 
 /* ─── Actions ─────────────────────────────────────────────────── */
 .actions {
@@ -249,7 +267,9 @@
   gap: 0.4rem;
 }
 
-.btnView, .btnUpdate, .btnDelete {
+.btnView,
+.btnUpdate,
+.btnDelete {
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;
@@ -260,23 +280,46 @@
   font-weight: 500;
   cursor: pointer;
   white-space: nowrap;
-  transition: background 0.15s, color 0.15s;
+  transition:
+    background 0.15s,
+    color 0.15s;
 }
 
-.btnView svg, .btnUpdate svg, .btnDelete svg {
+.btnView svg,
+.btnUpdate svg,
+.btnDelete svg {
   width: 13px;
   height: 13px;
   flex-shrink: 0;
 }
 
-.btnView   { background: #fff; border-color: #d1d5db; color: #374151; }
-.btnView:hover { background: #f3f4f6; }
+.btnView {
+  background: #fff;
+  border-color: #d1d5db;
+  color: #374151;
+}
+.btnView:hover {
+  background: #f3f4f6;
+}
 
-.btnUpdate { background: #fff; border-color: #d1d5db; color: #374151; }
-.btnUpdate:hover { background: #f3f4f6; }
+.btnUpdate {
+  background: #fff;
+  border-color: #d1d5db;
+  color: #374151;
+}
+.btnUpdate:hover {
+  background: #f3f4f6;
+}
 
-.btnDelete { background: #fff; border-color: #fca5a5; color: #ef4444; padding: 0.3rem 0.5rem; }
-.btnDelete:hover { background: #fef2f2; }
+.btnDelete {
+  background: #fff;
+  border-color: #fca5a5;
+  color: #ef4444;
+  padding: 0.3rem 0.5rem;
+}
+.btnDelete:hover {
+  background: #fef2f2;
+}
 
 /* ─── Pagination ──────────────────────────────────────────────── */
 .pagination {
@@ -298,7 +341,9 @@
   font-size: 0.82rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.15s, color 0.15s;
+  transition:
+    background 0.15s,
+    color 0.15s;
 }
 
 .pageBtn:hover:not(:disabled) {
@@ -307,7 +352,10 @@
   border-color: #93c5fd;
 }
 
-.pageBtn:disabled { opacity: 0.4; cursor: default; }
+.pageBtn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
 
 .pageNumbers {
   display: flex;
@@ -326,7 +374,10 @@
   font-size: 0.82rem;
   font-weight: 500;
   cursor: pointer;
-  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  transition:
+    background 0.15s,
+    color 0.15s,
+    border-color 0.15s;
 }
 
 .pageNum:hover {
