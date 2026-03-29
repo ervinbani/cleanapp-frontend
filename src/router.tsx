@@ -7,6 +7,7 @@ import DashboardPage from "./pages/DashboardPage";
 import CustomersPage from "./pages/CustomersPage";
 import ServicesPage from "./pages/ServicesPage";
 import UsersPage from "./pages/UsersPage";
+import JobsPage from "./pages/JobsPage";
 
 const router = createBrowserRouter([
   // Public routes
@@ -23,6 +24,7 @@ const router = createBrowserRouter([
           { path: "/", element: <DashboardPage /> },
           { path: "/users", element: <UsersPage /> },
           { path: "/customers", element: <CustomersPage /> },
+          { path: "/jobs", element: <JobsPage /> },
           { path: "/services", element: <ServicesPage /> },
         ],
       },
