@@ -185,7 +185,9 @@ function jobToForm(j: Job): JobForm {
       : j.serviceId
     : "";
   const assignedUserIds = j.assignedUsers.map((u) =>
-    typeof u === "object" ? (u as User & { _id?: string }).id ?? (u as User & { _id: string })._id : u,
+    typeof u === "object"
+      ? ((u as User & { _id?: string }).id ?? (u as User & { _id: string })._id)
+      : u,
   );
   return {
     customerId,
@@ -336,12 +338,8 @@ function JobModal({ job, lang, onClose, onSaved }: JobModalProps) {
       apiClient.get("/users", { params: { limit: 200 } }),
     ])
       .then(([c, s, u]) => {
-        setCustomers(
-          (c.data as { data: DropdownCustomer[] }).data ?? [],
-        );
-        setServices(
-          (s.data as { data: DropdownService[] }).data ?? [],
-        );
+        setCustomers((c.data as { data: DropdownCustomer[] }).data ?? []);
+        setServices((s.data as { data: DropdownService[] }).data ?? []);
         setUsers(
           ((u.data as { data: DropdownUser[] }).data ?? []).filter(
             (usr) => usr.isActive,
@@ -527,9 +525,7 @@ function JobModal({ job, lang, onClose, onSaved }: JobModalProps) {
                 <select
                   className={styles.input}
                   value={form.status}
-                  onChange={(e) =>
-                    set("status", e.target.value as JobStatus)
-                  }
+                  onChange={(e) => set("status", e.target.value as JobStatus)}
                 >
                   {JOB_STATUSES.map((s) => (
                     <option key={s} value={s}>
