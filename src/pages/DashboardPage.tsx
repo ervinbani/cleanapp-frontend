@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import styles from "./DashboardPage.module.css";
 import { customerService } from "../services/customerService";
 import { jobService } from "../services/jobService";
@@ -22,6 +23,7 @@ const t = {
 
 export default function DashboardPage() {
   const { lang } = useLang();
+  const navigate = useNavigate();
   const [totalClients, setTotalClients] = useState<number | null>(null);
   const [totalJobs, setTotalJobs] = useState<number | null>(null);
   const [totalServices, setTotalServices] = useState<number | null>(null);
@@ -52,19 +54,19 @@ export default function DashboardPage() {
       <h2 className={styles.heading}>{labels.heading}</h2>
 
       <div className={styles.statsRow}>
-        <div className={styles.statCard}>
+        <div className={styles.statCard} onClick={() => navigate("/customers")} role="button" tabIndex={0} onKeyDown={(e) => e.key === "Enter" && navigate("/customers")}>
           <span className={styles.statLabel}>{labels.totalClients}</span>
           <span className={styles.statValue}>
             {totalClients === null ? "—" : totalClients}
           </span>
         </div>
-        <div className={styles.statCard}>
+        <div className={styles.statCard} onClick={() => navigate("/jobs")} role="button" tabIndex={0} onKeyDown={(e) => e.key === "Enter" && navigate("/jobs")}>
           <span className={styles.statLabel}>{labels.totalJobs}</span>
           <span className={styles.statValue}>
             {totalJobs === null ? "—" : totalJobs}
           </span>
         </div>
-        <div className={styles.statCard}>
+        <div className={styles.statCard} onClick={() => navigate("/services")} role="button" tabIndex={0} onKeyDown={(e) => e.key === "Enter" && navigate("/services")}>
           <span className={styles.statLabel}>{labels.totalServices}</span>
           <span className={styles.statValue}>
             {totalServices === null ? "—" : totalServices}

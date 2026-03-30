@@ -34,6 +34,18 @@
   gap: 0.4rem;
   min-width: 200px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s, transform 0.1s;
+}
+
+.statCard:hover {
+  border-color: #93c5fd;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
+  transform: translateY(-2px);
+}
+
+.statCard:active {
+  transform: translateY(0);
 }
 
 .statLabel {
