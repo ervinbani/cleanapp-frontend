@@ -54,19 +54,37 @@ export default function DashboardPage() {
       <h2 className={styles.heading}>{labels.heading}</h2>
 
       <div className={styles.statsRow}>
-        <div className={styles.statCard} onClick={() => navigate("/customers")} role="button" tabIndex={0} onKeyDown={(e) => e.key === "Enter" && navigate("/customers")}>
+        <div
+          className={styles.statCard}
+          onClick={() => navigate("/customers")}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => e.key === "Enter" && navigate("/customers")}
+        >
           <span className={styles.statLabel}>{labels.totalClients}</span>
           <span className={styles.statValue}>
             {totalClients === null ? "—" : totalClients}
           </span>
         </div>
-        <div className={styles.statCard} onClick={() => navigate("/jobs")} role="button" tabIndex={0} onKeyDown={(e) => e.key === "Enter" && navigate("/jobs")}>
+        <div
+          className={styles.statCard}
+          onClick={() => navigate("/jobs")}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => e.key === "Enter" && navigate("/jobs")}
+        >
           <span className={styles.statLabel}>{labels.totalJobs}</span>
           <span className={styles.statValue}>
             {totalJobs === null ? "—" : totalJobs}
           </span>
         </div>
-        <div className={styles.statCard} onClick={() => navigate("/services")} role="button" tabIndex={0} onKeyDown={(e) => e.key === "Enter" && navigate("/services")}>
+        <div
+          className={styles.statCard}
+          onClick={() => navigate("/services")}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => e.key === "Enter" && navigate("/services")}
+        >
           <span className={styles.statLabel}>{labels.totalServices}</span>
           <span className={styles.statValue}>
             {totalServices === null ? "—" : totalServices}
