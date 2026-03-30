@@ -129,7 +129,11 @@ function AddUserModal({ lang, onClose, onSaved }: AddUserModalProps) {
             <h3 className={styles.modalTitle}>{ml2.title}</h3>
             <p className={styles.modalSubtitle}>{ml2.subtitle}</p>
           </div>
-          <button className={styles.modalClose} onClick={onClose} aria-label="Close">
+          <button
+            className={styles.modalClose}
+            onClick={onClose}
+            aria-label="Close"
+          >
             ✕
           </button>
         </div>
@@ -247,7 +251,12 @@ function AddUserModal({ lang, onClose, onSaved }: AddUserModalProps) {
           <div className={styles.toggleRow}>
             <div className={styles.toggleInfo}>
               <span className={styles.label}>{ml2.activeUser}</span>
-              <span className={styles.toggleInfoIcon} title="User can log in when active">ⓘ</span>
+              <span
+                className={styles.toggleInfoIcon}
+                title="User can log in when active"
+              >
+                ⓘ
+              </span>
             </div>
             <button
               type="button"
@@ -263,7 +272,11 @@ function AddUserModal({ lang, onClose, onSaved }: AddUserModalProps) {
 
           {/* Footer buttons */}
           <div className={styles.modalFooter}>
-            <button type="button" className={styles.btnCancel} onClick={onClose}>
+            <button
+              type="button"
+              className={styles.btnCancel}
+              onClick={onClose}
+            >
               {ml2.cancel}
             </button>
             <button type="submit" className={styles.btnSave} disabled={saving}>
@@ -393,7 +406,11 @@ function EditUserModal({ user, lang, onClose, onSaved }: EditUserModalProps) {
             <h3 className={styles.modalTitle}>{ml2.title}</h3>
             <p className={styles.modalSubtitle}>{ml2.subtitle}</p>
           </div>
-          <button className={styles.modalClose} onClick={onClose} aria-label="Close">
+          <button
+            className={styles.modalClose}
+            onClick={onClose}
+            aria-label="Close"
+          >
             ✕
           </button>
         </div>
@@ -511,7 +528,12 @@ function EditUserModal({ user, lang, onClose, onSaved }: EditUserModalProps) {
           <div className={styles.toggleRow}>
             <div className={styles.toggleInfo}>
               <span className={styles.label}>{ml2.activeUser}</span>
-              <span className={styles.toggleInfoIcon} title="User can log in when active">ⓘ</span>
+              <span
+                className={styles.toggleInfoIcon}
+                title="User can log in when active"
+              >
+                ⓘ
+              </span>
             </div>
             <button
               type="button"
@@ -526,7 +548,11 @@ function EditUserModal({ user, lang, onClose, onSaved }: EditUserModalProps) {
           {error && <p className={styles.errorMsg}>{error}</p>}
 
           <div className={styles.modalFooter}>
-            <button type="button" className={styles.btnCancel} onClick={onClose}>
+            <button
+              type="button"
+              className={styles.btnCancel}
+              onClick={onClose}
+            >
               {ml2.cancel}
             </button>
             <button type="submit" className={styles.btnSave} disabled={saving}>
@@ -717,7 +743,10 @@ export default function UsersPage() {
         <AddUserModal
           lang={lang}
           onClose={() => setShowAddModal(false)}
-          onSaved={() => { setShowAddModal(false); fetchUsers(); }}
+          onSaved={() => {
+            setShowAddModal(false);
+            fetchUsers();
+          }}
         />
       )}
       {editingUser && canWrite && (
@@ -725,7 +754,10 @@ export default function UsersPage() {
           user={editingUser}
           lang={lang}
           onClose={() => setEditingUser(null)}
-          onSaved={() => { setEditingUser(null); fetchUsers(); }}
+          onSaved={() => {
+            setEditingUser(null);
+            fetchUsers();
+          }}
         />
       )}
 
@@ -733,7 +765,10 @@ export default function UsersPage() {
       <div className={styles.header}>
         <h2 className={styles.title}>{l.title}</h2>
         {canWrite && (
-          <button className={styles.addBtn} onClick={() => setShowAddModal(true)}>
+          <button
+            className={styles.addBtn}
+            onClick={() => setShowAddModal(true)}
+          >
             {l.addUser}
           </button>
         )}
@@ -895,7 +930,10 @@ export default function UsersPage() {
                         {l.btnView}
                       </button>
                       {canWrite && (
-                        <button className={styles.btnUpdate} onClick={() => setEditingUser(u)}>
+                        <button
+                          className={styles.btnUpdate}
+                          onClick={() => setEditingUser(u)}
+                        >
                           <svg viewBox="0 0 20 20" fill="currentColor">
                             <path d="M13.586 3.586a2 2 0 112.828 2.828l-9.5 9.5A2 2 0 015.5 16.5H4a1 1 0 01-1-1v-1.5a2 2 0 01.586-1.414l9.5-9.5z" />
                           </svg>
