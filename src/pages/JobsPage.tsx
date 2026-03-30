@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useLang } from "../contexts/LangContext";
 import { useAuth } from "../contexts/AuthContext";
 import { jobService } from "../services/jobService";
+import apiClient from "../services/apiClient";
 import type { Job, JobStatus, Customer, Service, User } from "../types";
 import styles from "./JobsPage.module.css";
 
@@ -124,6 +125,586 @@ const t = {
   },
 };
 
+// ── Job Modal ────────────────────────────────────────────────────────────
+interface ChecklistItem {
+  labelEn: string;
+  labelEs: string;
+}
+
+interface JobForm {
+  customerId: string;
+  serviceId: string;
+  title: string;
+  scheduledStart: string;
+  scheduledEnd: string;
+  status: JobStatus;
+  price: string;
+  assignedUsers: string[];
+  notesInternal: string;
+  notesCustomer: string;
+  street: string;
+  city: string;
+  state: string;
+  zipCode: string;
+  country: string;
+  checklist: ChecklistItem[];
+}
+
+const EMPTY_JOB_FORM: JobForm = {
+  customerId: "",
+  serviceId: "",
+  title: "",
+  scheduledStart: "",
+  scheduledEnd: "",
+  status: "scheduled",
+  price: "",
+  assignedUsers: [],
+  notesInternal: "",
+  notesCustomer: "",
+  street: "",
+  city: "",
+  state: "",
+  zipCode: "",
+  country: "",
+  checklist: [],
+};
+
+function isoToLocal(iso: string): string {
+  if (!iso) return "";
+  return iso.slice(0, 16);
+}
+
+function jobToForm(j: Job): JobForm {
+  const customerId =
+    typeof j.customerId === "object"
+      ? (j.customerId as Customer)._id
+      : j.customerId;
+  const serviceId = j.serviceId
+    ? typeof j.serviceId === "object"
+      ? (j.serviceId as Service)._id
+      : j.serviceId
+    : "";
+  const assignedUserIds = j.assignedUsers.map((u) =>
+    typeof u === "object" ? (u as User & { _id?: string }).id ?? (u as User & { _id: string })._id : u,
+  );
+  return {
+    customerId,
+    serviceId,
+    title: j.title ?? "",
+    scheduledStart: isoToLocal(j.scheduledStart),
+    scheduledEnd: j.scheduledEnd ? isoToLocal(j.scheduledEnd) : "",
+    status: j.status,
+    price: j.price != null ? String(j.price) : "",
+    assignedUsers: assignedUserIds,
+    notesInternal: j.notesInternal ?? "",
+    notesCustomer: j.notesCustomer ?? "",
+    street: j.propertyAddress?.street ?? "",
+    city: j.propertyAddress?.city ?? "",
+    state: j.propertyAddress?.state ?? "",
+    zipCode: j.propertyAddress?.zipCode ?? "",
+    country: j.propertyAddress?.country ?? "",
+    checklist: j.checklist.map((item) => ({
+      labelEn: item.label.en,
+      labelEs: item.label.es,
+    })),
+  };
+}
+
+const JOB_STATUSES: JobStatus[] = [
+  "scheduled",
+  "confirmed",
+  "in_progress",
+  "completed",
+  "canceled",
+  "no_show",
+];
+
+const STATUS_LABELS: Record<JobStatus, { en: string; es: string }> = {
+  scheduled: { en: "Scheduled", es: "Programado" },
+  confirmed: { en: "Confirmed", es: "Confirmado" },
+  in_progress: { en: "In Progress", es: "En Progreso" },
+  completed: { en: "Completed", es: "Completado" },
+  canceled: { en: "Canceled", es: "Cancelado" },
+  no_show: { en: "No Show", es: "No Presentado" },
+};
+
+const jmT = {
+  en: {
+    addTitle: "Add Job",
+    editTitle: "Edit Job",
+    titleField: "Title",
+    customer: "Customer *",
+    service: "Service",
+    selectCustomer: "— Select customer —",
+    selectService: "— None —",
+    scheduledStart: "Scheduled Start *",
+    scheduledEnd: "Scheduled End",
+    status: "Status",
+    price: "Price ($)",
+    assignedUsers: "Assigned To",
+    notesInternal: "Internal Notes",
+    notesCustomer: "Customer Notes",
+    addressSection: "Property Address",
+    street: "Street",
+    city: "City",
+    stateLabel: "State",
+    zipCode: "Zip Code",
+    country: "Country",
+    checklistSection: "Checklist",
+    checkItemEn: "Label (EN)",
+    checkItemEs: "Label (ES)",
+    addItem: "+ Add Item",
+    cancel: "Cancel",
+    save: "Save",
+    update: "Update",
+    required: "Customer and Scheduled Start are required.",
+    loadingOpts: "Loading options…",
+  },
+  es: {
+    addTitle: "Agregar Trabajo",
+    editTitle: "Editar Trabajo",
+    titleField: "Título",
+    customer: "Cliente *",
+    service: "Servicio",
+    selectCustomer: "— Seleccionar cliente —",
+    selectService: "— Ninguno —",
+    scheduledStart: "Inicio Programado *",
+    scheduledEnd: "Fin Programado",
+    status: "Estado",
+    price: "Precio ($)",
+    assignedUsers: "Asignado a",
+    notesInternal: "Notas Internas",
+    notesCustomer: "Notas para el Cliente",
+    addressSection: "Dirección de la Propiedad",
+    street: "Calle",
+    city: "Ciudad",
+    stateLabel: "Estado/Provincia",
+    zipCode: "Código Postal",
+    country: "País",
+    checklistSection: "Lista de Verificación",
+    checkItemEn: "Etiqueta (EN)",
+    checkItemEs: "Etiqueta (ES)",
+    addItem: "+ Agregar Elemento",
+    cancel: "Cancelar",
+    save: "Guardar",
+    update: "Actualizar",
+    required: "El cliente y la fecha de inicio son obligatorios.",
+    loadingOpts: "Cargando opciones…",
+  },
+};
+
+interface DropdownCustomer {
+  _id: string;
+  firstName: string;
+  lastName: string;
+}
+interface DropdownService {
+  _id: string;
+  name: { en: string; es: string };
+}
+interface DropdownUser {
+  _id: string;
+  firstName: string;
+  lastName: string;
+  isActive: boolean;
+}
+
+interface JobModalProps {
+  job?: Job;
+  lang: "en" | "es";
+  onClose: () => void;
+  onSaved: () => void;
+}
+
+function JobModal({ job, lang, onClose, onSaved }: JobModalProps) {
+  const isEdit = !!job;
+  const l = jmT[lang];
+  const [form, setForm] = useState<JobForm>(
+    isEdit ? jobToForm(job!) : EMPTY_JOB_FORM,
+  );
+  const [error, setError] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [customers, setCustomers] = useState<DropdownCustomer[]>([]);
+  const [services, setServices] = useState<DropdownService[]>([]);
+  const [users, setUsers] = useState<DropdownUser[]>([]);
+  const [loadingOptions, setLoadingOptions] = useState(true);
+
+  useEffect(() => {
+    Promise.all([
+      apiClient.get("/customers", { params: { limit: 200 } }),
+      apiClient.get("/services", { params: { limit: 200 } }),
+      apiClient.get("/users", { params: { limit: 200 } }),
+    ])
+      .then(([c, s, u]) => {
+        setCustomers(
+          (c.data as { data: DropdownCustomer[] }).data ?? [],
+        );
+        setServices(
+          (s.data as { data: DropdownService[] }).data ?? [],
+        );
+        setUsers(
+          ((u.data as { data: DropdownUser[] }).data ?? []).filter(
+            (usr) => usr.isActive,
+          ),
+        );
+      })
+      .catch(() => {})
+      .finally(() => setLoadingOptions(false));
+  }, []);
+
+  const set = <K extends keyof JobForm>(field: K, value: JobForm[K]) =>
+    setForm((prev) => ({ ...prev, [field]: value }));
+
+  const toggleUser = (id: string) =>
+    setForm((prev) => ({
+      ...prev,
+      assignedUsers: prev.assignedUsers.includes(id)
+        ? prev.assignedUsers.filter((u) => u !== id)
+        : [...prev.assignedUsers, id],
+    }));
+
+  const addChecklistItem = () =>
+    setForm((prev) => ({
+      ...prev,
+      checklist: [...prev.checklist, { labelEn: "", labelEs: "" }],
+    }));
+
+  const updateChecklistItem = (
+    idx: number,
+    field: "labelEn" | "labelEs",
+    value: string,
+  ) =>
+    setForm((prev) => ({
+      ...prev,
+      checklist: prev.checklist.map((item, i) =>
+        i === idx ? { ...item, [field]: value } : item,
+      ),
+    }));
+
+  const removeChecklistItem = (idx: number) =>
+    setForm((prev) => ({
+      ...prev,
+      checklist: prev.checklist.filter((_, i) => i !== idx),
+    }));
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!form.customerId || !form.scheduledStart) {
+      setError(l.required);
+      return;
+    }
+    setSaving(true);
+    setError("");
+    try {
+      const payload = {
+        customerId: form.customerId,
+        serviceId: form.serviceId || undefined,
+        title: form.title.trim() || undefined,
+        scheduledStart: new Date(form.scheduledStart).toISOString(),
+        scheduledEnd: form.scheduledEnd
+          ? new Date(form.scheduledEnd).toISOString()
+          : undefined,
+        status: form.status,
+        price: form.price !== "" ? Number(form.price) : undefined,
+        assignedUsers: form.assignedUsers,
+        notesInternal: form.notesInternal.trim() || undefined,
+        notesCustomer: form.notesCustomer.trim() || undefined,
+        propertyAddress: {
+          street: form.street.trim() || undefined,
+          city: form.city.trim() || undefined,
+          state: form.state.trim() || undefined,
+          zipCode: form.zipCode.trim() || undefined,
+          country: form.country.trim() || undefined,
+        },
+        checklist: form.checklist
+          .filter((item) => item.labelEn.trim() || item.labelEs.trim())
+          .map((item) => ({
+            label: { en: item.labelEn.trim(), es: item.labelEs.trim() },
+            completed: false,
+          })),
+      };
+      if (isEdit) {
+        await jobService.update(job!._id, payload);
+      } else {
+        await jobService.create(payload);
+      }
+      onSaved();
+    } catch (err: unknown) {
+      const msg =
+        (err as { response?: { data?: { error?: string } } })?.response?.data
+          ?.error ?? "Error saving job.";
+      setError(msg);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className={styles.modalOverlay} onClick={onClose}>
+      <div
+        className={`${styles.modal} ${styles.modalLarge}`}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <h3 className={styles.modalTitle}>
+          {isEdit ? l.editTitle : l.addTitle}
+        </h3>
+        {loadingOptions ? (
+          <p className={styles.modalLoading}>{l.loadingOpts}</p>
+        ) : (
+          <form onSubmit={handleSubmit}>
+            {/* Customer + Service */}
+            <div className={styles.formRow}>
+              <div className={styles.formGroup}>
+                <label className={styles.label}>{l.customer}</label>
+                <select
+                  className={styles.input}
+                  value={form.customerId}
+                  onChange={(e) => set("customerId", e.target.value)}
+                  required
+                >
+                  <option value="">{l.selectCustomer}</option>
+                  {customers.map((c) => (
+                    <option key={c._id} value={c._id}>
+                      {c.firstName} {c.lastName}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className={styles.formGroup}>
+                <label className={styles.label}>{l.service}</label>
+                <select
+                  className={styles.input}
+                  value={form.serviceId}
+                  onChange={(e) => set("serviceId", e.target.value)}
+                >
+                  <option value="">{l.selectService}</option>
+                  {services.map((s) => (
+                    <option key={s._id} value={s._id}>
+                      {s.name?.[lang] ?? s.name?.en}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* Title */}
+            <div className={styles.formGroup}>
+              <label className={styles.label}>{l.titleField}</label>
+              <input
+                className={styles.input}
+                value={form.title}
+                onChange={(e) => set("title", e.target.value)}
+              />
+            </div>
+
+            {/* Scheduled Start + End */}
+            <div className={styles.formRow}>
+              <div className={styles.formGroup}>
+                <label className={styles.label}>{l.scheduledStart}</label>
+                <input
+                  className={styles.input}
+                  type="datetime-local"
+                  value={form.scheduledStart}
+                  onChange={(e) => set("scheduledStart", e.target.value)}
+                  required
+                />
+              </div>
+              <div className={styles.formGroup}>
+                <label className={styles.label}>{l.scheduledEnd}</label>
+                <input
+                  className={styles.input}
+                  type="datetime-local"
+                  value={form.scheduledEnd}
+                  onChange={(e) => set("scheduledEnd", e.target.value)}
+                />
+              </div>
+            </div>
+
+            {/* Status + Price */}
+            <div className={styles.formRow}>
+              <div className={styles.formGroup}>
+                <label className={styles.label}>{l.status}</label>
+                <select
+                  className={styles.input}
+                  value={form.status}
+                  onChange={(e) =>
+                    set("status", e.target.value as JobStatus)
+                  }
+                >
+                  {JOB_STATUSES.map((s) => (
+                    <option key={s} value={s}>
+                      {STATUS_LABELS[s][lang]}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className={styles.formGroup}>
+                <label className={styles.label}>{l.price}</label>
+                <input
+                  className={styles.input}
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={form.price}
+                  onChange={(e) => set("price", e.target.value)}
+                />
+              </div>
+            </div>
+
+            {/* Assigned Users */}
+            <div className={styles.formGroup}>
+              <label className={styles.label}>{l.assignedUsers}</label>
+              <div className={styles.userCheckboxList}>
+                {users.length === 0 ? (
+                  <span className={styles.emptyHint}>—</span>
+                ) : (
+                  users.map((u) => (
+                    <label key={u._id} className={styles.userCheckboxItem}>
+                      <input
+                        type="checkbox"
+                        checked={form.assignedUsers.includes(u._id)}
+                        onChange={() => toggleUser(u._id)}
+                      />
+                      {u.firstName} {u.lastName}
+                    </label>
+                  ))
+                )}
+              </div>
+            </div>
+
+            {/* Notes */}
+            <div className={styles.formRow}>
+              <div className={styles.formGroup}>
+                <label className={styles.label}>{l.notesInternal}</label>
+                <textarea
+                  className={styles.textarea}
+                  rows={3}
+                  value={form.notesInternal}
+                  onChange={(e) => set("notesInternal", e.target.value)}
+                />
+              </div>
+              <div className={styles.formGroup}>
+                <label className={styles.label}>{l.notesCustomer}</label>
+                <textarea
+                  className={styles.textarea}
+                  rows={3}
+                  value={form.notesCustomer}
+                  onChange={(e) => set("notesCustomer", e.target.value)}
+                />
+              </div>
+            </div>
+
+            {/* Property Address */}
+            <p className={styles.sectionDivider}>{l.addressSection}</p>
+            <div className={styles.formRow}>
+              <div className={styles.formGroup}>
+                <label className={styles.label}>{l.street}</label>
+                <input
+                  className={styles.input}
+                  value={form.street}
+                  onChange={(e) => set("street", e.target.value)}
+                />
+              </div>
+              <div className={styles.formGroup}>
+                <label className={styles.label}>{l.city}</label>
+                <input
+                  className={styles.input}
+                  value={form.city}
+                  onChange={(e) => set("city", e.target.value)}
+                />
+              </div>
+            </div>
+            <div className={styles.formRow}>
+              <div className={styles.formGroup}>
+                <label className={styles.label}>{l.stateLabel}</label>
+                <input
+                  className={styles.input}
+                  value={form.state}
+                  onChange={(e) => set("state", e.target.value)}
+                />
+              </div>
+              <div className={styles.formGroup}>
+                <label className={styles.label}>{l.zipCode}</label>
+                <input
+                  className={styles.input}
+                  value={form.zipCode}
+                  onChange={(e) => set("zipCode", e.target.value)}
+                />
+              </div>
+            </div>
+            <div className={styles.formGroup}>
+              <label className={styles.label}>{l.country}</label>
+              <input
+                className={styles.input}
+                value={form.country}
+                onChange={(e) => set("country", e.target.value)}
+              />
+            </div>
+
+            {/* Checklist */}
+            <p className={styles.sectionDivider}>{l.checklistSection}</p>
+            {form.checklist.map((item, idx) => (
+              <div key={idx} className={styles.checklistRow}>
+                <input
+                  className={styles.input}
+                  placeholder={l.checkItemEn}
+                  value={item.labelEn}
+                  onChange={(e) =>
+                    updateChecklistItem(idx, "labelEn", e.target.value)
+                  }
+                />
+                <input
+                  className={styles.input}
+                  placeholder={l.checkItemEs}
+                  value={item.labelEs}
+                  onChange={(e) =>
+                    updateChecklistItem(idx, "labelEs", e.target.value)
+                  }
+                />
+                <button
+                  type="button"
+                  className={styles.btnRemoveItem}
+                  onClick={() => removeChecklistItem(idx)}
+                >
+                  ✕
+                </button>
+              </div>
+            ))}
+            <button
+              type="button"
+              className={styles.btnAddItem}
+              onClick={addChecklistItem}
+            >
+              {l.addItem}
+            </button>
+
+            {error && <p className={styles.formError}>{error}</p>}
+
+            <div className={styles.modalFooter}>
+              <button
+                type="button"
+                className={styles.btnCancel}
+                onClick={onClose}
+                disabled={saving}
+              >
+                {l.cancel}
+              </button>
+              <button
+                type="submit"
+                className={styles.btnSave}
+                disabled={saving}
+              >
+                {isEdit ? l.update : l.save}
+              </button>
+            </div>
+          </form>
+        )}
+      </div>
+    </div>
+  );
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
 export default function JobsPage() {
   const { lang } = useLang();
   const { hasRole } = useAuth();
@@ -147,6 +728,9 @@ export default function JobsPage() {
 
   const canWrite = hasRole("owner", "manager", "staff");
   const canDelete = hasRole("owner", "manager");
+
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [editingJob, setEditingJob] = useState<Job | null>(null);
 
   const fetchJobs = useCallback(async () => {
     setLoading(true);
@@ -208,7 +792,14 @@ export default function JobsPage() {
       {/* Header */}
       <div className={styles.header}>
         <h2 className={styles.title}>{l.title}</h2>
-        {canWrite && <button className={styles.addBtn}>{l.addJob}</button>}
+        {canWrite && (
+          <button
+            className={styles.addBtn}
+            onClick={() => setShowAddModal(true)}
+          >
+            {l.addJob}
+          </button>
+        )}
       </div>
 
       {/* Toolbar */}
@@ -353,7 +944,10 @@ export default function JobsPage() {
                           {l.btnView}
                         </button>
                         {canWrite && (
-                          <button className={styles.btnUpdate}>
+                          <button
+                            className={styles.btnUpdate}
+                            onClick={() => setEditingJob(j)}
+                          >
                             <svg viewBox="0 0 20 20" fill="currentColor">
                               <path d="M13.586 3.586a2 2 0 112.828 2.828l-9.5 9.5A2 2 0 015.5 16.5H4a1 1 0 01-1-1v-1.5a2 2 0 01.586-1.414l9.5-9.5z" />
                             </svg>
@@ -421,6 +1015,28 @@ export default function JobsPage() {
           {l.page} {page} {l.of} {totalPages} &bull; {total} total
         </span>
       </div>
+
+      {showAddModal && canWrite && (
+        <JobModal
+          lang={lang}
+          onClose={() => setShowAddModal(false)}
+          onSaved={() => {
+            setShowAddModal(false);
+            fetchJobs();
+          }}
+        />
+      )}
+      {editingJob && canWrite && (
+        <JobModal
+          job={editingJob}
+          lang={lang}
+          onClose={() => setEditingJob(null)}
+          onSaved={() => {
+            setEditingJob(null);
+            fetchJobs();
+          }}
+        />
+      )}
     </div>
   );
 }
