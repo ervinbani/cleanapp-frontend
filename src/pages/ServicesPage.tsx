@@ -180,7 +180,10 @@ function ServiceModal({ service, lang, onClose, onSaved }: ServiceModalProps) {
           en: form.descriptionEn.trim() || undefined,
           es: form.descriptionEs.trim() || undefined,
         },
-        durationMinutes: form.durationMinutes !== "" ? Number(form.durationMinutes) : undefined,
+        durationMinutes:
+          form.durationMinutes !== ""
+            ? Number(form.durationMinutes)
+            : undefined,
         basePrice: form.basePrice !== "" ? Number(form.basePrice) : undefined,
         isActive: form.isActive,
       };
@@ -203,7 +206,9 @@ function ServiceModal({ service, lang, onClose, onSaved }: ServiceModalProps) {
   return (
     <div className={styles.modalOverlay} onClick={onClose}>
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-        <h3 className={styles.modalTitle}>{isEdit ? l.editTitle : l.addTitle}</h3>
+        <h3 className={styles.modalTitle}>
+          {isEdit ? l.editTitle : l.addTitle}
+        </h3>
         <form onSubmit={handleSubmit}>
           <div className={styles.formRow}>
             <div className={styles.formGroup}>
@@ -395,7 +400,10 @@ export default function ServicesPage() {
       <div className={styles.header}>
         <h2 className={styles.title}>{l.title}</h2>
         {canWrite && (
-          <button className={styles.addBtn} onClick={() => setShowAddModal(true)}>
+          <button
+            className={styles.addBtn}
+            onClick={() => setShowAddModal(true)}
+          >
             {l.addService}
           </button>
         )}
@@ -590,7 +598,10 @@ export default function ServicesPage() {
         <ServiceModal
           lang={lang}
           onClose={() => setShowAddModal(false)}
-          onSaved={() => { setShowAddModal(false); fetchServices(); }}
+          onSaved={() => {
+            setShowAddModal(false);
+            fetchServices();
+          }}
         />
       )}
       {editingService && canWrite && (
@@ -598,7 +609,10 @@ export default function ServicesPage() {
           service={editingService}
           lang={lang}
           onClose={() => setEditingService(null)}
-          onSaved={() => { setEditingService(null); fetchServices(); }}
+          onSaved={() => {
+            setEditingService(null);
+            fetchServices();
+          }}
         />
       )}
     </div>

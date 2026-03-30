@@ -204,7 +204,12 @@ const ml = {
   },
 };
 
-function CustomerModal({ customer, lang, onClose, onSaved }: CustomerModalProps) {
+function CustomerModal({
+  customer,
+  lang,
+  onClose,
+  onSaved,
+}: CustomerModalProps) {
   const isEdit = !!customer;
   const [form, setForm] = useState<CustomerForm>(
     isEdit ? customerToForm(customer!) : EMPTY_CUSTOMER_FORM,
@@ -266,7 +271,11 @@ function CustomerModal({ customer, lang, onClose, onSaved }: CustomerModalProps)
               {isEdit ? lm.subtitleEdit : lm.subtitleAdd}
             </p>
           </div>
-          <button className={styles.modalClose} onClick={onClose} aria-label="Close">
+          <button
+            className={styles.modalClose}
+            onClick={onClose}
+            aria-label="Close"
+          >
             ✕
           </button>
         </div>
@@ -331,7 +340,9 @@ function CustomerModal({ customer, lang, onClose, onSaved }: CustomerModalProps)
               <select
                 className={styles.input}
                 value={form.status}
-                onChange={(e) => set("status", e.target.value as CustomerStatus)}
+                onChange={(e) =>
+                  set("status", e.target.value as CustomerStatus)
+                }
                 required
               >
                 <option value="lead">Lead</option>
@@ -346,7 +357,9 @@ function CustomerModal({ customer, lang, onClose, onSaved }: CustomerModalProps)
               <select
                 className={styles.input}
                 value={form.source}
-                onChange={(e) => set("source", e.target.value as CustomerSource)}
+                onChange={(e) =>
+                  set("source", e.target.value as CustomerSource)
+                }
                 required
               >
                 <option value="manual">Manual</option>
@@ -423,7 +436,9 @@ function CustomerModal({ customer, lang, onClose, onSaved }: CustomerModalProps)
                 className={styles.input}
                 placeholder={lm.placeholderCountry}
                 value={form.country}
-                onChange={(e) => set("country", e.target.value.toUpperCase().slice(0, 2))}
+                onChange={(e) =>
+                  set("country", e.target.value.toUpperCase().slice(0, 2))
+                }
                 maxLength={2}
               />
             </div>
@@ -444,7 +459,11 @@ function CustomerModal({ customer, lang, onClose, onSaved }: CustomerModalProps)
           {error && <p className={styles.errorMsg}>{error}</p>}
 
           <div className={styles.modalFooter}>
-            <button type="button" className={styles.btnCancel} onClick={onClose}>
+            <button
+              type="button"
+              className={styles.btnCancel}
+              onClick={onClose}
+            >
               {lm.cancel}
             </button>
             <button type="submit" className={styles.btnSave} disabled={saving}>
@@ -554,7 +573,10 @@ export default function CustomersPage() {
         <CustomerModal
           lang={lang}
           onClose={() => setShowAddModal(false)}
-          onSaved={() => { setShowAddModal(false); fetchCustomers(); }}
+          onSaved={() => {
+            setShowAddModal(false);
+            fetchCustomers();
+          }}
         />
       )}
       {editingCustomer && canWrite && (
@@ -562,7 +584,10 @@ export default function CustomersPage() {
           customer={editingCustomer}
           lang={lang}
           onClose={() => setEditingCustomer(null)}
-          onSaved={() => { setEditingCustomer(null); fetchCustomers(); }}
+          onSaved={() => {
+            setEditingCustomer(null);
+            fetchCustomers();
+          }}
         />
       )}
 
@@ -570,7 +595,10 @@ export default function CustomersPage() {
       <div className={styles.header}>
         <h2 className={styles.title}>{l.title}</h2>
         {canWrite && (
-          <button className={styles.addBtn} onClick={() => setShowAddModal(true)}>
+          <button
+            className={styles.addBtn}
+            onClick={() => setShowAddModal(true)}
+          >
             {l.addClient}
           </button>
         )}
