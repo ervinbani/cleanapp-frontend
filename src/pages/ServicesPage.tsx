@@ -76,6 +76,240 @@ const t = {
   },
 };
 
+// ── Service Modal ────────────────────────────────────────────────────────────
+interface ServiceForm {
+  nameEn: string;
+  nameEs: string;
+  descriptionEn: string;
+  descriptionEs: string;
+  durationMinutes: string;
+  basePrice: string;
+  isActive: boolean;
+}
+
+const EMPTY_SERVICE_FORM: ServiceForm = {
+  nameEn: "",
+  nameEs: "",
+  descriptionEn: "",
+  descriptionEs: "",
+  durationMinutes: "",
+  basePrice: "",
+  isActive: true,
+};
+
+function serviceToForm(s: Service): ServiceForm {
+  return {
+    nameEn: s.name?.en ?? "",
+    nameEs: s.name?.es ?? "",
+    descriptionEn: s.description?.en ?? "",
+    descriptionEs: s.description?.es ?? "",
+    durationMinutes: s.durationMinutes != null ? String(s.durationMinutes) : "",
+    basePrice: s.basePrice != null ? String(s.basePrice) : "",
+    isActive: s.isActive,
+  };
+}
+
+interface ServiceModalProps {
+  service?: Service;
+  lang: "en" | "es";
+  onClose: () => void;
+  onSaved: () => void;
+}
+
+const mT = {
+  en: {
+    addTitle: "Add Service",
+    editTitle: "Edit Service",
+    nameEn: "Name (English)",
+    nameEs: "Name (Spanish)",
+    descEn: "Description (English)",
+    descEs: "Description (Spanish)",
+    duration: "Duration (minutes)",
+    price: "Base Price ($)",
+    status: "Status",
+    active: "Active",
+    inactive: "Inactive",
+    cancel: "Cancel",
+    save: "Save",
+    update: "Update",
+    required: "Name (EN) and Name (ES) are required.",
+  },
+  es: {
+    addTitle: "Agregar Servicio",
+    editTitle: "Editar Servicio",
+    nameEn: "Nombre (Inglés)",
+    nameEs: "Nombre (Español)",
+    descEn: "Descripción (Inglés)",
+    descEs: "Descripción (Español)",
+    duration: "Duración (minutos)",
+    price: "Precio Base ($)",
+    status: "Estado",
+    active: "Activo",
+    inactive: "Inactivo",
+    cancel: "Cancelar",
+    save: "Guardar",
+    update: "Actualizar",
+    required: "El nombre (EN) y el nombre (ES) son obligatorios.",
+  },
+};
+
+function ServiceModal({ service, lang, onClose, onSaved }: ServiceModalProps) {
+  const isEdit = !!service;
+  const l = mT[lang];
+  const [form, setForm] = useState<ServiceForm>(
+    isEdit ? serviceToForm(service!) : EMPTY_SERVICE_FORM,
+  );
+  const [error, setError] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  const set = (field: keyof ServiceForm, value: string | boolean) =>
+    setForm((prev) => ({ ...prev, [field]: value }));
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!form.nameEn.trim() || !form.nameEs.trim()) {
+      setError(l.required);
+      return;
+    }
+    setSaving(true);
+    setError("");
+    try {
+      const payload = {
+        name: { en: form.nameEn.trim(), es: form.nameEs.trim() },
+        description: {
+          en: form.descriptionEn.trim() || undefined,
+          es: form.descriptionEs.trim() || undefined,
+        },
+        durationMinutes: form.durationMinutes !== "" ? Number(form.durationMinutes) : undefined,
+        basePrice: form.basePrice !== "" ? Number(form.basePrice) : undefined,
+        isActive: form.isActive,
+      };
+      if (isEdit) {
+        await apiClient.put(`/services/${service!._id}`, payload);
+      } else {
+        await apiClient.post("/services", payload);
+      }
+      onSaved();
+    } catch (err: unknown) {
+      const msg =
+        (err as { response?: { data?: { error?: string } } })?.response?.data
+          ?.error ?? "Error saving service.";
+      setError(msg);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className={styles.modalOverlay} onClick={onClose}>
+      <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+        <h3 className={styles.modalTitle}>{isEdit ? l.editTitle : l.addTitle}</h3>
+        <form onSubmit={handleSubmit}>
+          <div className={styles.formRow}>
+            <div className={styles.formGroup}>
+              <label className={styles.label}>{l.nameEn} *</label>
+              <input
+                className={styles.input}
+                value={form.nameEn}
+                onChange={(e) => set("nameEn", e.target.value)}
+                required
+              />
+            </div>
+            <div className={styles.formGroup}>
+              <label className={styles.label}>{l.nameEs} *</label>
+              <input
+                className={styles.input}
+                value={form.nameEs}
+                onChange={(e) => set("nameEs", e.target.value)}
+                required
+              />
+            </div>
+          </div>
+
+          <div className={styles.formRow}>
+            <div className={styles.formGroup}>
+              <label className={styles.label}>{l.descEn}</label>
+              <textarea
+                className={styles.textarea}
+                rows={3}
+                value={form.descriptionEn}
+                onChange={(e) => set("descriptionEn", e.target.value)}
+              />
+            </div>
+            <div className={styles.formGroup}>
+              <label className={styles.label}>{l.descEs}</label>
+              <textarea
+                className={styles.textarea}
+                rows={3}
+                value={form.descriptionEs}
+                onChange={(e) => set("descriptionEs", e.target.value)}
+              />
+            </div>
+          </div>
+
+          <div className={styles.formRow}>
+            <div className={styles.formGroup}>
+              <label className={styles.label}>{l.duration}</label>
+              <input
+                className={styles.input}
+                type="number"
+                min="1"
+                value={form.durationMinutes}
+                onChange={(e) => set("durationMinutes", e.target.value)}
+              />
+            </div>
+            <div className={styles.formGroup}>
+              <label className={styles.label}>{l.price}</label>
+              <input
+                className={styles.input}
+                type="number"
+                min="0"
+                step="0.01"
+                value={form.basePrice}
+                onChange={(e) => set("basePrice", e.target.value)}
+              />
+            </div>
+          </div>
+
+          <div className={styles.formGroup}>
+            <label className={styles.label}>{l.status}</label>
+            <div className={styles.toggleRow}>
+              <label className={styles.toggleSwitch}>
+                <input
+                  type="checkbox"
+                  checked={form.isActive}
+                  onChange={(e) => set("isActive", e.target.checked)}
+                />
+                <span className={styles.toggleSlider} />
+              </label>
+              <span className={styles.toggleLabel}>
+                {form.isActive ? l.active : l.inactive}
+              </span>
+            </div>
+          </div>
+
+          {error && <p className={styles.formError}>{error}</p>}
+
+          <div className={styles.modalFooter}>
+            <button
+              type="button"
+              className={styles.btnCancel}
+              onClick={onClose}
+              disabled={saving}
+            >
+              {l.cancel}
+            </button>
+            <button type="submit" className={styles.btnSave} disabled={saving}>
+              {isEdit ? l.update : l.save}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
 export default function ServicesPage() {
   const { lang } = useLang();
   const { hasRole } = useAuth();
@@ -96,6 +330,9 @@ export default function ServicesPage() {
 
   const canWrite = hasRole("owner", "manager");
   const canDelete = hasRole("owner", "manager");
+
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [editingService, setEditingService] = useState<Service | null>(null);
 
   const fetchServices = useCallback(async () => {
     setLoading(true);
@@ -157,7 +394,11 @@ export default function ServicesPage() {
       {/* Header */}
       <div className={styles.header}>
         <h2 className={styles.title}>{l.title}</h2>
-        {canWrite && <button className={styles.addBtn}>{l.addService}</button>}
+        {canWrite && (
+          <button className={styles.addBtn} onClick={() => setShowAddModal(true)}>
+            {l.addService}
+          </button>
+        )}
       </div>
 
       {/* Toolbar */}
@@ -274,7 +515,10 @@ export default function ServicesPage() {
                         {l.btnView}
                       </button>
                       {canWrite && (
-                        <button className={styles.btnUpdate}>
+                        <button
+                          className={styles.btnUpdate}
+                          onClick={() => setEditingService(s)}
+                        >
                           <svg viewBox="0 0 20 20" fill="currentColor">
                             <path d="M13.586 3.586a2 2 0 112.828 2.828l-9.5 9.5A2 2 0 015.5 16.5H4a1 1 0 01-1-1v-1.5a2 2 0 01.586-1.414l9.5-9.5z" />
                           </svg>
@@ -341,6 +585,22 @@ export default function ServicesPage() {
           {l.page} {page} {l.of} {totalPages} &bull; {total} total
         </span>
       </div>
+
+      {showAddModal && canWrite && (
+        <ServiceModal
+          lang={lang}
+          onClose={() => setShowAddModal(false)}
+          onSaved={() => { setShowAddModal(false); fetchServices(); }}
+        />
+      )}
+      {editingService && canWrite && (
+        <ServiceModal
+          service={editingService}
+          lang={lang}
+          onClose={() => setEditingService(null)}
+          onSaved={() => { setEditingService(null); fetchServices(); }}
+        />
+      )}
     </div>
   );
 }

@@ -79,6 +79,384 @@ const t = {
   },
 };
 
+// ─── CustomerModal (Add + Edit) ────────────────────────────────────────
+interface CustomerForm {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  preferredLanguage: "en" | "es";
+  status: CustomerStatus;
+  source: CustomerSource;
+  notes: string;
+  street: string;
+  city: string;
+  state: string;
+  zipCode: string;
+  country: string;
+}
+
+const EMPTY_CUSTOMER_FORM: CustomerForm = {
+  firstName: "",
+  lastName: "",
+  email: "",
+  phone: "",
+  preferredLanguage: "en",
+  status: "lead",
+  source: "manual",
+  notes: "",
+  street: "",
+  city: "",
+  state: "",
+  zipCode: "",
+  country: "",
+};
+
+function customerToForm(c: Customer): CustomerForm {
+  return {
+    firstName: c.firstName,
+    lastName: c.lastName,
+    email: c.email ?? "",
+    phone: c.phone ?? "",
+    preferredLanguage: c.preferredLanguage,
+    status: c.status,
+    source: c.source,
+    notes: c.notes ?? "",
+    street: c.address?.street ?? "",
+    city: c.address?.city ?? "",
+    state: c.address?.state ?? "",
+    zipCode: c.address?.zipCode ?? "",
+    country: c.address?.country ?? "",
+  };
+}
+
+interface CustomerModalProps {
+  customer?: Customer; // undefined = add mode
+  lang: "en" | "es";
+  onClose: () => void;
+  onSaved: () => void;
+}
+
+const ml = {
+  en: {
+    titleAdd: "Add Client",
+    subtitleAdd: "Create a new client",
+    titleEdit: "Edit Client",
+    subtitleEdit: "Update client details",
+    firstName: "First Name",
+    lastName: "Last Name",
+    email: "Email",
+    phone: "Phone",
+    prefLang: "Preferred Language",
+    status: "Status",
+    source: "Source",
+    notes: "Internal Notes",
+    addressSection: "Address",
+    street: "Street",
+    city: "City",
+    stateField: "State",
+    zipCode: "Zip Code",
+    country: "Country",
+    cancel: "Cancel",
+    save: "Save Client",
+    saveEdit: "Save Changes",
+    saving: "Saving…",
+    placeholderEmail: "client@example.com",
+    placeholderPhone: "+1 234 567 8900",
+    placeholderNotes: "Internal notes…",
+    placeholderStreet: "123 Main St",
+    placeholderCity: "Miami",
+    placeholderState: "FL",
+    placeholderZip: "33101",
+    placeholderCountry: "US",
+  },
+  es: {
+    titleAdd: "Agregar Cliente",
+    subtitleAdd: "Crear un nuevo cliente",
+    titleEdit: "Editar Cliente",
+    subtitleEdit: "Actualizar datos del cliente",
+    firstName: "Nombre",
+    lastName: "Apellido",
+    email: "Correo",
+    phone: "Teléfono",
+    prefLang: "Idioma preferido",
+    status: "Estado",
+    source: "Fuente",
+    notes: "Notas internas",
+    addressSection: "Dirección",
+    street: "Calle",
+    city: "Ciudad",
+    stateField: "Estado / Provincia",
+    zipCode: "Código postal",
+    country: "País",
+    cancel: "Cancelar",
+    save: "Guardar Cliente",
+    saveEdit: "Guardar Cambios",
+    saving: "Guardando…",
+    placeholderEmail: "cliente@ejemplo.com",
+    placeholderPhone: "+1 234 567 8900",
+    placeholderNotes: "Notas internas…",
+    placeholderStreet: "Calle Mayor 123",
+    placeholderCity: "Miami",
+    placeholderState: "FL",
+    placeholderZip: "33101",
+    placeholderCountry: "US",
+  },
+};
+
+function CustomerModal({ customer, lang, onClose, onSaved }: CustomerModalProps) {
+  const isEdit = !!customer;
+  const [form, setForm] = useState<CustomerForm>(
+    isEdit ? customerToForm(customer!) : EMPTY_CUSTOMER_FORM,
+  );
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  const lm = ml[lang];
+
+  const set = <K extends keyof CustomerForm>(k: K, v: CustomerForm[K]) =>
+    setForm((f) => ({ ...f, [k]: v }));
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSaving(true);
+    setError("");
+    const payload = {
+      firstName: form.firstName.trim(),
+      lastName: form.lastName.trim(),
+      email: form.email.trim() || undefined,
+      phone: form.phone.trim() || undefined,
+      preferredLanguage: form.preferredLanguage,
+      status: form.status,
+      source: form.source,
+      notes: form.notes.trim() || undefined,
+      address: {
+        street: form.street.trim() || undefined,
+        city: form.city.trim() || undefined,
+        state: form.state.trim() || undefined,
+        zipCode: form.zipCode.trim() || undefined,
+        country: form.country.trim() || undefined,
+      },
+    };
+    try {
+      if (isEdit) {
+        await customerService.update(customer!._id, payload);
+      } else {
+        await customerService.create(payload);
+      }
+      onSaved();
+    } catch (err: unknown) {
+      const msg =
+        (err as { response?: { data?: { error?: string } } })?.response?.data
+          ?.error ?? "Error saving client.";
+      setError(msg);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className={styles.modalOverlay} onClick={onClose}>
+      <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+        <div className={styles.modalHeader}>
+          <div>
+            <h3 className={styles.modalTitle}>
+              {isEdit ? lm.titleEdit : lm.titleAdd}
+            </h3>
+            <p className={styles.modalSubtitle}>
+              {isEdit ? lm.subtitleEdit : lm.subtitleAdd}
+            </p>
+          </div>
+          <button className={styles.modalClose} onClick={onClose} aria-label="Close">
+            ✕
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className={styles.modalForm}>
+          {/* Name */}
+          <div className={styles.formRow}>
+            <div className={styles.formGroup}>
+              <label className={styles.label}>
+                {lm.firstName} <span className={styles.required}>*</span>
+              </label>
+              <input
+                className={styles.input}
+                value={form.firstName}
+                onChange={(e) => set("firstName", e.target.value)}
+                required
+              />
+            </div>
+            <div className={styles.formGroup}>
+              <label className={styles.label}>
+                {lm.lastName} <span className={styles.required}>*</span>
+              </label>
+              <input
+                className={styles.input}
+                value={form.lastName}
+                onChange={(e) => set("lastName", e.target.value)}
+                required
+              />
+            </div>
+          </div>
+
+          {/* Email + Phone */}
+          <div className={styles.formRow}>
+            <div className={styles.formGroup}>
+              <label className={styles.label}>{lm.email}</label>
+              <input
+                className={styles.input}
+                type="email"
+                placeholder={lm.placeholderEmail}
+                value={form.email}
+                onChange={(e) => set("email", e.target.value)}
+              />
+            </div>
+            <div className={styles.formGroup}>
+              <label className={styles.label}>{lm.phone}</label>
+              <input
+                className={styles.input}
+                type="tel"
+                placeholder={lm.placeholderPhone}
+                value={form.phone}
+                onChange={(e) => set("phone", e.target.value)}
+              />
+            </div>
+          </div>
+
+          {/* Status + Source */}
+          <div className={styles.formRow}>
+            <div className={styles.formGroup}>
+              <label className={styles.label}>
+                {lm.status} <span className={styles.required}>*</span>
+              </label>
+              <select
+                className={styles.input}
+                value={form.status}
+                onChange={(e) => set("status", e.target.value as CustomerStatus)}
+                required
+              >
+                <option value="lead">Lead</option>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+              </select>
+            </div>
+            <div className={styles.formGroup}>
+              <label className={styles.label}>
+                {lm.source} <span className={styles.required}>*</span>
+              </label>
+              <select
+                className={styles.input}
+                value={form.source}
+                onChange={(e) => set("source", e.target.value as CustomerSource)}
+                required
+              >
+                <option value="manual">Manual</option>
+                <option value="website">Website</option>
+                <option value="phone">Phone</option>
+                <option value="referral">Referral</option>
+                <option value="facebook">Facebook</option>
+                <option value="google">Google</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Preferred Language */}
+          <div className={styles.formGroup}>
+            <label className={styles.label}>{lm.prefLang}</label>
+            <select
+              className={styles.input}
+              value={form.preferredLanguage}
+              onChange={(e) =>
+                set("preferredLanguage", e.target.value as "en" | "es")
+              }
+            >
+              <option value="en">EN</option>
+              <option value="es">ES</option>
+            </select>
+          </div>
+
+          {/* Address section */}
+          <div className={styles.sectionDivider}>{lm.addressSection}</div>
+          <div className={styles.formRow}>
+            <div className={styles.formGroup} style={{ gridColumn: "1 / -1" }}>
+              <label className={styles.label}>{lm.street}</label>
+              <input
+                className={styles.input}
+                placeholder={lm.placeholderStreet}
+                value={form.street}
+                onChange={(e) => set("street", e.target.value)}
+              />
+            </div>
+          </div>
+          <div className={styles.formRow}>
+            <div className={styles.formGroup}>
+              <label className={styles.label}>{lm.city}</label>
+              <input
+                className={styles.input}
+                placeholder={lm.placeholderCity}
+                value={form.city}
+                onChange={(e) => set("city", e.target.value)}
+              />
+            </div>
+            <div className={styles.formGroup}>
+              <label className={styles.label}>{lm.stateField}</label>
+              <input
+                className={styles.input}
+                placeholder={lm.placeholderState}
+                value={form.state}
+                onChange={(e) => set("state", e.target.value)}
+              />
+            </div>
+          </div>
+          <div className={styles.formRow}>
+            <div className={styles.formGroup}>
+              <label className={styles.label}>{lm.zipCode}</label>
+              <input
+                className={styles.input}
+                placeholder={lm.placeholderZip}
+                value={form.zipCode}
+                onChange={(e) => set("zipCode", e.target.value)}
+              />
+            </div>
+            <div className={styles.formGroup}>
+              <label className={styles.label}>{lm.country}</label>
+              <input
+                className={styles.input}
+                placeholder={lm.placeholderCountry}
+                value={form.country}
+                onChange={(e) => set("country", e.target.value.toUpperCase().slice(0, 2))}
+                maxLength={2}
+              />
+            </div>
+          </div>
+
+          {/* Notes */}
+          <div className={styles.formGroup}>
+            <label className={styles.label}>{lm.notes}</label>
+            <textarea
+              className={styles.textarea}
+              placeholder={lm.placeholderNotes}
+              value={form.notes}
+              onChange={(e) => set("notes", e.target.value)}
+              rows={3}
+            />
+          </div>
+
+          {error && <p className={styles.errorMsg}>{error}</p>}
+
+          <div className={styles.modalFooter}>
+            <button type="button" className={styles.btnCancel} onClick={onClose}>
+              {lm.cancel}
+            </button>
+            <button type="submit" className={styles.btnSave} disabled={saving}>
+              {saving ? lm.saving : isEdit ? lm.saveEdit : lm.save}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
 export default function CustomersPage() {
   const { lang } = useLang();
   const { hasRole } = useAuth();
@@ -105,6 +483,9 @@ export default function CustomersPage() {
 
   const canWrite = hasRole("owner", "manager", "staff");
   const canDelete = hasRole("owner", "manager");
+
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
 
   const fetchCustomers = useCallback(async () => {
     setLoading(true);
@@ -169,10 +550,30 @@ export default function CustomersPage() {
 
   return (
     <div className={styles.page}>
+      {showAddModal && canWrite && (
+        <CustomerModal
+          lang={lang}
+          onClose={() => setShowAddModal(false)}
+          onSaved={() => { setShowAddModal(false); fetchCustomers(); }}
+        />
+      )}
+      {editingCustomer && canWrite && (
+        <CustomerModal
+          customer={editingCustomer}
+          lang={lang}
+          onClose={() => setEditingCustomer(null)}
+          onSaved={() => { setEditingCustomer(null); fetchCustomers(); }}
+        />
+      )}
+
       {/* Header */}
       <div className={styles.header}>
         <h2 className={styles.title}>{l.title}</h2>
-        {canWrite && <button className={styles.addBtn}>{l.addClient}</button>}
+        {canWrite && (
+          <button className={styles.addBtn} onClick={() => setShowAddModal(true)}>
+            {l.addClient}
+          </button>
+        )}
       </div>
 
       {/* Toolbar: global search + API filters */}
@@ -345,7 +746,10 @@ export default function CustomersPage() {
                         {l.btnView}
                       </button>
                       {canWrite && (
-                        <button className={styles.btnUpdate}>
+                        <button
+                          className={styles.btnUpdate}
+                          onClick={() => setEditingCustomer(c)}
+                        >
                           <svg viewBox="0 0 20 20" fill="currentColor">
                             <path d="M13.586 3.586a2 2 0 112.828 2.828l-9.5 9.5A2 2 0 015.5 16.5H4a1 1 0 01-1-1v-1.5a2 2 0 01.586-1.414l9.5-9.5z" />
                           </svg>
