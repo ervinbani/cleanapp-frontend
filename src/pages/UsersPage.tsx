@@ -7,6 +7,538 @@ import styles from "./UsersPage.module.css";
 
 const PAGE_LIMIT = 20;
 
+// ─── Roles available when creating a user (owner excluded) ────────
+const CREATABLE_ROLES: UserRole[] = ["manager", "staff", "cleaner"];
+
+interface AddUserForm {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  role: UserRole;
+  preferredLanguage: "en" | "es";
+  phone: string;
+  isActive: boolean;
+}
+
+const EMPTY_FORM: AddUserForm = {
+  firstName: "",
+  lastName: "",
+  email: "",
+  password: "",
+  role: "staff",
+  preferredLanguage: "en",
+  phone: "",
+  isActive: true,
+};
+
+interface AddUserModalProps {
+  lang: "en" | "es";
+  onClose: () => void;
+  onSaved: () => void;
+}
+
+function AddUserModal({ lang, onClose, onSaved }: AddUserModalProps) {
+  const [form, setForm] = useState<AddUserForm>(EMPTY_FORM);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+
+  const ml = {
+    en: {
+      title: "Add User",
+      subtitle: "Create a new team member",
+      firstName: "First Name",
+      lastName: "Last Name",
+      email: "Email",
+      emailHint: "Unique per tenant",
+      password: "Password",
+      passwordHint: "Will be stored securely",
+      role: "Role",
+      prefLang: "Preferred Language",
+      langHint: "Default EN",
+      phone: "Phone",
+      activeUser: "Active user",
+      cancel: "Cancel",
+      save: "Save User",
+      saving: "Saving…",
+      placeholderFirst: "First Name",
+      placeholderLast: "Last Name",
+      placeholderEmail: "user@example.com",
+      placeholderPhone: "+1 234 567 8900",
+    },
+    es: {
+      title: "Agregar Usuario",
+      subtitle: "Crear un nuevo miembro del equipo",
+      firstName: "Nombre",
+      lastName: "Apellido",
+      email: "Correo",
+      emailHint: "Único por empresa",
+      password: "Contraseña",
+      passwordHint: "Se guardará de forma segura",
+      role: "Rol",
+      prefLang: "Idioma preferido",
+      langHint: "Por defecto EN",
+      phone: "Teléfono",
+      activeUser: "Usuario activo",
+      cancel: "Cancelar",
+      save: "Guardar Usuario",
+      saving: "Guardando…",
+      placeholderFirst: "Nombre",
+      placeholderLast: "Apellido",
+      placeholderEmail: "usuario@ejemplo.com",
+      placeholderPhone: "+1 234 567 8900",
+    },
+  };
+  const ml2 = ml[lang];
+
+  const set = <K extends keyof AddUserForm>(k: K, v: AddUserForm[K]) =>
+    setForm((f) => ({ ...f, [k]: v }));
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSaving(true);
+    setError("");
+    try {
+      await apiClient.post("/users", {
+        firstName: form.firstName.trim(),
+        lastName: form.lastName.trim(),
+        email: form.email.trim(),
+        password: form.password,
+        role: form.role,
+        preferredLanguage: form.preferredLanguage,
+        phone: form.phone.trim() || undefined,
+        isActive: form.isActive,
+      });
+      onSaved();
+    } catch (err: unknown) {
+      const msg =
+        (err as { response?: { data?: { error?: string } } })?.response?.data
+          ?.error ?? "Error saving user.";
+      setError(msg);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className={styles.modalOverlay} onClick={onClose}>
+      <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+        {/* Modal header */}
+        <div className={styles.modalHeader}>
+          <div>
+            <h3 className={styles.modalTitle}>{ml2.title}</h3>
+            <p className={styles.modalSubtitle}>{ml2.subtitle}</p>
+          </div>
+          <button className={styles.modalClose} onClick={onClose} aria-label="Close">
+            ✕
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className={styles.modalForm}>
+          {/* First + Last name */}
+          <div className={styles.formRow}>
+            <div className={styles.formGroup}>
+              <label className={styles.label}>
+                {ml2.firstName} <span className={styles.required}>*</span>
+              </label>
+              <input
+                className={styles.input}
+                placeholder={ml2.placeholderFirst}
+                value={form.firstName}
+                onChange={(e) => set("firstName", e.target.value)}
+                required
+              />
+            </div>
+            <div className={styles.formGroup}>
+              <label className={styles.label}>
+                {ml2.lastName} <span className={styles.required}>*</span>
+              </label>
+              <input
+                className={styles.input}
+                placeholder={ml2.placeholderLast}
+                value={form.lastName}
+                onChange={(e) => set("lastName", e.target.value)}
+                required
+              />
+            </div>
+          </div>
+
+          {/* Email */}
+          <div className={styles.formGroup}>
+            <label className={styles.label}>
+              {ml2.email} <span className={styles.required}>*</span>
+            </label>
+            <input
+              className={styles.input}
+              type="email"
+              placeholder={ml2.placeholderEmail}
+              value={form.email}
+              onChange={(e) => set("email", e.target.value)}
+              required
+            />
+            <span className={styles.hint}>{ml2.emailHint}</span>
+          </div>
+
+          {/* Password */}
+          <div className={styles.formGroup}>
+            <label className={styles.label}>
+              {ml2.password} <span className={styles.required}>*</span>
+            </label>
+            <input
+              className={styles.input}
+              type="password"
+              placeholder="••••••••"
+              value={form.password}
+              onChange={(e) => set("password", e.target.value)}
+              required
+              minLength={6}
+            />
+            <span className={styles.hint}>{ml2.passwordHint}</span>
+          </div>
+
+          {/* Role + Preferred Language */}
+          <div className={styles.formRow}>
+            <div className={styles.formGroup}>
+              <label className={styles.label}>
+                {ml2.role} <span className={styles.required}>*</span>
+              </label>
+              <select
+                className={styles.input}
+                value={form.role}
+                onChange={(e) => set("role", e.target.value as UserRole)}
+                required
+              >
+                {CREATABLE_ROLES.map((r) => (
+                  <option key={r} value={r}>
+                    {r.charAt(0).toUpperCase() + r.slice(1)}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className={styles.formGroup}>
+              <label className={styles.label}>{ml2.prefLang}</label>
+              <select
+                className={styles.input}
+                value={form.preferredLanguage}
+                onChange={(e) =>
+                  set("preferredLanguage", e.target.value as "en" | "es")
+                }
+              >
+                <option value="en">EN</option>
+                <option value="es">ES</option>
+              </select>
+              <span className={styles.hint}>{ml2.langHint}</span>
+            </div>
+          </div>
+
+          {/* Phone */}
+          <div className={styles.formGroup}>
+            <label className={styles.label}>{ml2.phone}</label>
+            <input
+              className={styles.input}
+              type="tel"
+              placeholder={ml2.placeholderPhone}
+              value={form.phone}
+              onChange={(e) => set("phone", e.target.value)}
+            />
+          </div>
+
+          {/* Active toggle */}
+          <div className={styles.toggleRow}>
+            <div className={styles.toggleInfo}>
+              <span className={styles.label}>{ml2.activeUser}</span>
+              <span className={styles.toggleInfoIcon} title="User can log in when active">ⓘ</span>
+            </div>
+            <button
+              type="button"
+              className={`${styles.toggle} ${form.isActive ? styles.toggleOn : ""}`}
+              onClick={() => set("isActive", !form.isActive)}
+              aria-pressed={form.isActive}
+            >
+              <span className={styles.toggleThumb} />
+            </button>
+          </div>
+
+          {error && <p className={styles.errorMsg}>{error}</p>}
+
+          {/* Footer buttons */}
+          <div className={styles.modalFooter}>
+            <button type="button" className={styles.btnCancel} onClick={onClose}>
+              {ml2.cancel}
+            </button>
+            <button type="submit" className={styles.btnSave} disabled={saving}>
+              {saving ? ml2.saving : ml2.save}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+// ─── Edit User Modal ─────────────────────────────────────────────
+interface EditUserForm {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  role: UserRole;
+  preferredLanguage: "en" | "es";
+  phone: string;
+  isActive: boolean;
+}
+
+interface EditUserModalProps {
+  user: User;
+  lang: "en" | "es";
+  onClose: () => void;
+  onSaved: () => void;
+}
+
+function EditUserModal({ user, lang, onClose, onSaved }: EditUserModalProps) {
+  const [form, setForm] = useState<EditUserForm>({
+    firstName: user.firstName,
+    lastName: user.lastName,
+    email: user.email,
+    password: "",
+    role: user.role === "owner" ? "owner" : user.role,
+    preferredLanguage: user.preferredLanguage,
+    phone: user.phone ?? "",
+    isActive: user.isActive,
+  });
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+
+  const ml = {
+    en: {
+      title: "Edit User",
+      subtitle: "Update team member details",
+      firstName: "First Name",
+      lastName: "Last Name",
+      email: "Email",
+      emailHint: "Unique per tenant",
+      password: "New Password",
+      passwordHint: "Leave blank to keep current password",
+      role: "Role",
+      roleReadonly: "Role cannot be changed for owners",
+      prefLang: "Preferred Language",
+      langHint: "Default EN",
+      phone: "Phone",
+      activeUser: "Active user",
+      cancel: "Cancel",
+      save: "Save Changes",
+      saving: "Saving…",
+      placeholderPhone: "+1 234 567 8900",
+    },
+    es: {
+      title: "Editar Usuario",
+      subtitle: "Actualizar datos del miembro del equipo",
+      firstName: "Nombre",
+      lastName: "Apellido",
+      email: "Correo",
+      emailHint: "Único por empresa",
+      password: "Nueva Contraseña",
+      passwordHint: "Dejar en blanco para mantener la contraseña actual",
+      role: "Rol",
+      roleReadonly: "El rol no se puede cambiar para propietarios",
+      prefLang: "Idioma preferido",
+      langHint: "Por defecto EN",
+      phone: "Teléfono",
+      activeUser: "Usuario activo",
+      cancel: "Cancelar",
+      save: "Guardar Cambios",
+      saving: "Guardando…",
+      placeholderPhone: "+1 234 567 8900",
+    },
+  };
+  const ml2 = ml[lang];
+
+  const set = <K extends keyof EditUserForm>(k: K, v: EditUserForm[K]) =>
+    setForm((f) => ({ ...f, [k]: v }));
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSaving(true);
+    setError("");
+    try {
+      const payload: Record<string, unknown> = {
+        firstName: form.firstName.trim(),
+        lastName: form.lastName.trim(),
+        email: form.email.trim(),
+        role: form.role,
+        preferredLanguage: form.preferredLanguage,
+        phone: form.phone.trim() || undefined,
+        isActive: form.isActive,
+      };
+      if (form.password.trim()) payload.password = form.password;
+      await apiClient.put(`/users/${user.id}`, payload);
+      onSaved();
+    } catch (err: unknown) {
+      const msg =
+        (err as { response?: { data?: { error?: string } } })?.response?.data
+          ?.error ?? "Error saving user.";
+      setError(msg);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const isOwner = user.role === "owner";
+
+  return (
+    <div className={styles.modalOverlay} onClick={onClose}>
+      <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+        <div className={styles.modalHeader}>
+          <div>
+            <h3 className={styles.modalTitle}>{ml2.title}</h3>
+            <p className={styles.modalSubtitle}>{ml2.subtitle}</p>
+          </div>
+          <button className={styles.modalClose} onClick={onClose} aria-label="Close">
+            ✕
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className={styles.modalForm}>
+          <div className={styles.formRow}>
+            <div className={styles.formGroup}>
+              <label className={styles.label}>
+                {ml2.firstName} <span className={styles.required}>*</span>
+              </label>
+              <input
+                className={styles.input}
+                value={form.firstName}
+                onChange={(e) => set("firstName", e.target.value)}
+                required
+              />
+            </div>
+            <div className={styles.formGroup}>
+              <label className={styles.label}>
+                {ml2.lastName} <span className={styles.required}>*</span>
+              </label>
+              <input
+                className={styles.input}
+                value={form.lastName}
+                onChange={(e) => set("lastName", e.target.value)}
+                required
+              />
+            </div>
+          </div>
+
+          <div className={styles.formGroup}>
+            <label className={styles.label}>
+              {ml2.email} <span className={styles.required}>*</span>
+            </label>
+            <input
+              className={styles.input}
+              type="email"
+              value={form.email}
+              onChange={(e) => set("email", e.target.value)}
+              required
+            />
+            <span className={styles.hint}>{ml2.emailHint}</span>
+          </div>
+
+          <div className={styles.formGroup}>
+            <label className={styles.label}>{ml2.password}</label>
+            <input
+              className={styles.input}
+              type="password"
+              placeholder="••••••••"
+              value={form.password}
+              onChange={(e) => set("password", e.target.value)}
+              minLength={6}
+            />
+            <span className={styles.hint}>{ml2.passwordHint}</span>
+          </div>
+
+          <div className={styles.formRow}>
+            <div className={styles.formGroup}>
+              <label className={styles.label}>
+                {ml2.role} <span className={styles.required}>*</span>
+              </label>
+              {isOwner ? (
+                <>
+                  <input
+                    className={styles.input}
+                    value="Owner"
+                    disabled
+                    readOnly
+                  />
+                  <span className={styles.hint}>{ml2.roleReadonly}</span>
+                </>
+              ) : (
+                <select
+                  className={styles.input}
+                  value={form.role}
+                  onChange={(e) => set("role", e.target.value as UserRole)}
+                  required
+                >
+                  {CREATABLE_ROLES.map((r) => (
+                    <option key={r} value={r}>
+                      {r.charAt(0).toUpperCase() + r.slice(1)}
+                    </option>
+                  ))}
+                </select>
+              )}
+            </div>
+            <div className={styles.formGroup}>
+              <label className={styles.label}>{ml2.prefLang}</label>
+              <select
+                className={styles.input}
+                value={form.preferredLanguage}
+                onChange={(e) =>
+                  set("preferredLanguage", e.target.value as "en" | "es")
+                }
+              >
+                <option value="en">EN</option>
+                <option value="es">ES</option>
+              </select>
+              <span className={styles.hint}>{ml2.langHint}</span>
+            </div>
+          </div>
+
+          <div className={styles.formGroup}>
+            <label className={styles.label}>{ml2.phone}</label>
+            <input
+              className={styles.input}
+              type="tel"
+              placeholder={ml2.placeholderPhone}
+              value={form.phone}
+              onChange={(e) => set("phone", e.target.value)}
+            />
+          </div>
+
+          <div className={styles.toggleRow}>
+            <div className={styles.toggleInfo}>
+              <span className={styles.label}>{ml2.activeUser}</span>
+              <span className={styles.toggleInfoIcon} title="User can log in when active">ⓘ</span>
+            </div>
+            <button
+              type="button"
+              className={`${styles.toggle} ${form.isActive ? styles.toggleOn : ""}`}
+              onClick={() => set("isActive", !form.isActive)}
+              aria-pressed={form.isActive}
+            >
+              <span className={styles.toggleThumb} />
+            </button>
+          </div>
+
+          {error && <p className={styles.errorMsg}>{error}</p>}
+
+          <div className={styles.modalFooter}>
+            <button type="button" className={styles.btnCancel} onClick={onClose}>
+              {ml2.cancel}
+            </button>
+            <button type="submit" className={styles.btnSave} disabled={saving}>
+              {saving ? ml2.saving : ml2.save}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
 interface UsersResponse {
   success: boolean;
   data: User[];
@@ -113,6 +645,9 @@ export default function UsersPage() {
   const [colRole, setColRole] = useState("");
   const [colStatus, setColStatus] = useState("");
 
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [editingUser, setEditingUser] = useState<User | null>(null);
+
   const totalPages = Math.max(1, Math.ceil(total / PAGE_LIMIT));
   const canWrite = hasRole("owner", "manager");
 
@@ -178,10 +713,30 @@ export default function UsersPage() {
 
   return (
     <div className={styles.page}>
+      {showAddModal && canWrite && (
+        <AddUserModal
+          lang={lang}
+          onClose={() => setShowAddModal(false)}
+          onSaved={() => { setShowAddModal(false); fetchUsers(); }}
+        />
+      )}
+      {editingUser && canWrite && (
+        <EditUserModal
+          user={editingUser}
+          lang={lang}
+          onClose={() => setEditingUser(null)}
+          onSaved={() => { setEditingUser(null); fetchUsers(); }}
+        />
+      )}
+
       {/* Header */}
       <div className={styles.header}>
         <h2 className={styles.title}>{l.title}</h2>
-        {canWrite && <button className={styles.addBtn}>{l.addUser}</button>}
+        {canWrite && (
+          <button className={styles.addBtn} onClick={() => setShowAddModal(true)}>
+            {l.addUser}
+          </button>
+        )}
       </div>
 
       {/* Toolbar */}
@@ -340,7 +895,7 @@ export default function UsersPage() {
                         {l.btnView}
                       </button>
                       {canWrite && (
-                        <button className={styles.btnUpdate}>
+                        <button className={styles.btnUpdate} onClick={() => setEditingUser(u)}>
                           <svg viewBox="0 0 20 20" fill="currentColor">
                             <path d="M13.586 3.586a2 2 0 112.828 2.828l-9.5 9.5A2 2 0 015.5 16.5H4a1 1 0 01-1-1v-1.5a2 2 0 01.586-1.414l9.5-9.5z" />
                           </svg>
