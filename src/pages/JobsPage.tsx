@@ -334,6 +334,7 @@ function JobModal({ job, lang, onClose, onSaved }: JobModalProps) {
   const [services, setServices] = useState<DropdownService[]>([]);
   const [users, setUsers] = useState<DropdownUser[]>([]);
   const [loadingOptions, setLoadingOptions] = useState(true);
+  const [checklistTab, setChecklistTab] = useState<"en" | "es">("en");
 
   useEffect(() => {
     Promise.all([
@@ -447,9 +448,19 @@ function JobModal({ job, lang, onClose, onSaved }: JobModalProps) {
         className={`${styles.modal} ${styles.modalLarge}`}
         onClick={(e) => e.stopPropagation()}
       >
-        <h3 className={styles.modalTitle}>
-          {isEdit ? l.editTitle : l.addTitle}
-        </h3>
+        <div className={styles.modalHeader}>
+          <h3 className={styles.modalTitle}>
+            {isEdit ? l.editTitle : l.addTitle}
+          </h3>
+          <button
+            type="button"
+            className={styles.modalCloseBtn}
+            onClick={onClose}
+            aria-label="Close"
+          >
+            ×
+          </button>
+        </div>
         {loadingOptions ? (
           <p className={styles.modalLoading}>{l.loadingOpts}</p>
         ) : (
@@ -643,22 +654,34 @@ function JobModal({ job, lang, onClose, onSaved }: JobModalProps) {
 
             {/* Checklist */}
             <p className={styles.sectionDivider}>{l.checklistSection}</p>
+            <div className={styles.langTabs}>
+              <button
+                type="button"
+                className={`${styles.langTab} ${checklistTab === "en" ? styles.langTabActive : ""}`}
+                onClick={() => setChecklistTab("en")}
+              >
+                EN
+              </button>
+              <button
+                type="button"
+                className={`${styles.langTab} ${checklistTab === "es" ? styles.langTabActive : ""}`}
+                onClick={() => setChecklistTab("es")}
+              >
+                ES
+              </button>
+            </div>
             {form.checklist.map((item, idx) => (
               <div key={idx} className={styles.checklistRow}>
                 <input
                   className={styles.input}
-                  placeholder={l.checkItemEn}
-                  value={item.labelEn}
+                  placeholder={checklistTab === "en" ? l.checkItemEn : l.checkItemEs}
+                  value={checklistTab === "en" ? item.labelEn : item.labelEs}
                   onChange={(e) =>
-                    updateChecklistItem(idx, "labelEn", e.target.value)
-                  }
-                />
-                <input
-                  className={styles.input}
-                  placeholder={l.checkItemEs}
-                  value={item.labelEs}
-                  onChange={(e) =>
-                    updateChecklistItem(idx, "labelEs", e.target.value)
+                    updateChecklistItem(
+                      idx,
+                      checklistTab === "en" ? "labelEn" : "labelEs",
+                      e.target.value,
+                    )
                   }
                 />
                 <button
