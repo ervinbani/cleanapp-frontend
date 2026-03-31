@@ -109,41 +109,38 @@ export default function RegisterPage() {
           )}
         </div>
 
-        {/* Name row */}
-        <div className={styles.row}>
-          <div className={styles.field}>
-            <label className={styles.label} htmlFor="firstName">
-              {t("First Name", "Nombre")}
-            </label>
-            <input
-              id="firstName"
-              type="text"
-              className={`${styles.input} ${errors.firstName ? styles.inputError : ""}`}
-              placeholder="Jane"
-              {...register("firstName")}
-            />
-            {errors.firstName && (
-              <span className={styles.errorMsg}>
-                {errors.firstName.message}
-              </span>
-            )}
-          </div>
+        {/* First Name */}
+        <div className={styles.field}>
+          <label className={styles.label} htmlFor="firstName">
+            {t("First Name", "Nombre")}
+          </label>
+          <input
+            id="firstName"
+            type="text"
+            className={`${styles.input} ${errors.firstName ? styles.inputError : ""}`}
+            placeholder="Jane"
+            {...register("firstName")}
+          />
+          {errors.firstName && (
+            <span className={styles.errorMsg}>{errors.firstName.message}</span>
+          )}
+        </div>
 
-          <div className={styles.field}>
-            <label className={styles.label} htmlFor="lastName">
-              {t("Last Name", "Apellido")}
-            </label>
-            <input
-              id="lastName"
-              type="text"
-              className={`${styles.input} ${errors.lastName ? styles.inputError : ""}`}
-              placeholder="Doe"
-              {...register("lastName")}
-            />
-            {errors.lastName && (
-              <span className={styles.errorMsg}>{errors.lastName.message}</span>
-            )}
-          </div>
+        {/* Last Name */}
+        <div className={styles.field}>
+          <label className={styles.label} htmlFor="lastName">
+            {t("Last Name", "Apellido")}
+          </label>
+          <input
+            id="lastName"
+            type="text"
+            className={`${styles.input} ${errors.lastName ? styles.inputError : ""}`}
+            placeholder="Doe"
+            {...register("lastName")}
+          />
+          {errors.lastName && (
+            <span className={styles.errorMsg}>{errors.lastName.message}</span>
+          )}
         </div>
 
         {/* Email */}
