@@ -124,10 +124,10 @@ const mT = {
   en: {
     addTitle: "Add Service",
     editTitle: "Edit Service",
-    nameEn: "Name (English)",
-    nameEs: "Name (Spanish)",
-    descEn: "Description (English)",
-    descEs: "Description (Spanish)",
+    name: "Name",
+    description: "Description",
+    descPlaceholder: "Enter a description...",
+    namePlaceholder: "Service Name",
     duration: "Duration (minutes)",
     price: "Base Price ($)",
     status: "Status",
@@ -136,15 +136,15 @@ const mT = {
     cancel: "Cancel",
     save: "Save",
     update: "Update",
-    required: "Name (EN) and Name (ES) are required.",
+    required: "Name is required for at least the EN tab.",
   },
   es: {
     addTitle: "Agregar Servicio",
     editTitle: "Editar Servicio",
-    nameEn: "Nombre (Inglés)",
-    nameEs: "Nombre (Español)",
-    descEn: "Descripción (Inglés)",
-    descEs: "Descripción (Español)",
+    name: "Nombre",
+    description: "Descripción",
+    descPlaceholder: "Ingrese una descripción...",
+    namePlaceholder: "Nombre del Servicio",
     duration: "Duración (minutos)",
     price: "Precio Base ($)",
     status: "Estado",
@@ -153,7 +153,7 @@ const mT = {
     cancel: "Cancelar",
     save: "Guardar",
     update: "Actualizar",
-    required: "El nombre (EN) y el nombre (ES) son obligatorios.",
+    required: "El nombre es obligatorio al menos en el tab EN.",
   },
 };
 
@@ -165,21 +165,23 @@ function ServiceModal({ service, lang, onClose, onSaved }: ServiceModalProps) {
   );
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
+  const [activeTab, setActiveTab] = useState<"en" | "es">("en");
 
   const set = (field: keyof ServiceForm, value: string | boolean) =>
     setForm((prev) => ({ ...prev, [field]: value }));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.nameEn.trim() || !form.nameEs.trim()) {
+    if (!form.nameEn.trim()) {
       setError(l.required);
+      setActiveTab("en");
       return;
     }
     setSaving(true);
     setError("");
     try {
       const payload = {
-        name: { en: form.nameEn.trim(), es: form.nameEs.trim() },
+        name: { en: form.nameEn.trim(), es: form.nameEs.trim() || form.nameEn.trim() },
         description: {
           en: form.descriptionEn.trim() || undefined,
           es: form.descriptionEs.trim() || undefined,
@@ -210,52 +212,89 @@ function ServiceModal({ service, lang, onClose, onSaved }: ServiceModalProps) {
   return (
     <div className={styles.modalOverlay} onClick={onClose}>
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-        <h3 className={styles.modalTitle}>
-          {isEdit ? l.editTitle : l.addTitle}
-        </h3>
+        {/* Header */}
+        <div className={styles.modalHeader}>
+          <h3 className={styles.modalTitle}>
+            {isEdit ? l.editTitle : l.addTitle}
+          </h3>
+          <button
+            type="button"
+            className={styles.modalCloseBtn}
+            onClick={onClose}
+            aria-label="Close"
+          >
+            ×
+          </button>
+        </div>
+
         <form onSubmit={handleSubmit}>
-          <div className={styles.formRow}>
-            <div className={styles.formGroup}>
-              <label className={styles.label}>{l.nameEn} *</label>
-              <input
-                className={styles.input}
-                value={form.nameEn}
-                onChange={(e) => set("nameEn", e.target.value)}
-                required
-              />
-            </div>
-            <div className={styles.formGroup}>
-              <label className={styles.label}>{l.nameEs} *</label>
-              <input
-                className={styles.input}
-                value={form.nameEs}
-                onChange={(e) => set("nameEs", e.target.value)}
-                required
-              />
-            </div>
+          {/* Language tabs */}
+          <div className={styles.langTabs}>
+            <button
+              type="button"
+              className={`${styles.langTab} ${activeTab === "en" ? styles.langTabActive : ""}`}
+              onClick={() => setActiveTab("en")}
+            >
+              EN
+            </button>
+            <button
+              type="button"
+              className={`${styles.langTab} ${activeTab === "es" ? styles.langTabActive : ""}`}
+              onClick={() => setActiveTab("es")}
+            >
+              ES
+            </button>
           </div>
 
-          <div className={styles.formRow}>
-            <div className={styles.formGroup}>
-              <label className={styles.label}>{l.descEn}</label>
-              <textarea
-                className={styles.textarea}
-                rows={3}
-                value={form.descriptionEn}
-                onChange={(e) => set("descriptionEn", e.target.value)}
-              />
+          {/* Per-language fields */}
+          {activeTab === "en" && (
+            <div className={styles.langTabContent}>
+              <div className={styles.formGroup}>
+                <label className={styles.label}>{l.name}</label>
+                <input
+                  className={styles.input}
+                  placeholder={l.namePlaceholder}
+                  value={form.nameEn}
+                  onChange={(e) => set("nameEn", e.target.value)}
+                />
+              </div>
+              <div className={styles.formGroup}>
+                <label className={styles.label}>{l.description}</label>
+                <textarea
+                  className={styles.textarea}
+                  rows={4}
+                  placeholder={l.descPlaceholder}
+                  value={form.descriptionEn}
+                  onChange={(e) => set("descriptionEn", e.target.value)}
+                />
+              </div>
             </div>
-            <div className={styles.formGroup}>
-              <label className={styles.label}>{l.descEs}</label>
-              <textarea
-                className={styles.textarea}
-                rows={3}
-                value={form.descriptionEs}
-                onChange={(e) => set("descriptionEs", e.target.value)}
-              />
+          )}
+          {activeTab === "es" && (
+            <div className={styles.langTabContent}>
+              <div className={styles.formGroup}>
+                <label className={styles.label}>{l.name}</label>
+                <input
+                  className={styles.input}
+                  placeholder={l.namePlaceholder}
+                  value={form.nameEs}
+                  onChange={(e) => set("nameEs", e.target.value)}
+                />
+              </div>
+              <div className={styles.formGroup}>
+                <label className={styles.label}>{l.description}</label>
+                <textarea
+                  className={styles.textarea}
+                  rows={4}
+                  placeholder={l.descPlaceholder}
+                  value={form.descriptionEs}
+                  onChange={(e) => set("descriptionEs", e.target.value)}
+                />
+              </div>
             </div>
-          </div>
+          )}
 
+          {/* Shared fields */}
           <div className={styles.formRow}>
             <div className={styles.formGroup}>
               <label className={styles.label}>{l.duration}</label>
