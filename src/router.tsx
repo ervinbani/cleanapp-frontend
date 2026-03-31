@@ -8,6 +8,7 @@ import CustomersPage from "./pages/CustomersPage";
 import ServicesPage from "./pages/ServicesPage";
 import UsersPage from "./pages/UsersPage";
 import JobsPage from "./pages/JobsPage";
+import InvoicesPage from "./pages/InvoicesPage";
 
 const router = createBrowserRouter([
   // Public routes
@@ -25,6 +26,7 @@ const router = createBrowserRouter([
           { path: "/users", element: <UsersPage /> },
           { path: "/customers", element: <CustomersPage /> },
           { path: "/jobs", element: <JobsPage /> },
+          { path: "/invoices", element: <InvoicesPage /> },
           { path: "/services", element: <ServicesPage /> },
         ],
       },

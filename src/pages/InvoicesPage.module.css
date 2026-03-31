@@ -1,0 +1,551 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  height: 100%;
+}
+
+/* ─── Header ──────────────────────────────────────────────────── */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+
+.title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+}
+
+.addBtn {
+  padding: 0.55rem 1.1rem;
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+
+.addBtn:hover { background: #1d4ed8; }
+
+/* ─── Toolbar ─────────────────────────────────────────────────── */
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+}
+
+.searchWrap {
+  position: relative;
+  flex: 1;
+  min-width: 220px;
+  max-width: 380px;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 0.7rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  color: #9ca3af;
+  pointer-events: none;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 0.5rem 0.75rem 0.5rem 2.2rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  color: #374151;
+  background: #fff;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.15s;
+}
+
+.searchInput:focus { border-color: #2563eb; }
+
+.filterSelect {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  color: #374151;
+  background: #fff;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+.filterSelect:focus { border-color: #2563eb; }
+
+/* ─── Export buttons ──────────────────────────────────────────── */
+.exportBtns {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.btnExcelExport,
+.btnPdfExport {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.5rem 0.9rem;
+  border-radius: 8px;
+  border: 1px solid;
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.btnExcelExport svg,
+.btnPdfExport svg { width: 15px; height: 15px; flex-shrink: 0; }
+
+.btnExcelExport { background: #f0fdf4; border-color: #86efac; color: #15803d; }
+.btnExcelExport:hover { background: #dcfce7; border-color: #4ade80; }
+
+.btnPdfExport { background: #fef2f2; border-color: #fca5a5; color: #b91c1c; }
+.btnPdfExport:hover { background: #fee2e2; border-color: #f87171; }
+
+/* ─── Table wrapper ───────────────────────────────────────────── */
+.tableWrap {
+  flex: 1;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  overflow: auto;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+/* ─── Table ───────────────────────────────────────────────────── */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.headRow th {
+  padding: 0.75rem 1rem 0.4rem;
+  text-align: left;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: #f9fafb;
+  border-bottom: 1px solid #f0f0f0;
+  white-space: nowrap;
+}
+
+.filterRow th {
+  padding: 0.35rem 0.6rem 0.55rem;
+  background: #f9fafb;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.colFilter {
+  width: 100%;
+  padding: 0.3rem 0.5rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  color: #374151;
+  background: #fff;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.15s;
+}
+
+.colFilter:focus { border-color: #2563eb; }
+
+.bodyRow td {
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid #f3f4f6;
+  color: #374151;
+  vertical-align: middle;
+}
+
+.bodyRow:last-child td { border-bottom: none; }
+.bodyRow:hover td { background: #f8faff; }
+
+.invoiceNumCell { font-weight: 600; color: #111827 !important; white-space: nowrap; }
+.customerCell { color: #374151; white-space: nowrap; }
+.dateCell { white-space: nowrap; color: #374151; font-size: 0.82rem; }
+.amountCell { white-space: nowrap; font-weight: 500; color: #374151; }
+
+.empty {
+  text-align: center;
+  padding: 2.5rem !important;
+  color: #9ca3af;
+  font-size: 0.9rem;
+}
+
+/* ─── Status badges ───────────────────────────────────────────── */
+.badge {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.badge_draft { background: #f3f4f6; color: #6b7280; }
+.badge_sent { background: #dbeafe; color: #1d4ed8; }
+.badge_paid { background: #d1fae5; color: #065f46; }
+.badge_partially_paid { background: #fef3c7; color: #92400e; }
+.badge_overdue { background: #fee2e2; color: #991b1b; }
+.badge_void { background: #f3f4f6; color: #9ca3af; }
+
+/* ─── Action buttons ──────────────────────────────────────────── */
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.btnView,
+.btnUpdate,
+.btnDelete {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.3rem 0.65rem;
+  border-radius: 6px;
+  border: 1px solid;
+  font-size: 0.78rem;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s, color 0.15s;
+}
+
+.btnView svg,
+.btnUpdate svg,
+.btnDelete svg { width: 13px; height: 13px; flex-shrink: 0; }
+
+.btnView { background: #fff; border-color: #d1d5db; color: #374151; }
+.btnView:hover { background: #f3f4f6; }
+
+.btnUpdate { background: #fff; border-color: #d1d5db; color: #374151; }
+.btnUpdate:hover { background: #f3f4f6; }
+
+.btnDelete { background: #fff; border-color: #fca5a5; color: #ef4444; padding: 0.3rem 0.5rem; }
+.btnDelete:hover { background: #fef2f2; }
+
+/* ─── Pagination ──────────────────────────────────────────────── */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+  padding-bottom: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.pageBtn {
+  padding: 0.4rem 0.85rem;
+  border: 1px solid #d1d5db;
+  border-radius: 7px;
+  background: #fff;
+  color: #374151;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.pageBtn:hover:not(:disabled) { background: #eff6ff; color: #2563eb; border-color: #93c5fd; }
+.pageBtn:disabled { opacity: 0.4; cursor: default; }
+
+.pageNumbers { display: flex; align-items: center; gap: 0.25rem; }
+
+.pageNum {
+  min-width: 32px;
+  height: 32px;
+  padding: 0 0.35rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  background: #fff;
+  color: #374151;
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.pageNum:hover { background: #eff6ff; color: #2563eb; border-color: #93c5fd; }
+
+.pageNumActive {
+  background: #2563eb !important;
+  color: #fff !important;
+  border-color: #2563eb !important;
+  font-weight: 700;
+}
+
+.ellipsis { padding: 0 0.25rem; color: #9ca3af; font-size: 0.85rem; user-select: none; }
+.pageInfo { font-size: 0.8rem; color: #9ca3af; margin-left: 0.5rem; }
+
+/* ─── Inline Form ──────────────────────────────────────────────── */
+.formSection {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1.5rem 2rem;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+.formHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+}
+
+.formTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+}
+
+.formCloseBtn {
+  background: none;
+  border: none;
+  font-size: 1.4rem;
+  line-height: 1;
+  color: #9ca3af;
+  cursor: pointer;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  transition: color 0.15s, background 0.15s;
+}
+
+.formCloseBtn:hover { color: #374151; background: #f3f4f6; }
+
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 0;
+}
+
+.formRow3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 0;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: 1rem;
+}
+
+.label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #374151;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.input {
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 0.55rem 0.75rem;
+  font-size: 0.95rem;
+  color: #111827;
+  background: #fff;
+  outline: none;
+  transition: border-color 0.15s;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.input:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15); }
+
+.textarea {
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 0.55rem 0.75rem;
+  font-size: 0.95rem;
+  color: #111827;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.15s;
+  font-family: inherit;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.textarea:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15); }
+
+.sectionDivider {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #9ca3af;
+  margin: 0.5rem 0 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #f3f4f6;
+}
+
+/* ─── Items rows ──────────────────────────────────────────────── */
+.itemRow {
+  display: grid;
+  grid-template-columns: 2fr 1fr 0.7fr 0.7fr 0.7fr auto;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  align-items: end;
+}
+
+.btnRemoveItem {
+  background: none;
+  border: none;
+  color: #ef4444;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  transition: background 0.15s;
+  line-height: 1;
+  margin-bottom: 1rem;
+}
+
+.btnRemoveItem:hover { background: #fee2e2; }
+
+.btnAddItem {
+  background: none;
+  border: 1px dashed #d1d5db;
+  border-radius: 8px;
+  color: #6b7280;
+  font-size: 0.875rem;
+  padding: 0.4rem 0.9rem;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+  margin-bottom: 1rem;
+}
+
+.btnAddItem:hover { border-color: #3b82f6; color: #3b82f6; }
+
+/* ─── Totals ──────────────────────────────────────────────────── */
+.totalsWrap {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 1rem;
+}
+
+.totalsTable {
+  font-size: 0.9rem;
+  color: #374151;
+}
+
+.totalsTable td {
+  padding: 0.25rem 0.75rem;
+}
+
+.totalsTable td:first-child {
+  text-align: right;
+  font-weight: 600;
+  color: #6b7280;
+}
+
+.totalsTable td:last-child {
+  text-align: right;
+  min-width: 80px;
+}
+
+.totalRow td {
+  font-weight: 700;
+  color: #111827 !important;
+  font-size: 1rem;
+  border-top: 2px solid #e5e7eb;
+  padding-top: 0.5rem;
+}
+
+.formError {
+  font-size: 0.85rem;
+  color: #ef4444;
+  margin: 0.25rem 0 0.75rem;
+}
+
+.formFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid #f3f4f6;
+}
+
+.btnCancel {
+  padding: 0.55rem 1.25rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background: #fff;
+  color: #374151;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btnCancel:hover { background: #f9fafb; }
+
+.btnSave {
+  padding: 0.55rem 1.25rem;
+  border: none;
+  border-radius: 8px;
+  background: #3b82f6;
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btnSave:hover { background: #2563eb; }
+.btnSave:disabled, .btnCancel:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ─── Download PDF button ─────────────────────────────────────── */
+.btnDownloadPdf {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.55rem 1.25rem;
+  border: 1px solid #fca5a5;
+  border-radius: 8px;
+  background: #fef2f2;
+  color: #b91c1c;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  margin-right: auto;
+}
+
+.btnDownloadPdf:hover { background: #fee2e2; border-color: #f87171; }
+.btnDownloadPdf:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.btnDownloadPdf svg { width: 15px; height: 15px; flex-shrink: 0; }

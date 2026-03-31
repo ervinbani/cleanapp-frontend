@@ -7,7 +7,7 @@ export type JobStatus =
   | "completed"
   | "canceled"
   | "no_show";
-export type InvoiceStatus = "draft" | "sent" | "paid" | "overdue" | "void";
+export type InvoiceStatus = "draft" | "sent" | "paid" | "partially_paid" | "overdue" | "void";
 export type CustomerStatus = "lead" | "active" | "inactive";
 
 export interface User {
@@ -121,7 +121,9 @@ export interface Job {
 
 export interface InvoiceItem {
   description?: string;
+  serviceType?: string;
   quantity?: number;
+  unit?: string;
   unitPrice?: number;
   total?: number;
 }
@@ -132,15 +134,29 @@ export interface Invoice {
   customerId: string | Customer;
   jobId?: string | Job;
   invoiceNumber: string;
+  customerSnapshot?: {
+    name?: string;
+    email?: string;
+    address?: string;
+    vatNumber?: string;
+  };
+  issuedDate?: string;
+  dueDate?: string;
+  servicePeriod?: {
+    from?: string;
+    to?: string;
+  };
   items: InvoiceItem[];
   subtotal?: number;
+  discount?: number;
+  taxRate?: number;
   tax?: number;
   total?: number;
   currency: string;
   status: InvoiceStatus;
-  dueDate?: string;
   paidAt?: string;
-  paymentMethod?: "cash" | "card" | "bank_transfer" | "stripe" | "other";
+  paymentMethod?: "cash" | "card" | "bank_transfer" | "stripe" | "paypal" | "other";
+  notes?: string;
   createdAt: string;
   updatedAt: string;
 }
