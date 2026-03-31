@@ -47,6 +47,8 @@ const t = {
     page: "Page",
     of: "of",
     min: "min",
+    exportExcel: "Export Excel",
+    exportPdf: "Export PDF",
   },
   es: {
     title: "Servicios",
@@ -73,6 +75,8 @@ const t = {
     page: "Página",
     of: "de",
     min: "min",
+    exportExcel: "Exportar Excel",
+    exportPdf: "Exportar PDF",
   },
 };
 
@@ -394,6 +398,59 @@ export default function ServicesPage() {
 
   const pageRange = getPageRange(page, totalPages);
 
+  const exportExcel = async () => {
+    const ExcelJS = (await import("exceljs")).default;
+    const wb = new ExcelJS.Workbook();
+    const ws = wb.addWorksheet("Services");
+    ws.columns = [
+      { header: l.colName, key: "name", width: 28 },
+      { header: l.colDescription, key: "description", width: 40 },
+      { header: l.colDuration, key: "duration", width: 16 },
+      { header: l.colPrice, key: "price", width: 14 },
+      { header: l.colStatus, key: "status", width: 12 },
+    ];
+    const headerRow = ws.getRow(1);
+    headerRow.eachCell((cell) => {
+      cell.font = { bold: true };
+      cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFE5E7EB" } };
+    });
+    displayed.forEach((s) => {
+      ws.addRow({
+        name: s.name?.[lang] ?? s.name?.en ?? "",
+        description: s.description?.[lang] ?? s.description?.en ?? "",
+        duration: s.durationMinutes != null ? `${s.durationMinutes} ${l.min}` : "",
+        price: s.basePrice != null ? `$${s.basePrice.toFixed(2)}` : "",
+        status: s.isActive ? l.active : l.inactive,
+      });
+    });
+    const buf = await wb.xlsx.writeBuffer();
+    const url = URL.createObjectURL(new Blob([buf], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }));
+    const a = document.createElement("a"); a.href = url; a.download = "services.xlsx"; a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const exportPdf = async () => {
+    const { default: jsPDF } = await import("jspdf");
+    await import("jspdf-autotable");
+    const doc = new jsPDF({ orientation: "landscape" });
+    doc.setFontSize(14);
+    doc.text(l.title, 14, 16);
+    (doc as any).autoTable({
+      startY: 22,
+      head: [[l.colName, l.colDescription, l.colDuration, l.colPrice, l.colStatus]],
+      body: displayed.map((s) => [
+        s.name?.[lang] ?? s.name?.en ?? "",
+        s.description?.[lang] ?? s.description?.en ?? "",
+        s.durationMinutes != null ? `${s.durationMinutes} ${l.min}` : "",
+        s.basePrice != null ? `$${s.basePrice.toFixed(2)}` : "",
+        s.isActive ? l.active : l.inactive,
+      ]),
+      headStyles: { fillColor: [37, 99, 235] },
+      alternateRowStyles: { fillColor: [249, 250, 251] },
+    });
+    doc.save("services.pdf");
+  };
+
   return (
     <div className={styles.page}>
       {/* Header */}
@@ -429,6 +486,16 @@ export default function ServicesPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
+        </div>
+        <div className={styles.exportBtns}>
+          <button className={styles.btnExcelOutline} onClick={exportExcel}>
+            <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15"><path fillRule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 001 1h14a1 1 0 001-1V7.414A1 1 0 0017.707 7L14 3.293A1 1 0 0013.586 3H3zm9 1.414L15.586 8H13a1 1 0 01-1-1V4.414zM7 9a1 1 0 000 2h6a1 1 0 100-2H7zm0 4a1 1 0 100 2h4a1 1 0 100-2H7z" clipRule="evenodd" /></svg>
+            {l.exportExcel}
+          </button>
+          <button className={styles.btnPdfOutline} onClick={exportPdf}>
+            <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15"><path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h4a1 1 0 100-2H7z" clipRule="evenodd" /></svg>
+            {l.exportPdf}
+          </button>
         </div>
       </div>
 
