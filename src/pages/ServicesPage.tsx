@@ -181,7 +181,10 @@ function ServiceModal({ service, lang, onClose, onSaved }: ServiceModalProps) {
     setError("");
     try {
       const payload = {
-        name: { en: form.nameEn.trim(), es: form.nameEs.trim() || form.nameEn.trim() },
+        name: {
+          en: form.nameEn.trim(),
+          es: form.nameEs.trim() || form.nameEn.trim(),
+        },
         description: {
           en: form.descriptionEn.trim() || undefined,
           es: form.descriptionEs.trim() || undefined,
