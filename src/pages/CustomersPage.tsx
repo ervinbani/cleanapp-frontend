@@ -618,13 +618,7 @@ export default function CustomersPage() {
     doc.text(l.title, 14, 15);
     autoTable(doc, {
       startY: 22,
-      head: [[
-        l.colName,
-        l.colEmail,
-        l.colCountry,
-        l.colStatus,
-        l.colSource,
-      ]],
+      head: [[l.colName, l.colEmail, l.colCountry, l.colStatus, l.colSource]],
       body: displayed.map((c) => [
         `${c.firstName} ${c.lastName}`,
         c.email ?? "—",
