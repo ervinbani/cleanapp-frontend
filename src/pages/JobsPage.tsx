@@ -806,7 +806,11 @@ export default function JobsPage() {
       sheet.addRow({
         title: j.title ?? "—",
         customer: customer ? `${customer.firstName} ${customer.lastName}` : "—",
-        service: service ? (lang === "es" ? service.name.es : service.name.en) : "—",
+        service: service
+          ? lang === "es"
+            ? service.name.es
+            : service.name.en
+          : "—",
         scheduled: formatDateTime(j.scheduledStart, lang),
         status: l[`status_${j.status}` as keyof typeof l] as string,
         assigned: getAssignedNames(j),
@@ -815,9 +819,15 @@ export default function JobsPage() {
     });
     const headerRow = sheet.getRow(1);
     headerRow.font = { bold: true };
-    headerRow.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFE5E7EB" } };
+    headerRow.fill = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "FFE5E7EB" },
+    };
     const buffer = await workbook.xlsx.writeBuffer();
-    const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+    const blob = new Blob([buffer], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
@@ -834,7 +844,17 @@ export default function JobsPage() {
     doc.text(l.title, 14, 15);
     autoTable(doc, {
       startY: 22,
-      head: [[l.colTitle, l.colCustomer, l.colService, l.colScheduled, l.colStatus, l.colAssigned, l.colPrice]],
+      head: [
+        [
+          l.colTitle,
+          l.colCustomer,
+          l.colService,
+          l.colScheduled,
+          l.colStatus,
+          l.colAssigned,
+          l.colPrice,
+        ],
+      ],
       body: displayed.map((j) => {
         const customer = getCustomer(j);
         const service = getService(j);
@@ -906,13 +926,21 @@ export default function JobsPage() {
         <div className={styles.exportBtns}>
           <button className={styles.btnExcelExport} onClick={handleExportExcel}>
             <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15">
-              <path fillRule="evenodd" d="M3 4a1 1 0 011-1h4a1 1 0 010 2H6.414l2.293 2.293a1 1 0 11-1.414 1.414L5 6.414V8a1 1 0 01-2 0V4zm9 1a1 1 0 110-2h4a1 1 0 011 1v4a1 1 0 11-2 0V6.414l-2.293 2.293a1 1 0 11-1.414-1.414L13.586 5H12zm-9 7a1 1 0 112 0v1.586l2.293-2.293a1 1 0 111.414 1.414L6.414 15H8a1 1 0 110 2H4a1 1 0 01-1-1v-4zm13-1a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 110-2h1.586l-2.293-2.293a1 1 0 111.414-1.414L17 13.586V12a1 1 0 011-1z" clipRule="evenodd" />
+              <path
+                fillRule="evenodd"
+                d="M3 4a1 1 0 011-1h4a1 1 0 010 2H6.414l2.293 2.293a1 1 0 11-1.414 1.414L5 6.414V8a1 1 0 01-2 0V4zm9 1a1 1 0 110-2h4a1 1 0 011 1v4a1 1 0 11-2 0V6.414l-2.293 2.293a1 1 0 11-1.414-1.414L13.586 5H12zm-9 7a1 1 0 112 0v1.586l2.293-2.293a1 1 0 111.414 1.414L6.414 15H8a1 1 0 110 2H4a1 1 0 01-1-1v-4zm13-1a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 110-2h1.586l-2.293-2.293a1 1 0 111.414-1.414L17 13.586V12a1 1 0 011-1z"
+                clipRule="evenodd"
+              />
             </svg>
             {l.exportExcel}
           </button>
           <button className={styles.btnPdfExport} onClick={handleExportPdf}>
             <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15">
-              <path fillRule="evenodd" d="M3 4a1 1 0 011-1h4a1 1 0 010 2H6.414l2.293 2.293a1 1 0 11-1.414 1.414L5 6.414V8a1 1 0 01-2 0V4zm9 1a1 1 0 110-2h4a1 1 0 011 1v4a1 1 0 11-2 0V6.414l-2.293-2.293a1 1 0 11-1.414-1.414L13.586 5H12zm-9 7a1 1 0 112 0v1.586l2.293-2.293a1 1 0 111.414 1.414L6.414 15H8a1 1 0 110 2H4a1 1 0 01-1-1v-4zm13-1a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 110-2h1.586l-2.293-2.293a1 1 0 111.414-1.414L17 13.586V12a1 1 0 011-1z" clipRule="evenodd" />
+              <path
+                fillRule="evenodd"
+                d="M3 4a1 1 0 011-1h4a1 1 0 010 2H6.414l2.293 2.293a1 1 0 11-1.414 1.414L5 6.414V8a1 1 0 01-2 0V4zm9 1a1 1 0 110-2h4a1 1 0 011 1v4a1 1 0 11-2 0V6.414l-2.293-2.293a1 1 0 11-1.414-1.414L13.586 5H12zm-9 7a1 1 0 112 0v1.586l2.293-2.293a1 1 0 111.414 1.414L6.414 15H8a1 1 0 110 2H4a1 1 0 01-1-1v-4zm13-1a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 110-2h1.586l-2.293-2.293a1 1 0 111.414-1.414L17 13.586V12a1 1 0 011-1z"
+                clipRule="evenodd"
+              />
             </svg>
             {l.exportPdf}
           </button>
