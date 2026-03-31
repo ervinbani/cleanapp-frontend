@@ -40,8 +40,13 @@ export default function RegisterPage() {
   const onSubmit = async (data: FormData) => {
     try {
       setServerError("");
-      const { confirmPassword: _, ...payload } = data;
-      await registerUser(payload);
+      const { confirmPassword: _, ...rest } = data;
+      const slug = rest.tenantName
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-|-$/g, "");
+      await registerUser({ ...rest, slug });
       navigate("/");
     } catch (err: unknown) {
       const msg =
