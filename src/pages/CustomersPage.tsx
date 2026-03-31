@@ -50,6 +50,8 @@ const t = {
     loading: "Loading…",
     page: "Page",
     of: "of",
+    exportExcel: "Export Excel",
+    exportPdf: "Export PDF",
   },
   es: {
     title: "Clientes",
@@ -76,6 +78,8 @@ const t = {
     loading: "Cargando…",
     page: "Página",
     of: "de",
+    exportExcel: "Exportar Excel",
+    exportPdf: "Exportar PDF",
   },
 };
 
@@ -567,6 +571,74 @@ export default function CustomersPage() {
 
   const pageRange = getPageRange(page, totalPages);
 
+  const handleExportExcel = useCallback(async () => {
+    const ExcelJS = (await import("exceljs")).default;
+    const workbook = new ExcelJS.Workbook();
+    const sheet = workbook.addWorksheet("Clients");
+    sheet.columns = [
+      { header: l.colName, key: "name", width: 25 },
+      { header: l.colEmail, key: "email", width: 30 },
+      { header: l.colCountry, key: "country", width: 12 },
+      { header: l.colStatus, key: "status", width: 12 },
+      { header: l.colSource, key: "source", width: 14 },
+    ];
+    displayed.forEach((c) => {
+      sheet.addRow({
+        name: `${c.firstName} ${c.lastName}`,
+        email: c.email ?? "",
+        country: c.address?.country?.toUpperCase() ?? "",
+        status: c.status,
+        source: c.source,
+      });
+    });
+    const headerRow = sheet.getRow(1);
+    headerRow.font = { bold: true };
+    headerRow.fill = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "FFE5E7EB" },
+    };
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "clients.xlsx";
+    a.click();
+    URL.revokeObjectURL(url);
+  }, [displayed, l]);
+
+  const handleExportPdf = useCallback(async () => {
+    const { default: jsPDF } = await import("jspdf");
+    const { default: autoTable } = await import("jspdf-autotable");
+    const doc = new jsPDF({ orientation: "landscape" });
+    doc.setFontSize(14);
+    doc.text(l.title, 14, 15);
+    autoTable(doc, {
+      startY: 22,
+      head: [[
+        l.colName,
+        l.colEmail,
+        l.colCountry,
+        l.colStatus,
+        l.colSource,
+      ]],
+      body: displayed.map((c) => [
+        `${c.firstName} ${c.lastName}`,
+        c.email ?? "—",
+        c.address?.country?.toUpperCase() ?? "—",
+        c.status,
+        c.source,
+      ]),
+      headStyles: { fillColor: [37, 99, 235] },
+      styles: { fontSize: 9 },
+      alternateRowStyles: { fillColor: [248, 250, 255] },
+    });
+    doc.save("clients.pdf");
+  }, [displayed, l]);
+
   return (
     <div className={styles.page}>
       {showAddModal && canWrite && (
@@ -650,6 +722,29 @@ export default function CustomersPage() {
           <option value="facebook">Facebook</option>
           <option value="google">Google</option>
         </select>
+
+        <div className={styles.exportBtns}>
+          <button className={styles.btnExcelExport} onClick={handleExportExcel}>
+            <svg viewBox="0 0 20 20" fill="currentColor">
+              <path
+                fillRule="evenodd"
+                d="M3 4a1 1 0 011-1h4a1 1 0 010 2H6.414l2.293 2.293a1 1 0 01-1.414 1.414L5 6.414V8a1 1 0 01-2 0V4zm9 1a1 1 0 110-2h4a1 1 0 011 1v4a1 1 0 11-2 0V6.414l-2.293 2.293a1 1 0 01-1.414-1.414L13.586 5H12zm-9 7a1 1 0 112 0v1.586l2.293-2.293a1 1 0 011.414 1.414L6.414 15H8a1 1 0 110 2H4a1 1 0 01-1-1v-4zm13-1a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 110-2h1.586l-2.293-2.293a1 1 0 011.414-1.414L17 13.586V12a1 1 0 011-1z"
+                clipRule="evenodd"
+              />
+            </svg>
+            {l.exportExcel}
+          </button>
+          <button className={styles.btnPdfExport} onClick={handleExportPdf}>
+            <svg viewBox="0 0 20 20" fill="currentColor">
+              <path
+                fillRule="evenodd"
+                d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z"
+                clipRule="evenodd"
+              />
+            </svg>
+            {l.exportPdf}
+          </button>
+        </div>
       </div>
 
       {/* Table */}
