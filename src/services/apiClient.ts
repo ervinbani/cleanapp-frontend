@@ -11,12 +11,12 @@ apiClient.interceptors.request.use((config) => {
   }
   return config;
 });
-
+// check for 401 errors and if token exists, remove it and redirect to login page
 apiClient.interceptors.response.use(
   (res) => res,
   (err) => {
-    if (err.response?.status === 401) {
-      localStorage.removeItem("brillo_token");
+    if (err.response?.status === 401 && localStorage.getItem("token")) {
+      localStorage.removeItem("token");
       window.location.href = "/login";
     }
     return Promise.reject(err);
