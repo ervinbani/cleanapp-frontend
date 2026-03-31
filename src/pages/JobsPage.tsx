@@ -674,7 +674,9 @@ function JobModal({ job, lang, onClose, onSaved }: JobModalProps) {
               <div key={idx} className={styles.checklistRow}>
                 <input
                   className={styles.input}
-                  placeholder={checklistTab === "en" ? l.checkItemEn : l.checkItemEs}
+                  placeholder={
+                    checklistTab === "en" ? l.checkItemEn : l.checkItemEs
+                  }
                   value={checklistTab === "en" ? item.labelEn : item.labelEs}
                   onChange={(e) =>
                     updateChecklistItem(
