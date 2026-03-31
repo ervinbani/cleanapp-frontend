@@ -447,6 +447,7 @@ export default function ServicesPage() {
     const doc = new jsPDF({ orientation: "landscape" });
     doc.setFontSize(14);
     doc.text(l.title, 14, 16);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (doc as any).autoTable({
       startY: 22,
       head: [
@@ -502,7 +503,7 @@ export default function ServicesPage() {
           />
         </div>
         <div className={styles.exportBtns}>
-          <button className={styles.btnExcelOutline} onClick={exportExcel}>
+          <button className={styles.btnExcelExport} onClick={exportExcel}>
             <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15">
               <path
                 fillRule="evenodd"
@@ -512,7 +513,7 @@ export default function ServicesPage() {
             </svg>
             {l.exportExcel}
           </button>
-          <button className={styles.btnPdfOutline} onClick={exportPdf}>
+          <button className={styles.btnPdfExport} onClick={exportPdf}>
             <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15">
               <path
                 fillRule="evenodd"
