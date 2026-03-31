@@ -276,7 +276,13 @@ function AddUserModal({ lang, onClose, onSaved }: AddUserModalProps) {
                 onChange={(e) => {
                   const val = e.target.value;
                   set("tenantName", val);
-                  set("slug", val.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""));
+                  set(
+                    "slug",
+                    val
+                      .toLowerCase()
+                      .replace(/[^a-z0-9]+/g, "-")
+                      .replace(/^-|-$/g, ""),
+                  );
                 }}
               />
               <span className={styles.hint}>{ml2.tenantNameHint}</span>
@@ -288,7 +294,10 @@ function AddUserModal({ lang, onClose, onSaved }: AddUserModalProps) {
                 placeholder={ml2.placeholderSlug}
                 value={form.slug}
                 onChange={(e) =>
-                  set("slug", e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-"))
+                  set(
+                    "slug",
+                    e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-"),
+                  )
                 }
               />
               <span className={styles.hint}>{ml2.slugHint}</span>
