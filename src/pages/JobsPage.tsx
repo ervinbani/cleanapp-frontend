@@ -91,6 +91,8 @@ const t = {
     status_completed: "Completed",
     status_canceled: "Canceled",
     status_no_show: "No Show",
+    exportExcel: "Export Excel",
+    exportPdf: "Export PDF",
   },
   es: {
     title: "Trabajos",
@@ -122,6 +124,8 @@ const t = {
     status_completed: "Completado",
     status_canceled: "Cancelado",
     status_no_show: "No Presentado",
+    exportExcel: "Exportar Excel",
+    exportPdf: "Exportar PDF",
   },
 };
 
@@ -783,6 +787,74 @@ export default function JobsPage() {
 
   const pageRange = getPageRange(page, totalPages);
 
+  const handleExportExcel = useCallback(async () => {
+    const ExcelJS = (await import("exceljs")).default;
+    const workbook = new ExcelJS.Workbook();
+    const sheet = workbook.addWorksheet("Jobs");
+    sheet.columns = [
+      { header: l.colTitle, key: "title", width: 28 },
+      { header: l.colCustomer, key: "customer", width: 25 },
+      { header: l.colService, key: "service", width: 22 },
+      { header: l.colScheduled, key: "scheduled", width: 22 },
+      { header: l.colStatus, key: "status", width: 14 },
+      { header: l.colAssigned, key: "assigned", width: 28 },
+      { header: l.colPrice, key: "price", width: 10 },
+    ];
+    displayed.forEach((j) => {
+      const customer = getCustomer(j);
+      const service = getService(j);
+      sheet.addRow({
+        title: j.title ?? "—",
+        customer: customer ? `${customer.firstName} ${customer.lastName}` : "—",
+        service: service ? (lang === "es" ? service.name.es : service.name.en) : "—",
+        scheduled: formatDateTime(j.scheduledStart, lang),
+        status: l[`status_${j.status}` as keyof typeof l] as string,
+        assigned: getAssignedNames(j),
+        price: j.price != null ? `$${j.price}` : "—",
+      });
+    });
+    const headerRow = sheet.getRow(1);
+    headerRow.font = { bold: true };
+    headerRow.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFE5E7EB" } };
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "jobs.xlsx";
+    a.click();
+    URL.revokeObjectURL(url);
+  }, [displayed, l, lang]);
+
+  const handleExportPdf = useCallback(async () => {
+    const { default: jsPDF } = await import("jspdf");
+    const { default: autoTable } = await import("jspdf-autotable");
+    const doc = new jsPDF({ orientation: "landscape" });
+    doc.setFontSize(14);
+    doc.text(l.title, 14, 15);
+    autoTable(doc, {
+      startY: 22,
+      head: [[l.colTitle, l.colCustomer, l.colService, l.colScheduled, l.colStatus, l.colAssigned, l.colPrice]],
+      body: displayed.map((j) => {
+        const customer = getCustomer(j);
+        const service = getService(j);
+        return [
+          j.title ?? "—",
+          customer ? `${customer.firstName} ${customer.lastName}` : "—",
+          service ? (lang === "es" ? service.name.es : service.name.en) : "—",
+          formatDateTime(j.scheduledStart, lang),
+          l[`status_${j.status}` as keyof typeof l] as string,
+          getAssignedNames(j),
+          j.price != null ? `$${j.price}` : "—",
+        ];
+      }),
+      headStyles: { fillColor: [37, 99, 235] },
+      styles: { fontSize: 9 },
+      alternateRowStyles: { fillColor: [248, 250, 255] },
+    });
+    doc.save("jobs.pdf");
+  }, [displayed, l, lang]);
+
   return (
     <div className={styles.page}>
       {/* Header */}
@@ -831,6 +903,20 @@ export default function JobsPage() {
             </option>
           ))}
         </select>
+        <div className={styles.exportBtns}>
+          <button className={styles.btnExcelExport} onClick={handleExportExcel}>
+            <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15">
+              <path fillRule="evenodd" d="M3 4a1 1 0 011-1h4a1 1 0 010 2H6.414l2.293 2.293a1 1 0 11-1.414 1.414L5 6.414V8a1 1 0 01-2 0V4zm9 1a1 1 0 110-2h4a1 1 0 011 1v4a1 1 0 11-2 0V6.414l-2.293 2.293a1 1 0 11-1.414-1.414L13.586 5H12zm-9 7a1 1 0 112 0v1.586l2.293-2.293a1 1 0 111.414 1.414L6.414 15H8a1 1 0 110 2H4a1 1 0 01-1-1v-4zm13-1a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 110-2h1.586l-2.293-2.293a1 1 0 111.414-1.414L17 13.586V12a1 1 0 011-1z" clipRule="evenodd" />
+            </svg>
+            {l.exportExcel}
+          </button>
+          <button className={styles.btnPdfExport} onClick={handleExportPdf}>
+            <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15">
+              <path fillRule="evenodd" d="M3 4a1 1 0 011-1h4a1 1 0 010 2H6.414l2.293 2.293a1 1 0 11-1.414 1.414L5 6.414V8a1 1 0 01-2 0V4zm9 1a1 1 0 110-2h4a1 1 0 011 1v4a1 1 0 11-2 0V6.414l-2.293-2.293a1 1 0 11-1.414-1.414L13.586 5H12zm-9 7a1 1 0 112 0v1.586l2.293-2.293a1 1 0 111.414 1.414L6.414 15H8a1 1 0 110 2H4a1 1 0 01-1-1v-4zm13-1a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 110-2h1.586l-2.293-2.293a1 1 0 111.414-1.414L17 13.586V12a1 1 0 011-1z" clipRule="evenodd" />
+            </svg>
+            {l.exportPdf}
+          </button>
+        </div>
       </div>
 
       {/* Table */}
