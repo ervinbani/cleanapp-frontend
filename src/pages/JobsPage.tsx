@@ -751,8 +751,8 @@ export default function JobsPage() {
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_LIMIT));
 
-  const canWrite = hasRole("owner", "manager", "staff");
-  const canDelete = hasRole("owner", "manager");
+  const canWrite = hasRole("owner", "director", "manager_operations", "manager_hr", "staff");
+  const canDelete = hasRole("owner", "director", "manager_operations", "manager_hr");
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingJob, setEditingJob] = useState<Job | null>(null);

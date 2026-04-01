@@ -837,8 +837,8 @@ export default function InvoicesPage() {
   const [colStatus, setColStatus] = useState("");
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_LIMIT));
-  const canWrite = hasRole("owner", "manager", "staff");
-  const canDelete = hasRole("owner", "manager");
+  const canWrite = hasRole("owner", "director", "manager_operations", "manager_hr", "staff");
+  const canDelete = hasRole("owner");
 
   const [showForm, setShowForm] = useState(false);
   const [editingInvoice, setEditingInvoice] = useState<Invoice | null>(null);
