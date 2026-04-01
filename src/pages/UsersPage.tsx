@@ -8,7 +8,13 @@ import styles from "./UsersPage.module.css";
 const PAGE_LIMIT = 20;
 
 // ─── Roles available when creating a user (owner excluded) ────────
-const CREATABLE_ROLES: UserRole[] = ["manager", "staff", "cleaner"];
+const CREATABLE_ROLES: UserRole[] = [
+  "director",
+  "manager_operations",
+  "manager_hr",
+  "staff",
+  "worker",
+];
 
 interface AddUserForm {
   firstName: string;
@@ -636,7 +642,14 @@ function getPageRange(current: number, total: number): (number | "…")[] {
   return [1, "…", current - 1, current, current + 1, "…", total];
 }
 
-const ROLES: UserRole[] = ["owner", "manager", "staff", "cleaner"];
+const ROLES: UserRole[] = [
+  "owner",
+  "director",
+  "manager_operations",
+  "manager_hr",
+  "staff",
+  "worker",
+];
 
 const t = {
   en: {
@@ -736,7 +749,7 @@ export default function UsersPage() {
   const [editingUser, setEditingUser] = useState<User | null>(null);
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_LIMIT));
-  const canWrite = hasRole("owner", "manager");
+  const canWrite = hasRole("owner", "director", "manager_operations", "manager_hr");
 
   const fetchUsers = useCallback(async () => {
     setLoading(true);
@@ -1050,7 +1063,7 @@ export default function UsersPage() {
               </tr>
             ) : (
               displayed.map((u) => (
-                <tr key={u.id} className={styles.bodyRow}>
+                <tr key={u._id ?? u.id} className={styles.bodyRow}>
                   <td className={styles.nameCell}>
                     <div className={styles.avatarRow}>
                       <span className={styles.avatar}>
@@ -1101,7 +1114,7 @@ export default function UsersPage() {
                       {hasRole("owner") && (
                         <button
                           className={styles.btnDelete}
-                          onClick={() => handleDelete(u.id)}
+                          onClick={() => handleDelete(u._id ?? u.id)}
                         >
                           <svg viewBox="0 0 20 20" fill="currentColor">
                             <path

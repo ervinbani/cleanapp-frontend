@@ -1,5 +1,11 @@
 export type Language = "en" | "es";
-export type UserRole = "owner" | "manager" | "staff" | "cleaner";
+export type UserRole =
+  | "owner"
+  | "director"
+  | "manager_operations"
+  | "manager_hr"
+  | "staff"
+  | "worker";
 export type JobStatus =
   | "scheduled"
   | "confirmed"
@@ -12,6 +18,7 @@ export type CustomerStatus = "lead" | "active" | "inactive";
 
 export interface User {
   id: string;
+  _id?: string;
   tenantId: string;
   firstName: string;
   lastName: string;
