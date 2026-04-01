@@ -447,7 +447,7 @@ function EditUserModal({ user, lang, onClose, onSaved }: EditUserModalProps) {
         isActive: form.isActive,
       };
       if (form.password.trim()) payload.password = form.password;
-      await apiClient.put(`/users/${user.id}`, payload);
+      await apiClient.put(`/users/${user._id ?? user.id}`, payload);
       onSaved();
     } catch (err: unknown) {
       const msg =
