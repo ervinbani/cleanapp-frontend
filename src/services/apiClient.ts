@@ -15,8 +15,8 @@ apiClient.interceptors.request.use((config) => {
 apiClient.interceptors.response.use(
   (res) => res,
   (err) => {
-    if (err.response?.status === 401 && localStorage.getItem("token")) {
-      localStorage.removeItem("token");
+    if (err.response?.status === 401 && localStorage.getItem("brillo_token")) {
+      localStorage.removeItem("brillo_token");
       window.location.href = "/login";
     }
     return Promise.reject(err);

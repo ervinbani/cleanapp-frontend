@@ -202,3 +202,30 @@ export interface AuthData {
   token: string;
   user: User;
 }
+
+// Roles & Permissions
+export type PermissionAction = "read" | "create" | "update" | "delete";
+export type PermissionResource =
+  | "users"
+  | "jobs"
+  | "services"
+  | "invoices"
+  | "roles"
+  | "permissions";
+
+export interface Permission {
+  _id: string;
+  key?: string;
+  entity: PermissionResource;
+  action: PermissionAction;
+  description?: string;
+  isActive?: boolean;
+}
+
+export interface Role {
+  _id: string;
+  name: string;
+  code: UserRole;
+  isSystem?: boolean;
+  permissions: (Permission | string)[];
+}

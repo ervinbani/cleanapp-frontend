@@ -732,7 +732,7 @@ function JobModal({ job, lang, onClose, onSaved }: JobModalProps) {
 
 export default function JobsPage() {
   const { lang } = useLang();
-  const { hasRole } = useAuth();
+  const { hasPermission } = useAuth();
   const l = t[lang];
 
   const [jobs, setJobs] = useState<Job[]>([]);
@@ -751,8 +751,9 @@ export default function JobsPage() {
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_LIMIT));
 
-  const canWrite = hasRole("owner", "director", "manager_operations", "manager_hr", "staff");
-  const canDelete = hasRole("owner", "director", "manager_operations", "manager_hr");
+  const canCreate = hasPermission("jobs", "create");
+  const canWrite = hasPermission("jobs", "update");
+  const canDelete = hasPermission("jobs", "delete");
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingJob, setEditingJob] = useState<Job | null>(null);
@@ -905,7 +906,7 @@ export default function JobsPage() {
       {/* Header */}
       <div className={styles.header}>
         <h2 className={styles.title}>{l.title}</h2>
-        {canWrite && (
+        {canCreate && (
           <button
             className={styles.addBtn}
             onClick={() => setShowAddModal(true)}
@@ -1151,7 +1152,7 @@ export default function JobsPage() {
         </span>
       </div>
 
-      {showAddModal && canWrite && (
+      {showAddModal && canCreate && (
         <JobModal
           lang={lang}
           onClose={() => setShowAddModal(false)}

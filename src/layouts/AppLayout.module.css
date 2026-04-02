@@ -46,6 +46,8 @@
   flex-direction: column;
   gap: 2px;
   padding: 0 0.75rem;
+  flex: 1;
+  overflow-y: auto;
 }
 
 .navItem {
@@ -92,6 +94,84 @@
   font-weight: 400;
   color: #9ca3af;
   margin-top: 1px;
+}
+
+/* ─── Settings accordion ──────────────────────────────────────── */
+.settingsGroup {
+  display: flex;
+  flex-direction: column;
+}
+
+.settingsToggle {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.65rem 0.85rem;
+  border-radius: 10px;
+  background: none;
+  border: none;
+  color: #4b5563;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+  text-decoration: none;
+  width: 100%;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+}
+
+.settingsToggle:hover {
+  background-color: #eff6ff;
+  color: #2563eb;
+}
+
+.chevron {
+  margin-left: auto;
+  font-size: 1.2rem;
+  line-height: 1;
+  display: inline-block;
+  transition: transform 0.2s ease;
+  color: #9ca3af;
+}
+
+.chevronOpen {
+  transform: rotate(90deg);
+}
+
+.subMenu {
+  display: flex;
+  flex-direction: column;
+  margin: 2px 0 4px 1.6rem;
+  padding-left: 0.65rem;
+  border-left: 2px solid #e4eaf4;
+  gap: 1px;
+}
+
+.subMenuItem {
+  display: flex;
+  align-items: center;
+  padding: 0.45rem 0.75rem;
+  border-radius: 8px;
+  text-decoration: none;
+  color: #6b7280;
+  font-size: 0.83rem;
+  font-weight: 500;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+}
+
+.subMenuItem:hover {
+  background-color: #eff6ff;
+  color: #2563eb;
+}
+
+.subMenuItemActive {
+  background-color: #dbeafe;
+  color: #2563eb;
+  font-weight: 600;
 }
 
 /* ─── Main ────────────────────────────────────────────────────── */

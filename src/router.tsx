@@ -9,6 +9,7 @@ import ServicesPage from "./pages/ServicesPage";
 import UsersPage from "./pages/UsersPage";
 import JobsPage from "./pages/JobsPage";
 import InvoicesPage from "./pages/InvoicesPage";
+import RolesPermissionsPage from "./pages/settings/RolesPermissionsPage";
 
 const router = createBrowserRouter([
   // Public routes
@@ -28,6 +29,8 @@ const router = createBrowserRouter([
           { path: "/jobs", element: <JobsPage /> },
           { path: "/invoices", element: <InvoicesPage /> },
           { path: "/services", element: <ServicesPage /> },
+          { path: "/settings", element: <Navigate to="/settings/roles" replace /> },
+          { path: "/settings/roles", element: <RolesPermissionsPage /> },
         ],
       },
     ],

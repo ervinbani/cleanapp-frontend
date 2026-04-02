@@ -1,0 +1,234 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* ─── Header ──────────────────────────────────────────────────── */
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 0.25rem 0;
+}
+
+.subtitle {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+.newRoleBtn {
+  padding: 0.55rem 1.1rem;
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+
+.newRoleBtn:hover:not(:disabled) {
+  background: #1d4ed8;
+}
+
+.newRoleBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ─── Tabs ────────────────────────────────────────────────────── */
+.tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid #e4eaf4;
+  overflow-x: auto;
+}
+
+.tab {
+  padding: 0.55rem 1.1rem;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  font-size: 0.875rem;
+  color: #374151;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.15s, border-color 0.15s;
+  margin-bottom: -1px;
+}
+
+.tab:hover {
+  color: #2563eb;
+}
+
+.tabActive {
+  color: #2563eb;
+  font-weight: 600;
+  border-bottom-color: #2563eb;
+}
+
+/* ─── Section ─────────────────────────────────────────────────── */
+.section {
+  background: #ffffff;
+  border: 1px solid #e4eaf4;
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+.roleTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 0.25rem 0;
+}
+
+.roleSubtitle {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0 0 1rem 0;
+  border-bottom: 1px solid #e4eaf4;
+  padding-bottom: 1rem;
+}
+
+.hints {
+  list-style: disc;
+  padding-left: 1.25rem;
+  margin: 0 0 1.25rem 0;
+}
+
+.hints li {
+  font-size: 0.825rem;
+  color: #6b7280;
+}
+
+/* ─── Table ───────────────────────────────────────────────────── */
+.tableWrapper {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.thResource {
+  text-align: left;
+  padding: 0.6rem 1rem;
+  font-weight: 600;
+  color: #6b7280;
+  border-bottom: 1px solid #e4eaf4;
+  width: 40%;
+}
+
+.thAction {
+  text-align: center;
+  padding: 0.6rem 1rem;
+  font-weight: 600;
+  color: #6b7280;
+  border-bottom: 1px solid #e4eaf4;
+}
+
+.tdResource {
+  padding: 0.7rem 1rem;
+  font-weight: 500;
+  color: #374151;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.tdCheck {
+  text-align: center;
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.table tr:last-child .tdResource,
+.table tr:last-child .tdCheck {
+  border-bottom: none;
+}
+
+/* ─── Checkbox ────────────────────────────────────────────────── */
+.checkbox {
+  width: 1.1rem;
+  height: 1.1rem;
+  accent-color: #2563eb;
+  cursor: pointer;
+}
+
+.checkbox:disabled {
+  cursor: default;
+  opacity: 0.7;
+}
+
+/* ─── Footer ──────────────────────────────────────────────────── */
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding-top: 0.5rem;
+}
+
+.cancelBtn {
+  padding: 0.55rem 1.25rem;
+  background: #ffffff;
+  color: #374151;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.cancelBtn:hover:not(:disabled) {
+  background: #f9fafb;
+}
+
+.cancelBtn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.saveBtn {
+  padding: 0.55rem 1.25rem;
+  background: #2563eb;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.saveBtn:hover:not(:disabled) {
+  background: #1d4ed8;
+}
+
+.saveBtn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ─── State messages ──────────────────────────────────────────── */
+.stateMsg {
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.errorMsg {
+  color: #dc2626;
+  font-size: 0.875rem;
+}
