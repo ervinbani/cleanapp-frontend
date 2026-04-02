@@ -29,7 +29,10 @@ const router = createBrowserRouter([
           { path: "/jobs", element: <JobsPage /> },
           { path: "/invoices", element: <InvoicesPage /> },
           { path: "/services", element: <ServicesPage /> },
-          { path: "/settings", element: <Navigate to="/settings/roles" replace /> },
+          {
+            path: "/settings",
+            element: <Navigate to="/settings/roles" replace />,
+          },
           { path: "/settings/roles", element: <RolesPermissionsPage /> },
         ],
       },

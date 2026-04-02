@@ -4,16 +4,36 @@ import { useLang } from "../../contexts/LangContext";
 import styles from "./SettingsLayout.module.css";
 
 const subNavItems = [
-  { path: "/settings/general", label: "General", labelEs: "General", restricted: false },
-  { path: "/settings/team", label: "Team", labelEs: "Equipo", restricted: false },
+  {
+    path: "/settings/general",
+    label: "General",
+    labelEs: "General",
+    restricted: false,
+  },
+  {
+    path: "/settings/team",
+    label: "Team",
+    labelEs: "Equipo",
+    restricted: false,
+  },
   {
     path: "/settings/roles",
     label: "Roles & Permissions",
     labelEs: "Roles y Permisos",
     restricted: true,
   },
-  { path: "/settings/billing", label: "Billing", labelEs: "Facturación", restricted: false },
-  { path: "/settings/languages", label: "Languages", labelEs: "Idiomas", restricted: false },
+  {
+    path: "/settings/billing",
+    label: "Billing",
+    labelEs: "Facturación",
+    restricted: false,
+  },
+  {
+    path: "/settings/languages",
+    label: "Languages",
+    labelEs: "Idiomas",
+    restricted: false,
+  },
 ];
 
 export default function SettingsLayout() {

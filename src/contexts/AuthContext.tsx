@@ -19,38 +19,56 @@ import type { LoginCredentials, RegisterPayload } from "../types";
 // from /auth/me once the backend returns permissions in that response.
 const ROLE_PERMISSIONS: Record<UserRole, string[]> = {
   owner: [
-    "users.read", "users.create", "users.update", "users.delete",
-    "jobs.read", "jobs.create", "jobs.update", "jobs.delete",
-    "services.read", "services.create", "services.update", "services.delete",
-    "invoices.read", "invoices.create", "invoices.update", "invoices.delete",
-    "roles.read", "roles.create", "roles.update", "roles.delete",
-    "permissions.read", "permissions.update",
+    "users.read",
+    "users.create",
+    "users.update",
+    "users.delete",
+    "jobs.read",
+    "jobs.create",
+    "jobs.update",
+    "jobs.delete",
+    "services.read",
+    "services.create",
+    "services.update",
+    "services.delete",
+    "invoices.read",
+    "invoices.create",
+    "invoices.update",
+    "invoices.delete",
+    "roles.read",
+    "roles.create",
+    "roles.update",
+    "roles.delete",
+    "permissions.read",
+    "permissions.update",
   ],
   director: [
-    "users.read", "users.update",
-    "jobs.read", "jobs.create", "jobs.update", "jobs.delete",
-    "services.read", "services.create", "services.update",
-    "invoices.read", "invoices.update",
+    "users.read",
+    "users.update",
+    "jobs.read",
+    "jobs.create",
+    "jobs.update",
+    "jobs.delete",
+    "services.read",
+    "services.create",
+    "services.update",
+    "invoices.read",
+    "invoices.update",
     "roles.read",
     "permissions.read",
   ],
   manager_operations: [
-    "jobs.read", "jobs.create", "jobs.update", "jobs.delete",
+    "jobs.read",
+    "jobs.create",
+    "jobs.update",
+    "jobs.delete",
     "services.read",
     "users.read",
     "invoices.read",
   ],
-  manager_hr: [
-    "users.read", "users.create", "users.update", "users.delete",
-  ],
-  staff: [
-    "jobs.read",
-    "services.read",
-    "invoices.read",
-  ],
-  worker: [
-    "jobs.read",
-  ],
+  manager_hr: ["users.read", "users.create", "users.update", "users.delete"],
+  staff: ["jobs.read", "services.read", "invoices.read"],
+  worker: ["jobs.read"],
 };
 
 interface AuthContextValue {
@@ -114,12 +132,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const hasPermission = (entity: string, action: string): boolean => {
     if (!user) return false;
-    return ROLE_PERMISSIONS[user.role]?.includes(`${entity}.${action}`) ?? false;
+    return (
+      ROLE_PERMISSIONS[user.role]?.includes(`${entity}.${action}`) ?? false
+    );
   };
 
   return (
     <AuthContext.Provider
-      value={{ user, token, isLoading, login, register, logout, hasRole, hasPermission }}
+      value={{
+        user,
+        token,
+        isLoading,
+        login,
+        register,
+        logout,
+        hasRole,
+        hasPermission,
+      }}
     >
       {children}
     </AuthContext.Provider>

@@ -3,7 +3,12 @@ import { Navigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import { useLang } from "../../contexts/LangContext";
 import { roleService, permissionService } from "../../services/roleService";
-import type { Role, Permission, PermissionAction, PermissionResource } from "../../types";
+import type {
+  Role,
+  Permission,
+  PermissionAction,
+  PermissionResource,
+} from "../../types";
 import styles from "./RolesPermissionsPage.module.css";
 
 const RESOURCES: PermissionResource[] = [
@@ -65,7 +70,9 @@ export default function RolesPermissionsPage() {
         setRoles(normalizedRoles);
         setAllPermissions(fetchedPerms);
         if (normalizedRoles.length > 0) {
-          setLocalPermIds(new Set(normalizedRoles[0].permissions.map((p) => p._id)));
+          setLocalPermIds(
+            new Set(normalizedRoles[0].permissions.map((p) => p._id)),
+          );
         }
       })
       .catch(() => setError("Failed to load roles and permissions."))
@@ -76,7 +83,9 @@ export default function RolesPermissionsPage() {
 
   const handleTabChange = (idx: number) => {
     setSelectedRoleIdx(idx);
-    setLocalPermIds(new Set((roles[idx].permissions as Permission[]).map((p) => p._id)));
+    setLocalPermIds(
+      new Set((roles[idx].permissions as Permission[]).map((p) => p._id)),
+    );
     setIsDirty(false);
   };
 
@@ -92,7 +101,9 @@ export default function RolesPermissionsPage() {
   };
 
   const handleCancel = () => {
-    const original = (roles[selectedRoleIdx].permissions as Permission[]).map((p) => p._id);
+    const original = (roles[selectedRoleIdx].permissions as Permission[]).map(
+      (p) => p._id,
+    );
     setLocalPermIds(new Set(original));
     setIsDirty(false);
   };
@@ -132,7 +143,10 @@ export default function RolesPermissionsPage() {
       lang === "en"
         ? "Manage access levels and permissions for your workspace."
         : "Gestiona los niveles de acceso y permisos de tu espacio de trabajo.",
-    accessFor: lang === "en" ? "Access and permissions for the" : "Acceso y permisos para el rol",
+    accessFor:
+      lang === "en"
+        ? "Access and permissions for the"
+        : "Acceso y permisos para el rol",
     role: lang === "en" ? "role." : ".",
     hint:
       lang === "en"
@@ -181,8 +195,8 @@ export default function RolesPermissionsPage() {
           <div className={styles.section}>
             <h3 className={styles.roleTitle}>{selectedRole.name}</h3>
             <p className={styles.roleSubtitle}>
-              {labels.accessFor}{" "}
-              <strong>{selectedRole.name}</strong> {labels.role}
+              {labels.accessFor} <strong>{selectedRole.name}</strong>{" "}
+              {labels.role}
             </p>
 
             <ul className={styles.hints}>

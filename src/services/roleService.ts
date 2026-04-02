@@ -13,5 +13,7 @@ export const roleService = {
 
 export const permissionService = {
   getAll: (): Promise<Permission[]> =>
-    apiClient.get<ApiResponse<Permission[]>>("/permissions").then((r) => r.data.data),
+    apiClient
+      .get<ApiResponse<Permission[]>>("/permissions")
+      .then((r) => r.data.data),
 };

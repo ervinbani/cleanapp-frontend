@@ -13,7 +13,13 @@ export type JobStatus =
   | "completed"
   | "canceled"
   | "no_show";
-export type InvoiceStatus = "draft" | "sent" | "paid" | "partially_paid" | "overdue" | "void";
+export type InvoiceStatus =
+  | "draft"
+  | "sent"
+  | "paid"
+  | "partially_paid"
+  | "overdue"
+  | "void";
 export type CustomerStatus = "lead" | "active" | "inactive";
 
 export interface User {
@@ -162,7 +168,13 @@ export interface Invoice {
   currency: string;
   status: InvoiceStatus;
   paidAt?: string;
-  paymentMethod?: "cash" | "card" | "bank_transfer" | "stripe" | "paypal" | "other";
+  paymentMethod?:
+    | "cash"
+    | "card"
+    | "bank_transfer"
+    | "stripe"
+    | "paypal"
+    | "other";
   notes?: string;
   createdAt: string;
   updatedAt: string;
