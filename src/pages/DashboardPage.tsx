@@ -12,12 +12,32 @@ const WEEKDAYS_EN = ["S", "M", "T", "W", "T", "F", "S"];
 const WEEKDAYS_ES = ["D", "L", "M", "X", "J", "V", "S"];
 
 const MONTH_NAMES_EN = [
-  "January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December",
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
 ];
 const MONTH_NAMES_ES = [
-  "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
-  "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre",
+  "Enero",
+  "Febrero",
+  "Marzo",
+  "Abril",
+  "Mayo",
+  "Junio",
+  "Julio",
+  "Agosto",
+  "Septiembre",
+  "Octubre",
+  "Noviembre",
+  "Diciembre",
 ];
 
 const STATUS_COLORS: Record<string, string> = {
@@ -135,7 +155,8 @@ export default function DashboardPage() {
   }, [displayedJobs, calendarDate]);
 
   const calendarCells = useMemo(
-    () => buildCalendarGrid(calendarDate.getFullYear(), calendarDate.getMonth()),
+    () =>
+      buildCalendarGrid(calendarDate.getFullYear(), calendarDate.getMonth()),
     [calendarDate],
   );
 
@@ -231,17 +252,31 @@ export default function DashboardPage() {
 
         {/* Month navigation */}
         <div className={styles.calendarNav}>
-          <button className={styles.navBtn} onClick={prevMonth} aria-label="Previous month">‹</button>
+          <button
+            className={styles.navBtn}
+            onClick={prevMonth}
+            aria-label="Previous month"
+          >
+            ‹
+          </button>
           <span className={styles.calendarMonthLabel}>
             {monthNames[calendarDate.getMonth()]} {calendarDate.getFullYear()}
           </span>
-          <button className={styles.navBtn} onClick={nextMonth} aria-label="Next month">›</button>
+          <button
+            className={styles.navBtn}
+            onClick={nextMonth}
+            aria-label="Next month"
+          >
+            ›
+          </button>
         </div>
 
         {/* Grid */}
         <div className={styles.calendarGrid}>
           {weekdays.map((d, i) => (
-            <div key={i} className={styles.weekdayLabel}>{d}</div>
+            <div key={i} className={styles.weekdayLabel}>
+              {d}
+            </div>
           ))}
           {calendarCells.map((day, i) => {
             if (day === null) return <div key={`empty-${i}`} />;
@@ -260,13 +295,16 @@ export default function DashboardPage() {
                   <div
                     key={job._id}
                     className={styles.jobPill}
-                    style={{ backgroundColor: STATUS_COLORS[job.status] ?? "#3b82f6" }}
+                    style={{
+                      backgroundColor: STATUS_COLORS[job.status] ?? "#3b82f6",
+                    }}
                     onClick={() => navigate("/jobs")}
                     title={`${formatJobTime(job.scheduledStart)} ${job.title ?? ""}`}
                   >
                     <span className={styles.jobPillDot} />
                     <span className={styles.jobPillText}>
-                      {formatJobTime(job.scheduledStart)} {job.title ?? job.status}
+                      {formatJobTime(job.scheduledStart)}{" "}
+                      {job.title ?? job.status}
                     </span>
                   </div>
                 ))}
@@ -284,7 +322,10 @@ export default function DashboardPage() {
                       >
                         <span
                           className={styles.tooltipDot}
-                          style={{ backgroundColor: STATUS_COLORS[job.status] ?? "#3b82f6" }}
+                          style={{
+                            backgroundColor:
+                              STATUS_COLORS[job.status] ?? "#3b82f6",
+                          }}
                         />
                         <span>
                           {formatJobTime(job.scheduledStart)}{" "}
