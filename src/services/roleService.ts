@@ -5,9 +5,20 @@ export const roleService = {
   getAll: (): Promise<Role[]> =>
     apiClient.get<ApiResponse<Role[]>>("/roles").then((r) => r.data.data),
 
+  create: (data: {
+    name: string;
+    code: string;
+    description: string;
+    isActive: boolean;
+    permissionIds: string[];
+  }): Promise<Role> =>
+    apiClient
+      .post<ApiResponse<Role>>("/roles", data)
+      .then((r) => r.data.data),
+
   update: (id: string, permissionIds: string[]): Promise<Role> =>
     apiClient
-      .put<ApiResponse<Role>>(`/roles/${id}`, { permissions: permissionIds })
+      .put<ApiResponse<Role>>(`/roles/${id}`, { permissionIds })
       .then((r) => r.data.data),
 };
 
