@@ -61,7 +61,9 @@ function NewRoleForm({ allPermissions, onCancel, onSaved }: NewRoleFormProps) {
   const [isCodeManual, setIsCodeManual] = useState(false);
   const [description, setDescription] = useState("");
   const [isActive, setIsActive] = useState(true);
-  const [selectedPermIds, setSelectedPermIds] = useState<Set<string>>(new Set());
+  const [selectedPermIds, setSelectedPermIds] = useState<Set<string>>(
+    new Set(),
+  );
   const [search, setSearch] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
@@ -247,9 +249,7 @@ function NewRoleForm({ allPermissions, onCancel, onSaved }: NewRoleFormProps) {
             <tbody>
               {filteredResources.map((resource) => {
                 const rowPerms = ACTIONS.map((a) => findPerm(resource, a));
-                const validPerms = rowPerms.filter(
-                  Boolean,
-                ) as Permission[];
+                const validPerms = rowPerms.filter(Boolean) as Permission[];
                 const allChecked =
                   validPerms.length > 0 &&
                   validPerms.every((p) => selectedPermIds.has(p._id));
@@ -359,7 +359,8 @@ export default function RolesPermissionsPage() {
       })
       .catch((err: unknown) => {
         const msg = axios.isAxiosError(err)
-          ? (err.response?.data?.message ?? "Failed to load roles and permissions.")
+          ? (err.response?.data?.message ??
+            "Failed to load roles and permissions.")
           : "Failed to load roles and permissions.";
         setError(msg);
       })
@@ -417,7 +418,9 @@ export default function RolesPermissionsPage() {
       setIsDirty(false);
     } catch (err: unknown) {
       const msg = axios.isAxiosError(err)
-        ? (err.response?.data?.message ?? err.response?.data?.error ?? `Error ${err.response?.status}`)
+        ? (err.response?.data?.message ??
+          err.response?.data?.error ??
+          `Error ${err.response?.status}`)
         : "Failed to save changes.";
       setError(msg);
     } finally {
@@ -472,125 +475,129 @@ export default function RolesPermissionsPage() {
             setRoles((prev) => [...prev, normalized]);
             setSelectedRoleIdx(roles.length);
             setLocalPermIds(
-              new Set((normalized.permissions as Permission[]).map((p) => p._id)),
+              new Set(
+                (normalized.permissions as Permission[]).map((p) => p._id),
+              ),
             );
             setShowNewRole(false);
           }}
         />
       ) : (
         <>
-      {/* Header */}
-      <div className={styles.header}>
-        <div>
-          <h2 className={styles.title}>{labels.heading}</h2>
-          <p className={styles.subtitle}>{labels.subtitle}</p>
-        </div>
-        {canEdit && (
-          <button
-            className={styles.newRoleBtn}
-            onClick={() => setShowNewRole(true)}
-          >
-            {labels.newRole}
-          </button>
-        )}
-      </div>
-
-      {isLoading && <p className={styles.stateMsg}>Loading…</p>}
-      {error && <p className={styles.errorMsg}>{error}</p>}
-
-      {!isLoading && !error && roles.length > 0 && (
-        <>
-          {/* Role tabs */}
-          <div className={styles.tabs}>
-            {roles.map((role, idx) => (
+          {/* Header */}
+          <div className={styles.header}>
+            <div>
+              <h2 className={styles.title}>{labels.heading}</h2>
+              <p className={styles.subtitle}>{labels.subtitle}</p>
+            </div>
+            {canEdit && (
               <button
-                key={role._id}
-                className={`${styles.tab} ${idx === selectedRoleIdx ? styles.tabActive : ""}`}
-                onClick={() => handleTabChange(idx)}
+                className={styles.newRoleBtn}
+                onClick={() => setShowNewRole(true)}
               >
-                {role.name}
+                {labels.newRole}
               </button>
-            ))}
+            )}
           </div>
 
-          {/* Role section */}
-          <div className={styles.section}>
-            <h3 className={styles.roleTitle}>{selectedRole.name}</h3>
-            <p className={styles.roleSubtitle}>
-              {labels.accessFor} <strong>{selectedRole.name}</strong>{" "}
-              {labels.role}
-            </p>
+          {isLoading && <p className={styles.stateMsg}>Loading…</p>}
+          {error && <p className={styles.errorMsg}>{error}</p>}
 
-            <ul className={styles.hints}>
-              <li>{labels.hint}</li>
-            </ul>
+          {!isLoading && !error && roles.length > 0 && (
+            <>
+              {/* Role tabs */}
+              <div className={styles.tabs}>
+                {roles.map((role, idx) => (
+                  <button
+                    key={role._id}
+                    className={`${styles.tab} ${idx === selectedRoleIdx ? styles.tabActive : ""}`}
+                    onClick={() => handleTabChange(idx)}
+                  >
+                    {role.name}
+                  </button>
+                ))}
+              </div>
 
-            {/* Permission table */}
-            <div className={styles.tableWrapper}>
-              <table className={styles.table}>
-                <thead>
-                  <tr>
-                    <th className={styles.thResource}></th>
-                    {ACTIONS.map((action) => (
-                      <th key={action} className={styles.thAction}>
-                        {ACTION_LABELS[action]}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {RESOURCES.map((resource) => (
-                    <tr key={resource}>
-                      <td className={styles.tdResource}>
-                        {RESOURCE_LABELS[resource]}
-                      </td>
-                      {ACTIONS.map((action) => {
-                        const perm = findPerm(resource, action);
-                        if (!perm) {
-                          return <td key={action} className={styles.tdCheck} />;
-                        }
-                        const checked = localPermIds.has(perm._id);
-                        return (
-                          <td key={action} className={styles.tdCheck}>
-                            <input
-                              type="checkbox"
-                              className={styles.checkbox}
-                              checked={checked}
-                              disabled={!canEdit}
-                              onChange={() => handleToggle(perm._id)}
-                            />
+              {/* Role section */}
+              <div className={styles.section}>
+                <h3 className={styles.roleTitle}>{selectedRole.name}</h3>
+                <p className={styles.roleSubtitle}>
+                  {labels.accessFor} <strong>{selectedRole.name}</strong>{" "}
+                  {labels.role}
+                </p>
+
+                <ul className={styles.hints}>
+                  <li>{labels.hint}</li>
+                </ul>
+
+                {/* Permission table */}
+                <div className={styles.tableWrapper}>
+                  <table className={styles.table}>
+                    <thead>
+                      <tr>
+                        <th className={styles.thResource}></th>
+                        {ACTIONS.map((action) => (
+                          <th key={action} className={styles.thAction}>
+                            {ACTION_LABELS[action]}
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {RESOURCES.map((resource) => (
+                        <tr key={resource}>
+                          <td className={styles.tdResource}>
+                            {RESOURCE_LABELS[resource]}
                           </td>
-                        );
-                      })}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
+                          {ACTIONS.map((action) => {
+                            const perm = findPerm(resource, action);
+                            if (!perm) {
+                              return (
+                                <td key={action} className={styles.tdCheck} />
+                              );
+                            }
+                            const checked = localPermIds.has(perm._id);
+                            return (
+                              <td key={action} className={styles.tdCheck}>
+                                <input
+                                  type="checkbox"
+                                  className={styles.checkbox}
+                                  checked={checked}
+                                  disabled={!canEdit}
+                                  onChange={() => handleToggle(perm._id)}
+                                />
+                              </td>
+                            );
+                          })}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
 
-          {/* Footer actions */}
-          {canEdit && (
-            <div className={styles.footer}>
-              <button
-                className={styles.cancelBtn}
-                onClick={handleCancel}
-                disabled={!isDirty || isSaving}
-              >
-                {labels.cancel}
-              </button>
-              <button
-                className={styles.saveBtn}
-                onClick={handleSave}
-                disabled={!isDirty || isSaving}
-              >
-                {isSaving ? labels.saving : labels.save}
-              </button>
-            </div>
+              {/* Footer actions */}
+              {canEdit && (
+                <div className={styles.footer}>
+                  <button
+                    className={styles.cancelBtn}
+                    onClick={handleCancel}
+                    disabled={!isDirty || isSaving}
+                  >
+                    {labels.cancel}
+                  </button>
+                  <button
+                    className={styles.saveBtn}
+                    onClick={handleSave}
+                    disabled={!isDirty || isSaving}
+                  >
+                    {isSaving ? labels.saving : labels.save}
+                  </button>
+                </div>
+              )}
+            </>
           )}
         </>
-      )}
-      </>
       )}
     </div>
   );

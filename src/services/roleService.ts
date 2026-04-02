@@ -12,9 +12,7 @@ export const roleService = {
     isActive: boolean;
     permissionIds: string[];
   }): Promise<Role> =>
-    apiClient
-      .post<ApiResponse<Role>>("/roles", data)
-      .then((r) => r.data.data),
+    apiClient.post<ApiResponse<Role>>("/roles", data).then((r) => r.data.data),
 
   update: (id: string, permissionIds: string[]): Promise<Role> =>
     apiClient
