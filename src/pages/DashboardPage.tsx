@@ -3,10 +3,11 @@ import { useNavigate } from "react-router-dom";
 import styles from "./DashboardPage.module.css";
 import { customerService } from "../services/customerService";
 import { jobService } from "../services/jobService";
+import { invoiceService } from "../services/invoiceService";
 import apiClient from "../services/apiClient";
 import { useLang } from "../contexts/LangContext";
 import { useAuth } from "../contexts/AuthContext";
-import type { Job } from "../types";
+import type { Customer, Invoice, Job } from "../types";
 
 const WEEKDAYS_EN = ["S", "M", "T", "W", "T", "F", "S"];
 const WEEKDAYS_ES = ["D", "L", "M", "X", "J", "V", "S"];
@@ -62,6 +63,8 @@ const t = {
     newJob: "+ New Job",
     newClient: "+ New Client",
     newInvoice: "+ New Invoice",
+    recentActivity: "Recent Activity",
+    noActivity: "No recent activity",
   },
   es: {
     heading: "Inicio",
@@ -75,8 +78,34 @@ const t = {
     newJob: "+ Nuevo Trabajo",
     newClient: "+ Nuevo Cliente",
     newInvoice: "+ Nueva Factura",
+    recentActivity: "Actividad Reciente",
+    noActivity: "Sin actividad reciente",
   },
 };
+
+interface ActivityItem {
+  id: string;
+  icon: string;
+  color: string;
+  text: string;
+  time: Date;
+  onClick?: () => void;
+}
+
+function timeAgo(date: Date, lang: "en" | "es"): string {
+  const diff = Math.floor((Date.now() - date.getTime()) / 1000);
+  if (diff < 60) return lang === "en" ? "just now" : "ahora mismo";
+  if (diff < 3600) {
+    const m = Math.floor(diff / 60);
+    return lang === "en" ? `${m}m ago` : `hace ${m}m`;
+  }
+  if (diff < 86400) {
+    const h = Math.floor(diff / 3600);
+    return lang === "en" ? `${h}h ago` : `hace ${h}h`;
+  }
+  const d = Math.floor(diff / 86400);
+  return lang === "en" ? `${d}d ago` : `hace ${d}d`;
+}
 
 function buildCalendarGrid(year: number, month: number) {
   const firstDay = new Date(year, month, 1).getDay();
@@ -96,6 +125,8 @@ export default function DashboardPage() {
   const [totalJobs, setTotalJobs] = useState<number | null>(null);
   const [totalServices, setTotalServices] = useState<number | null>(null);
   const [allJobs, setAllJobs] = useState<Job[]>([]);
+  const [recentInvoices, setRecentInvoices] = useState<Invoice[]>([]);
+  const [recentCustomers, setRecentCustomers] = useState<Customer[]>([]);
   const [calendarDate, setCalendarDate] = useState(() => {
     const now = new Date();
     return new Date(now.getFullYear(), now.getMonth(), 1);
@@ -125,6 +156,16 @@ export default function DashboardPage() {
       .getAll({ page: 1, limit: 200 })
       .then((res) => setAllJobs(res.data))
       .catch(() => setAllJobs([]));
+
+    invoiceService
+      .getAll({ page: 1, limit: 8 })
+      .then((res) => setRecentInvoices(res.data))
+      .catch(() => setRecentInvoices([]));
+
+    customerService
+      .getAll({ page: 1, limit: 5 })
+      .then((res) => setRecentCustomers(res.data))
+      .catch(() => setRecentCustomers([]));
   }, []);
 
   const displayedJobs = useMemo(() => {
@@ -159,6 +200,57 @@ export default function DashboardPage() {
     );
     return map;
   }, [displayedJobs, calendarDate]);
+
+  const activityItems = useMemo<ActivityItem[]>(() => {
+    const items: ActivityItem[] = [];
+
+    // Jobs → show last 5 by updatedAt
+    const sortedJobs = [...allJobs]
+      .sort((a, b) => new Date(b.updatedAt ?? b.scheduledStart).getTime() - new Date(a.updatedAt ?? a.scheduledStart).getTime())
+      .slice(0, 5);
+
+    sortedJobs.forEach((job) => {
+      const icon = job.status === "completed" ? "✅" : job.status === "in_progress" ? "🔄" : job.status === "canceled" ? "❌" : "📅";
+      const color = STATUS_COLORS[job.status] ?? "#3b82f6";
+      items.push({
+        id: `job-${job._id}`,
+        icon,
+        color,
+        text: `Job "${job.title ?? job.status}" — ${job.status.replace("_", " ")}`,
+        time: new Date(job.updatedAt ?? job.scheduledStart),
+        onClick: () => navigate("/jobs"),
+      });
+    });
+
+    // Invoices
+    recentInvoices.forEach((inv) => {
+      const isPaid = inv.status === "paid";
+      items.push({
+        id: `inv-${inv._id}`,
+        icon: isPaid ? "💰" : "📄",
+        color: isPaid ? "#10b981" : "#6b7280",
+        text: `Invoice #${inv.invoiceNumber} — ${inv.status}`,
+        time: new Date(inv.paidAt ?? inv.issuedDate ?? inv._id),
+        onClick: () => navigate("/invoices"),
+      });
+    });
+
+    // Customers
+    recentCustomers.forEach((c) => {
+      items.push({
+        id: `cus-${c._id}`,
+        icon: "👤",
+        color: "#8b5cf6",
+        text: `New client: ${c.firstName} ${c.lastName}`,
+        time: new Date(c.createdAt),
+        onClick: () => navigate("/customers"),
+      });
+    });
+
+    return items
+      .sort((a, b) => b.time.getTime() - a.time.getTime())
+      .slice(0, 8);
+  }, [allJobs, recentInvoices, recentCustomers, navigate]);
 
   const calendarCells = useMemo(
     () =>
@@ -264,7 +356,8 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Calendar widget */}
+      {/* Calendar + Activity row */}
+      <div className={styles.bottomRow}>
       <div className={styles.calendarCard}>
         {/* Header */}
         <div className={styles.calendarHeader}>
@@ -382,6 +475,40 @@ export default function DashboardPage() {
           <p className={styles.noJobs}>{labels.noJobs}</p>
         )}
       </div>
+
+      {/* Recent Activity */}
+      <div className={styles.activityCard}>
+        <h3 className={styles.activityTitle}>{labels.recentActivity}</h3>
+        {activityItems.length === 0 ? (
+          <p className={styles.noActivity}>{labels.noActivity}</p>
+        ) : (
+          <ul className={styles.activityList}>
+            {activityItems.map((item) => (
+              <li
+                key={item.id}
+                className={styles.activityItem}
+                onClick={item.onClick}
+                role={item.onClick ? "button" : undefined}
+                tabIndex={item.onClick ? 0 : undefined}
+                onKeyDown={(e) => e.key === "Enter" && item.onClick?.()}
+              >
+                <span
+                  className={styles.activityIcon}
+                  style={{ background: `${item.color}18`, color: item.color }}
+                >
+                  {item.icon}
+                </span>
+                <span className={styles.activityText}>{item.text}</span>
+                <span className={styles.activityTime}>
+                  {timeAgo(item.time, lang)}
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
+      </div>{/* end bottomRow */}
     </div>
   );
 }

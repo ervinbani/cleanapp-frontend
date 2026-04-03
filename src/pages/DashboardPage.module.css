@@ -113,6 +113,14 @@
   line-height: 1;
 }
 
+/* ── Bottom row: Calendar + Activity ─────────────────── */
+.bottomRow {
+  display: flex;
+  gap: 1.25rem;
+  align-items: flex-start;
+  margin-top: 0.5rem;
+}
+
 /* ── Calendar ─────────────────────────────────────────── */
 .calendarCard {
   background: #ffffff;
@@ -120,8 +128,8 @@
   border-radius: 0.75rem;
   padding: 1.25rem 1.5rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
-  margin-top: 0.5rem;
-  max-width: 520px;
+  flex: 1 1 0;
+  min-width: 0;
 }
 
 .calendarHeader {
@@ -352,4 +360,80 @@
   font-size: 0.85rem;
   padding: 1rem 0 0.5rem;
   margin: 0;
+}
+
+/* ── Recent Activity ─────────────────────────────────── */
+.activityCard {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  flex: 0 0 300px;
+  width: 300px;
+}
+
+.activityTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #111827;
+  margin: 0 0 1rem;
+}
+
+.activityList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.activityItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.65rem 0;
+  border-bottom: 1px solid #f3f4f6;
+  cursor: pointer;
+  transition: background 0.15s;
+  border-radius: 6px;
+}
+
+.activityItem:last-child {
+  border-bottom: none;
+}
+
+.activityItem:hover {
+  background: #f9fafb;
+}
+
+.activityIcon {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.activityText {
+  flex: 1;
+  font-size: 0.875rem;
+  color: #374151;
+}
+
+.activityTime {
+  font-size: 0.78rem;
+  color: #9ca3af;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.noActivity {
+  color: #9ca3af;
+  font-size: 0.85rem;
+  margin: 0;
+  padding: 0.5rem 0;
 }
