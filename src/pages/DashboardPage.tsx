@@ -59,6 +59,9 @@ const t = {
     allJobs: "All Jobs",
     myJobs: "My Jobs",
     noJobs: "No jobs this month",
+    newJob: "+ New Job",
+    newClient: "+ New Client",
+    newInvoice: "+ New Invoice",
   },
   es: {
     heading: "Inicio",
@@ -69,6 +72,9 @@ const t = {
     allJobs: "Todos",
     myJobs: "Mis Trabajos",
     noJobs: "Sin trabajos este mes",
+    newJob: "+ Nuevo Trabajo",
+    newClient: "+ Nuevo Cliente",
+    newInvoice: "+ Nueva Factura",
   },
 };
 
@@ -83,7 +89,7 @@ function buildCalendarGrid(year: number, month: number) {
 
 export default function DashboardPage() {
   const { lang } = useLang();
-  const { user } = useAuth();
+  const { user, hasPermission } = useAuth();
   const navigate = useNavigate();
 
   const [totalClients, setTotalClients] = useState<number | null>(null);
@@ -183,9 +189,41 @@ export default function DashboardPage() {
     });
   };
 
+  const canCreateJob = hasPermission("jobs", "create");
+  const canCreateClient = hasPermission("users", "create");
+  const canCreateInvoice = hasPermission("invoices", "create");
+
   return (
     <div className={styles.page}>
-      <h2 className={styles.heading}>{labels.heading}</h2>
+      <div className={styles.headingRow}>
+        <h2 className={styles.heading}>{labels.heading}</h2>
+        <div className={styles.quickActions}>
+          {canCreateJob && (
+            <button
+              className={styles.qaBtn}
+              onClick={() => navigate("/jobs?new=1")}
+            >
+              {labels.newJob}
+            </button>
+          )}
+          {canCreateClient && (
+            <button
+              className={styles.qaBtn}
+              onClick={() => navigate("/customers?new=1")}
+            >
+              {labels.newClient}
+            </button>
+          )}
+          {canCreateInvoice && (
+            <button
+              className={`${styles.qaBtn} ${styles.qaBtnPrimary}`}
+              onClick={() => navigate("/invoices?new=1")}
+            >
+              {labels.newInvoice}
+            </button>
+          )}
+        </div>
+      </div>
 
       <div className={styles.statsRow}>
         <div

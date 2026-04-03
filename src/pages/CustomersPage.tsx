@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useLang } from "../contexts/LangContext";
 import { useAuth } from "../contexts/AuthContext";
 import { customerService } from "../services/customerService";
@@ -509,6 +510,14 @@ export default function CustomersPage() {
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
+
+  const [searchParams, setSearchParams] = useSearchParams();
+  useEffect(() => {
+    if (searchParams.get("new") === "1" && canWrite) {
+      setShowAddModal(true);
+      setSearchParams({}, { replace: true });
+    }
+  }, [searchParams, setSearchParams, canWrite]);
 
   const fetchCustomers = useCallback(async () => {
     setLoading(true);

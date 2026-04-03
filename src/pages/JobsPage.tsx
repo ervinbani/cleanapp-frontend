@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useLang } from "../contexts/LangContext";
 import { useAuth } from "../contexts/AuthContext";
 import { jobService } from "../services/jobService";
@@ -757,6 +758,14 @@ export default function JobsPage() {
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingJob, setEditingJob] = useState<Job | null>(null);
+
+  const [searchParams, setSearchParams] = useSearchParams();
+  useEffect(() => {
+    if (searchParams.get("new") === "1" && canCreate) {
+      setShowAddModal(true);
+      setSearchParams({}, { replace: true });
+    }
+  }, [searchParams, setSearchParams, canCreate]);
 
   const fetchJobs = useCallback(async () => {
     setLoading(true);
