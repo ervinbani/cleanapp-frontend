@@ -1085,21 +1085,20 @@ export default function JobsPage() {
                     )}
                     <td>
                       <div className={styles.actions}>
-                        <button className={styles.btnView}>
+                        <button className={styles.btnView} title={l.btnView}>
                           <svg viewBox="0 0 20 20" fill="currentColor">
                             <path d="M10 3C5 3 1.73 7.11 1.07 9.69a1 1 0 000 .62C1.73 12.89 5 17 10 17s8.27-4.11 8.93-6.69a1 1 0 000-.62C18.27 7.11 15 3 10 3zm0 11a4 4 0 110-8 4 4 0 010 8zm0-6a2 2 0 100 4 2 2 0 000-4z" />
                           </svg>
-                          {l.btnView}
                         </button>
                         {canWrite && (
                           <button
                             className={styles.btnUpdate}
+                            title={l.btnUpdate}
                             onClick={() => setEditingJob(j)}
                           >
                             <svg viewBox="0 0 20 20" fill="currentColor">
                               <path d="M13.586 3.586a2 2 0 112.828 2.828l-9.5 9.5A2 2 0 015.5 16.5H4a1 1 0 01-1-1v-1.5a2 2 0 01.586-1.414l9.5-9.5z" />
                             </svg>
-                            {l.btnUpdate}
                           </button>
                         )}
                         {canDelete && (
