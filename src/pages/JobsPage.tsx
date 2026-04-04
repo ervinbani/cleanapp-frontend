@@ -733,7 +733,8 @@ function JobModal({ job, lang, onClose, onSaved }: JobModalProps) {
 
 export default function JobsPage() {
   const { lang } = useLang();
-  const { hasPermission } = useAuth();
+  const { hasPermission, hasRole } = useAuth();
+  const isWorker = hasRole("worker", "cleaner");
   const l = t[lang];
 
   const [jobs, setJobs] = useState<Job[]>([]);
@@ -993,7 +994,7 @@ export default function JobsPage() {
               <th>{l.colScheduled}</th>
               <th>{l.colStatus}</th>
               <th>{l.colAssigned}</th>
-              <th>{l.colPrice}</th>
+              {!isWorker && <th>{l.colPrice}</th>}
               <th>{l.colActions}</th>
             </tr>
             <tr className={styles.filterRow}>
@@ -1037,13 +1038,13 @@ export default function JobsPage() {
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan={8} className={styles.empty}>
+                <td colSpan={isWorker ? 7 : 8} className={styles.empty}>
                   {l.loading}
                 </td>
               </tr>
             ) : displayed.length === 0 ? (
               <tr>
-                <td colSpan={8} className={styles.empty}>
+                <td colSpan={isWorker ? 7 : 8} className={styles.empty}>
                   {l.noResults}
                 </td>
               </tr>
@@ -1077,9 +1078,11 @@ export default function JobsPage() {
                     <td className={styles.assignedCell}>
                       {getAssignedNames(j)}
                     </td>
-                    <td className={styles.priceCell}>
-                      {j.price != null ? `$${j.price.toFixed(2)}` : "—"}
-                    </td>
+                    {!isWorker && (
+                      <td className={styles.priceCell}>
+                        {j.price != null ? `$${j.price.toFixed(2)}` : "—"}
+                      </td>
+                    )}
                     <td>
                       <div className={styles.actions}>
                         <button className={styles.btnView}>
