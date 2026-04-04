@@ -749,7 +749,12 @@ export default function UsersPage() {
   const [editingUser, setEditingUser] = useState<User | null>(null);
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_LIMIT));
-  const canWrite = hasRole("owner", "director", "manager_operations", "manager_hr");
+  const canWrite = hasRole(
+    "owner",
+    "director",
+    "manager_operations",
+    "manager_hr",
+  );
 
   const fetchUsers = useCallback(async () => {
     setLoading(true);
