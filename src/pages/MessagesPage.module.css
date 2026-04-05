@@ -174,7 +174,9 @@
   line-height: 1;
   border-radius: 4px;
   color: #9ca3af;
-  transition: opacity 0.15s, background 0.15s;
+  transition:
+    opacity 0.15s,
+    background 0.15s;
 }
 
 .convItem:hover .convMenuBtn {
@@ -317,7 +319,9 @@
   line-height: 1;
   border-radius: 4px;
   color: rgba(255, 255, 255, 0.85);
-  transition: opacity 0.15s, background 0.15s;
+  transition:
+    opacity 0.15s,
+    background 0.15s;
 }
 
 .bubbleTheirs .msgMenuBtn {

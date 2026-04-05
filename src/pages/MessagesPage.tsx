@@ -57,7 +57,8 @@ const ml = {
     confirmDeleteBody: "This action cannot be undone.",
     deleteConv: "Delete conversation",
     confirmDeleteConv: "Delete this conversation?",
-    confirmDeleteConvBody: "All messages with this contact will be deleted permanently.",
+    confirmDeleteConvBody:
+      "All messages with this contact will be deleted permanently.",
     delete: "Delete",
   },
   es: {
@@ -82,7 +83,8 @@ const ml = {
     confirmDeleteBody: "Esta acción no se puede deshacer.",
     deleteConv: "Eliminar conversación",
     confirmDeleteConv: "¿Eliminar esta conversación?",
-    confirmDeleteConvBody: "Todos los mensajes con este contacto serán eliminados permanentemente.",
+    confirmDeleteConvBody:
+      "Todos los mensajes con este contacto serán eliminados permanentemente.",
     delete: "Eliminar",
   },
 };
@@ -260,7 +262,9 @@ export default function MessagesPage() {
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [openConvMenuId, setOpenConvMenuId] = useState<string | null>(null);
-  const [confirmDeleteConvUserId, setConfirmDeleteConvUserId] = useState<string | null>(null);
+  const [confirmDeleteConvUserId, setConfirmDeleteConvUserId] = useState<
+    string | null
+  >(null);
   const threadEndRef = useRef<HTMLDivElement>(null);
 
   // ── load inbox + users ────────────────────────────────────────────────────
@@ -298,8 +302,7 @@ export default function MessagesPage() {
         } else {
           if (!isMine && !msg.isRead) existing.unreadCount += 1;
           if (
-            new Date(msg.createdAt) >
-            new Date(existing.lastMessage.createdAt)
+            new Date(msg.createdAt) > new Date(existing.lastMessage.createdAt)
           ) {
             existing.lastMessage = msg;
           }
@@ -443,10 +446,9 @@ export default function MessagesPage() {
     // build a MessageUser for the recipient from the populated field or
     // fall back to the users list we already have
     const populated = asUser(msg.toUserId);
-    const fromUsers = users.find(
-      (u) => (u._id ?? u.id) === recipientId,
-    );
-    const contact: MessageUser | null = populated ??
+    const fromUsers = users.find((u) => (u._id ?? u.id) === recipientId);
+    const contact: MessageUser | null =
+      populated ??
       (fromUsers
         ? {
             _id: fromUsers._id ?? fromUsers.id ?? recipientId,
@@ -469,7 +471,12 @@ export default function MessagesPage() {
           );
         }
         return [
-          { userId: recipientId, user: contact, lastMessage: msg, unreadCount: 0 },
+          {
+            userId: recipientId,
+            user: contact,
+            lastMessage: msg,
+            unreadCount: 0,
+          },
           ...prev,
         ];
       });
@@ -641,7 +648,9 @@ export default function MessagesPage() {
                       )}
                       <p className={styles.bubbleBody}>{msg.body}</p>
                       <span className={styles.bubbleTime}>
-                        <span className={styles.bubbleTimeText}>{formatTime(msg.createdAt)}</span>
+                        <span className={styles.bubbleTimeText}>
+                          {formatTime(msg.createdAt)}
+                        </span>
                         {isMine && (
                           <span
                             className={
