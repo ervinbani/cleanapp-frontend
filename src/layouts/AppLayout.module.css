@@ -96,6 +96,19 @@
   margin-top: 1px;
 }
 
+.navBadge {
+  margin-left: auto;
+  background: #ef4444;
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 0 0.45rem;
+  line-height: 1.6;
+  min-width: 1.3rem;
+  text-align: center;
+}
+
 /* ─── Settings accordion ──────────────────────────────────────── */
 .settingsGroup {
   display: flex;

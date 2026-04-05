@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { useLang } from "../contexts/LangContext";
+import { messageService } from "../services/messageService";
 import styles from "./AppLayout.module.css";
 
 const navItems = [
@@ -112,6 +113,15 @@ export default function AppLayout() {
   const [settingsOpen, setSettingsOpen] = useState(() =>
     location.pathname.startsWith("/settings"),
   );
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    const fetch = () =>
+      messageService.getUnreadCount().then(setUnreadCount).catch(() => {});
+    fetch();
+    const id = setInterval(fetch, 30_000);
+    return () => clearInterval(id);
+  }, []);
 
   const isSettingsArea = location.pathname.startsWith("/settings");
 
@@ -193,6 +203,9 @@ export default function AppLayout() {
                       <span className={styles.navLabelSub}>{item.label}</span>
                     )}
                   </span>
+                  {item.path === "/messages" && unreadCount > 0 && (
+                    <span className={styles.navBadge}>{unreadCount}</span>
+                  )}
                 </NavLink>
               ),
             )}
