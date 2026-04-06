@@ -4,6 +4,7 @@ import type {
   AuthData,
   LoginCredentials,
   RegisterPayload,
+  User,
 } from "../types";
 
 export const login = async (
@@ -27,4 +28,19 @@ export const register = async (payload: RegisterPayload): Promise<AuthData> => {
 export const getMe = async (): Promise<AuthData["user"]> => {
   const res = await apiClient.get<ApiResponse<AuthData["user"]>>("/auth/me");
   return res.data.data;
+};
+
+export const updateMe = async (data: {
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  phone?: string;
+  preferredLanguage?: string;
+}): Promise<User> => {
+  const res = await apiClient.put<ApiResponse<User>>("/auth/me", data);
+  return res.data.data;
+};
+
+export const deleteTenant = async (password: string): Promise<void> => {
+  await apiClient.delete("/tenant", { data: { password } });
 };

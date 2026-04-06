@@ -10,6 +10,7 @@ import {
   login as loginApi,
   register as registerApi,
   getMe,
+  updateMe as updateMeApi,
 } from "../services/authService";
 import type { LoginCredentials, RegisterPayload } from "../types";
 
@@ -78,6 +79,7 @@ interface AuthContextValue {
   login: (credentials: LoginCredentials) => Promise<void>;
   register: (payload: RegisterPayload) => Promise<void>;
   logout: () => void;
+  updateUser: (data: Partial<User>) => Promise<void>;
   hasRole: (...roles: UserRole[]) => boolean;
   hasPermission: (entity: string, action: string) => boolean;
 }
@@ -125,6 +127,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
   };
 
+  const updateUser = async (data: Partial<User>) => {
+    const updated = await updateMeApi(data);
+    setUser(updated);
+  };
+
   const hasRole = (...roles: UserRole[]) => {
     if (!user) return false;
     return roles.includes(user.role);
@@ -146,6 +153,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         login,
         register,
         logout,
+        updateUser,
         hasRole,
         hasPermission,
       }}

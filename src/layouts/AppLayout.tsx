@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { useLang } from "../contexts/LangContext";
 import { messageService } from "../services/messageService";
+import { deleteTenant } from "../services/authService";
 import styles from "./AppLayout.module.css";
 
 const navItems = [
@@ -105,7 +106,7 @@ const settingsSubItems = [
 ];
 
 export default function AppLayout() {
-  const { user, logout, hasRole, hasPermission } = useAuth();
+  const { user, logout, hasRole, hasPermission, updateUser } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const { lang, setLang } = useLang();
@@ -114,6 +115,29 @@ export default function AppLayout() {
     location.pathname.startsWith("/settings"),
   );
   const [unreadCount, setUnreadCount] = useState(0);
+
+  // ── user dropdown
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // ── profile modal
+  const [showProfile, setShowProfile] = useState(false);
+  const [profileForm, setProfileForm] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+  });
+  const [profileSaving, setProfileSaving] = useState(false);
+  const [profileError, setProfileError] = useState("");
+  const [profileSuccess, setProfileSuccess] = useState(false);
+
+  // ── delete account modal
+  const [showDeleteAccount, setShowDeleteAccount] = useState(false);
+  const [deletePassword, setDeletePassword] = useState("");
+  const [deleteConfirmWord, setDeleteConfirmWord] = useState("");
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
 
   useEffect(() => {
     const fetch = () =>
@@ -125,6 +149,81 @@ export default function AppLayout() {
     const id = setInterval(fetch, 30_000);
     return () => clearInterval(id);
   }, []);
+
+  // close dropdown on outside click
+  useEffect(() => {
+    if (!dropdownOpen) return;
+    const handler = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [dropdownOpen]);
+
+  // sync profile form when user changes
+  useEffect(() => {
+    if (user) {
+      setProfileForm({
+        firstName: user.firstName ?? "",
+        lastName: user.lastName ?? "",
+        email: user.email ?? "",
+        phone: user.phone ?? "",
+      });
+    }
+  }, [user]);
+
+  const openProfile = () => {
+    setDropdownOpen(false);
+    setProfileError("");
+    setProfileSuccess(false);
+    setShowProfile(true);
+  };
+
+  const handleProfileSave = async () => {
+    setProfileSaving(true);
+    setProfileError("");
+    setProfileSuccess(false);
+    try {
+      await updateUser(profileForm);
+      setProfileSuccess(true);
+    } catch {
+      setProfileError(lang === "en" ? "Failed to save changes." : "Error al guardar.");
+    } finally {
+      setProfileSaving(false);
+    }
+  };
+
+  const openDeleteAccount = () => {
+    setShowProfile(false);
+    setDeletePassword("");
+    setDeleteConfirmWord("");
+    setDeleteError("");
+    setShowDeleteAccount(true);
+  };
+
+  const handleDeleteAccount = async () => {
+    if (deleteConfirmWord !== "DELETE") {
+      setDeleteError(lang === "en" ? 'You must type DELETE to confirm.' : 'Debes escribir DELETE para confirmar.');
+      return;
+    }
+    if (!deletePassword.trim()) {
+      setDeleteError(lang === "en" ? "Password is required." : "La contraseña es obligatoria.");
+      return;
+    }
+    setDeleteLoading(true);
+    setDeleteError("");
+    try {
+      await deleteTenant(deletePassword);
+      logout();
+      navigate("/login");
+    } catch {
+      setDeleteError(lang === "en" ? "Incorrect password or server error." : "Contraseña incorrecta o error del servidor.");
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
 
   const isSettingsArea = location.pathname.startsWith("/settings");
 
@@ -248,21 +347,46 @@ export default function AppLayout() {
               </button>
             </div>
 
-            <div className={styles.userMenu}>
-              <div className={styles.avatar}>
-                {user?.firstName?.[0]}
-                {user?.lastName?.[0]}
-              </div>
-              <span className={styles.userName}>
-                {user?.firstName} {user?.lastName}
-              </span>
+            <div className={styles.userMenu} ref={dropdownRef}>
               <button
-                className={styles.logoutBtn}
-                onClick={handleLogout}
-                title="Logout"
+                className={styles.userMenuTrigger}
+                onClick={() => setDropdownOpen((o) => !o)}
+                aria-expanded={dropdownOpen}
               >
-                ⏻
+                <div className={styles.avatar}>
+                  {user?.firstName?.[0]}
+                  {user?.lastName?.[0]}
+                </div>
+                <span className={styles.userName}>
+                  {user?.firstName} {user?.lastName}
+                </span>
+                <span className={styles.userChevron}>{dropdownOpen ? "▴" : "▾"}</span>
               </button>
+
+              {dropdownOpen && (
+                <div className={styles.userDropdown}>
+                  <div className={styles.userDropdownHeader}>
+                    <div className={styles.avatarLarge}>
+                      {user?.firstName?.[0]}{user?.lastName?.[0]}
+                    </div>
+                    <div>
+                      <p className={styles.dropdownName}>{user?.firstName} {user?.lastName}</p>
+                      <p className={styles.dropdownRole}>{user?.role}</p>
+                    </div>
+                  </div>
+                  <hr className={styles.dropdownDivider} />
+                  <button className={styles.dropdownItem} onClick={openProfile}>
+                    👤 {lang === "en" ? "My Profile" : "Mi Perfil"}
+                  </button>
+                  <hr className={styles.dropdownDivider} />
+                  <button
+                    className={styles.dropdownItem}
+                    onClick={() => { setDropdownOpen(false); handleLogout(); }}
+                  >
+                    ⏻ {lang === "en" ? "Logout" : "Cerrar sesión"}
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </header>
@@ -272,6 +396,139 @@ export default function AppLayout() {
           <Outlet />
         </main>
       </div>
+
+      {/* ── Profile Modal ───────────────────────────────── */}
+      {showProfile && (
+        <div className={styles.modalOverlay} onClick={() => setShowProfile(false)}>
+          <div className={styles.modal} onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
+            <h2 className={styles.modalTitle}>
+              {lang === "en" ? "My Profile" : "Mi Perfil"}
+            </h2>
+
+            <div className={styles.profileGrid}>
+              <div>
+                <label className={styles.formLabel}>{lang === "en" ? "First Name" : "Nombre"}</label>
+                <input
+                  className={styles.formInput}
+                  value={profileForm.firstName}
+                  onChange={(e) => setProfileForm((f) => ({ ...f, firstName: e.target.value }))}
+                />
+              </div>
+              <div>
+                <label className={styles.formLabel}>{lang === "en" ? "Last Name" : "Apellido"}</label>
+                <input
+                  className={styles.formInput}
+                  value={profileForm.lastName}
+                  onChange={(e) => setProfileForm((f) => ({ ...f, lastName: e.target.value }))}
+                />
+              </div>
+              <div className={styles.profileFullWidth}>
+                <label className={styles.formLabel}>Email</label>
+                <input
+                  className={styles.formInput}
+                  type="email"
+                  value={profileForm.email}
+                  onChange={(e) => setProfileForm((f) => ({ ...f, email: e.target.value }))}
+                />
+              </div>
+              <div className={styles.profileFullWidth}>
+                <label className={styles.formLabel}>{lang === "en" ? "Phone" : "Teléfono"}</label>
+                <input
+                  className={styles.formInput}
+                  type="tel"
+                  value={profileForm.phone}
+                  onChange={(e) => setProfileForm((f) => ({ ...f, phone: e.target.value }))}
+                />
+              </div>
+            </div>
+
+            {profileError && <p className={styles.formError}>{profileError}</p>}
+            {profileSuccess && (
+              <p className={styles.formSuccess}>
+                {lang === "en" ? "Saved successfully." : "Guardado con éxito."}
+              </p>
+            )}
+
+            <div className={styles.modalActions}>
+              {hasRole("owner") && (
+                <button className={styles.deleteAccBtn} onClick={openDeleteAccount}>
+                  {lang === "en" ? "Delete Account" : "Eliminar cuenta"}
+                </button>
+              )}
+              <button className={styles.cancelBtn} onClick={() => setShowProfile(false)}>
+                {lang === "en" ? "Cancel" : "Cancelar"}
+              </button>
+              <button
+                className={styles.saveBtn}
+                onClick={handleProfileSave}
+                disabled={profileSaving}
+              >
+                {profileSaving ? (lang === "en" ? "Saving…" : "Guardando…") : (lang === "en" ? "Save" : "Guardar")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Delete Account Modal ────────────────────────── */}
+      {showDeleteAccount && (
+        <div className={styles.modalOverlay} onClick={() => setShowDeleteAccount(false)}>
+          <div className={styles.modal} onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
+            <h2 className={`${styles.modalTitle} ${styles.dangerTitle}`}>
+              ⚠️ {lang === "en" ? "Delete Account" : "Eliminar cuenta"}
+            </h2>
+            <p className={styles.dangerBody}>
+              {lang === "en"
+                ? "This will permanently delete your account, all users, jobs, invoices, and all data associated with your organisation. This action cannot be undone."
+                : "Esto eliminará permanentemente tu cuenta, todos los usuarios, trabajos, facturas y todos los datos de tu organización. Esta acción no se puede deshacer."}
+            </p>
+
+            <label className={styles.formLabel}>
+              {lang === "en" ? "Your password" : "Tu contraseña"}
+            </label>
+            <input
+              className={styles.formInput}
+              type="password"
+              autoComplete="current-password"
+              value={deletePassword}
+              onChange={(e) => setDeletePassword(e.target.value)}
+            />
+
+            <label className={styles.formLabel} style={{ marginTop: "0.75rem" }}>
+              {lang === "en"
+                ? 'Type DELETE to confirm'
+                : 'Escribe DELETE para confirmar'}
+            </label>
+            <input
+              className={styles.formInput}
+              placeholder="DELETE"
+              value={deleteConfirmWord}
+              onChange={(e) => setDeleteConfirmWord(e.target.value)}
+            />
+
+            {deleteError && <p className={styles.formError}>{deleteError}</p>}
+
+            <div className={styles.modalActions}>
+              <button
+                className={styles.cancelBtn}
+                onClick={() => setShowDeleteAccount(false)}
+                disabled={deleteLoading}
+              >
+                {lang === "en" ? "Cancel" : "Cancelar"}
+              </button>
+              <button
+                className={styles.confirmDeleteBtn}
+                onClick={handleDeleteAccount}
+                disabled={deleteLoading || deleteConfirmWord !== "DELETE" || !deletePassword.trim()}
+              >
+                {deleteLoading
+                  ? (lang === "en" ? "Deleting…" : "Eliminando…")
+                  : (lang === "en" ? "Delete Everything" : "Eliminar todo")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
