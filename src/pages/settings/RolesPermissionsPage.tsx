@@ -319,6 +319,204 @@ function NewRoleForm({ allPermissions, onCancel, onSaved }: NewRoleFormProps) {
   );
 }
 
+// ─── Edit Role Form ───────────────────────────────────────────────────────────
+interface EditRoleFormProps {
+  role: Role;
+  onCancel: () => void;
+  onSaved: (role: Role) => void;
+  onDeleted: () => void;
+}
+
+function EditRoleForm({ role, onCancel, onSaved, onDeleted }: EditRoleFormProps) {
+  const [name, setName] = useState(role.name);
+  const [code, setCode] = useState(role.code as string);
+  const [description, setDescription] = useState(role.description ?? "");
+  const [isActive, setIsActive] = useState(role.isActive ?? true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+  const handleSave = async () => {
+    if (!name.trim()) {
+      setFormError("Role name is required.");
+      return;
+    }
+    setIsSaving(true);
+    setFormError(null);
+    try {
+      const updated = await roleService.updateMeta(role._id, {
+        name: name.trim(),
+        code: code.trim(),
+        description: description.trim(),
+        isActive,
+      });
+      onSaved(updated);
+    } catch (err: unknown) {
+      const msg = axios.isAxiosError(err)
+        ? (err.response?.data?.message ??
+          err.response?.data?.error ??
+          `Error ${err.response?.status}`)
+        : "Failed to save changes.";
+      setFormError(msg);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    setIsDeleting(true);
+    try {
+      await roleService.deleteRole(role._id);
+      onDeleted();
+    } catch (err: unknown) {
+      const msg = axios.isAxiosError(err)
+        ? (err.response?.data?.message ??
+          err.response?.data?.error ??
+          `Error ${err.response?.status}`)
+        : "Failed to delete role.";
+      setFormError(msg);
+      setIsDeleting(false);
+    }
+  };
+
+  return (
+    <div className={styles.newRoleView}>
+      <nav className={styles.breadcrumb}>
+        <button className={styles.breadcrumbLink} onClick={onCancel}>
+          Settings
+        </button>
+        <span className={styles.breadcrumbSep}>/</span>
+        <button className={styles.breadcrumbLink} onClick={onCancel}>
+          Roles &amp; Permissions
+        </button>
+        <span className={styles.breadcrumbSep}>/</span>
+        <span className={styles.breadcrumbCurrent}>Edit: {role.name}</span>
+      </nav>
+
+      <div className={styles.formCard}>
+        <h2 className={styles.formTitle}>Edit Role</h2>
+
+        {formError && <p className={styles.errorMsg}>{formError}</p>}
+
+        {role.isSystem && (
+          <p className={styles.systemRoleNote}>
+            System roles cannot be edited or deleted.
+          </p>
+        )}
+
+        <div className={styles.formGroup}>
+          <label className={styles.label}>Role Name</label>
+          <input
+            className={styles.input}
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            disabled={role.isSystem}
+          />
+        </div>
+
+        <div className={styles.formRow}>
+          <div className={styles.formGroup}>
+            <label className={styles.label}>Role Code</label>
+            <input
+              className={styles.input}
+              type="text"
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+              disabled={role.isSystem}
+            />
+          </div>
+          <div className={styles.formGroup}>
+            <label className={styles.label}>Description</label>
+            <textarea
+              className={styles.textarea}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              rows={2}
+              disabled={role.isSystem}
+            />
+          </div>
+        </div>
+
+        <div className={styles.formGroupInline}>
+          <span className={styles.label}>Status</span>
+          <label className={styles.toggle}>
+            <input
+              type="checkbox"
+              checked={isActive}
+              onChange={(e) => setIsActive(e.target.checked)}
+              disabled={role.isSystem}
+            />
+            <span className={styles.toggleSlider} />
+          </label>
+          <span className={styles.toggleLabel}>
+            {isActive ? "Active" : "Inactive"}
+          </span>
+        </div>
+
+        {showDeleteConfirm && (
+          <div className={styles.dangerZone}>
+            <p className={styles.dangerZoneText}>
+              Are you sure you want to delete <strong>{role.name}</strong>? This
+              action cannot be undone.
+            </p>
+            <div className={styles.dangerZoneActions}>
+              <button
+                className={styles.cancelBtn}
+                onClick={() => setShowDeleteConfirm(false)}
+                disabled={isDeleting}
+              >
+                Cancel
+              </button>
+              <button
+                className={styles.confirmDeleteBtn}
+                onClick={handleDelete}
+                disabled={isDeleting}
+              >
+                {isDeleting ? "Deleting…" : "Yes, delete"}
+              </button>
+            </div>
+          </div>
+        )}
+
+        <div className={styles.formFooter}>
+          {!role.isSystem ? (
+            <button
+              className={styles.deleteRoleBtn}
+              onClick={() => setShowDeleteConfirm(true)}
+              disabled={isSaving || isDeleting || showDeleteConfirm}
+              type="button"
+            >
+              Delete Role
+            </button>
+          ) : (
+            <span />
+          )}
+          <div className={styles.formFooterRight}>
+            <button
+              className={styles.cancelBtn}
+              onClick={onCancel}
+              disabled={isSaving || isDeleting}
+            >
+              Cancel
+            </button>
+            {!role.isSystem && (
+              <button
+                className={styles.saveBtn}
+                onClick={handleSave}
+                disabled={isSaving || isDeleting}
+              >
+                {isSaving ? "Saving…" : "Save Changes"}
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Main Page ────────────────────────────────────────────────────────────────
 export default function RolesPermissionsPage() {
   const { hasRole } = useAuth();
@@ -336,6 +534,7 @@ export default function RolesPermissionsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showNewRole, setShowNewRole] = useState(false);
+  const [showEditRole, setShowEditRole] = useState(false);
 
   useEffect(() => {
     setIsLoading(true);
@@ -482,6 +681,42 @@ export default function RolesPermissionsPage() {
             setShowNewRole(false);
           }}
         />
+      ) : showEditRole && selectedRole ? (
+        <EditRoleForm
+          role={selectedRole}
+          onCancel={() => setShowEditRole(false)}
+          onSaved={(updatedRole) => {
+            const permMap = new Map(allPermissions.map((p) => [p._id, p]));
+            const normalized: Role = {
+              ...updatedRole,
+              permissions: (updatedRole.permissions as (Permission | string)[])
+                .map((p) => (typeof p === "string" ? permMap.get(p) : p))
+                .filter(Boolean) as Permission[],
+            };
+            setRoles((prev) =>
+              prev.map((r, i) => (i === selectedRoleIdx ? normalized : r)),
+            );
+            setShowEditRole(false);
+          }}
+          onDeleted={() => {
+            const newRoles = roles.filter((_, i) => i !== selectedRoleIdx);
+            const newIdx = Math.max(0, selectedRoleIdx - 1);
+            setRoles(newRoles);
+            setSelectedRoleIdx(newIdx);
+            if (newRoles.length > 0) {
+              setLocalPermIds(
+                new Set(
+                  (newRoles[newIdx].permissions as Permission[]).map(
+                    (p) => p._id,
+                  ),
+                ),
+              );
+            } else {
+              setLocalPermIds(new Set());
+            }
+            setShowEditRole(false);
+          }}
+        />
       ) : (
         <>
           {/* Header */}
@@ -520,7 +755,17 @@ export default function RolesPermissionsPage() {
 
               {/* Role section */}
               <div className={styles.section}>
-                <h3 className={styles.roleTitle}>{selectedRole.name}</h3>
+                <div className={styles.roleTitleRow}>
+                  <h3 className={styles.roleTitle}>{selectedRole.name}</h3>
+                  {canEdit && (
+                    <button
+                      className={styles.editRoleBtn}
+                      onClick={() => setShowEditRole(true)}
+                    >
+                      ✏ Edit Role
+                    </button>
+                  )}
+                </div>
                 <p className={styles.roleSubtitle}>
                   {labels.accessFor} <strong>{selectedRole.name}</strong>{" "}
                   {labels.role}

@@ -238,6 +238,8 @@ export interface Role {
   _id: string;
   name: string;
   code: UserRole;
+  description?: string;
+  isActive?: boolean;
   isSystem?: boolean;
   permissions: (Permission | string)[];
 }
