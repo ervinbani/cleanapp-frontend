@@ -766,8 +766,12 @@ export default function RolesPermissionsPage() {
                     <button
                       className={styles.editRoleBtn}
                       onClick={() => setShowEditRole(true)}
+                      title="Edit Role"
                     >
-                      ✏ Edit Role
+                      <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14" style={{marginRight: "0.35rem", verticalAlign: "middle"}}>
+                        <path d="M13.586 3.586a2 2 0 112.828 2.828l-9.5 9.5A2 2 0 015.5 16.5H4a1 1 0 01-1-1v-1.5a2 2 0 01.586-1.414l9.5-9.5z" />
+                      </svg>
+                      Edit Role
                     </button>
                   )}
                 </div>
