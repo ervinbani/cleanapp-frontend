@@ -327,7 +327,12 @@ interface EditRoleFormProps {
   onDeleted: () => void;
 }
 
-function EditRoleForm({ role, onCancel, onSaved, onDeleted }: EditRoleFormProps) {
+function EditRoleForm({
+  role,
+  onCancel,
+  onSaved,
+  onDeleted,
+}: EditRoleFormProps) {
   const [name, setName] = useState(role.name);
   const [code, setCode] = useState(role.code as string);
   const [description, setDescription] = useState(role.description ?? "");

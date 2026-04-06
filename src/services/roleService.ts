@@ -21,7 +21,12 @@ export const roleService = {
 
   updateMeta: (
     id: string,
-    data: { name: string; code: string; description: string; isActive: boolean },
+    data: {
+      name: string;
+      code: string;
+      description: string;
+      isActive: boolean;
+    },
   ): Promise<Role> =>
     apiClient
       .put<ApiResponse<Role>>(`/roles/${id}`, data)
