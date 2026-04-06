@@ -998,6 +998,9 @@ export default function InvoicesPage() {
         />
       )}
 
+      {/* Toolbar + Table + Pagination — hidden while form is open */}
+      {!showForm && !editingInvoice && (
+        <>
       {/* Toolbar */}
       <div className={styles.toolbar}>
         <div className={styles.searchWrap}>
@@ -1199,6 +1202,8 @@ export default function InvoicesPage() {
           {l.page} {page} {l.of} {totalPages} &bull; {total} total
         </span>
       </div>
+        </>
+      )}
     </div>
   );
 }

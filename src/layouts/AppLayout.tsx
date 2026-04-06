@@ -117,7 +117,10 @@ export default function AppLayout() {
 
   useEffect(() => {
     const fetch = () =>
-      messageService.getUnreadCount().then(setUnreadCount).catch(() => {});
+      messageService
+        .getUnreadCount()
+        .then(setUnreadCount)
+        .catch(() => {});
     fetch();
     const id = setInterval(fetch, 30_000);
     return () => clearInterval(id);
