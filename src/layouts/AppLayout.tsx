@@ -154,7 +154,10 @@ export default function AppLayout() {
   useEffect(() => {
     if (!dropdownOpen) return;
     const handler = (e: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target as Node)
+      ) {
         setDropdownOpen(false);
       }
     };
@@ -189,7 +192,9 @@ export default function AppLayout() {
       await updateUser(profileForm);
       setProfileSuccess(true);
     } catch {
-      setProfileError(lang === "en" ? "Failed to save changes." : "Error al guardar.");
+      setProfileError(
+        lang === "en" ? "Failed to save changes." : "Error al guardar.",
+      );
     } finally {
       setProfileSaving(false);
     }
@@ -205,11 +210,19 @@ export default function AppLayout() {
 
   const handleDeleteAccount = async () => {
     if (deleteConfirmWord !== "DELETE") {
-      setDeleteError(lang === "en" ? 'You must type DELETE to confirm.' : 'Debes escribir DELETE para confirmar.');
+      setDeleteError(
+        lang === "en"
+          ? "You must type DELETE to confirm."
+          : "Debes escribir DELETE para confirmar.",
+      );
       return;
     }
     if (!deletePassword.trim()) {
-      setDeleteError(lang === "en" ? "Password is required." : "La contraseña es obligatoria.");
+      setDeleteError(
+        lang === "en"
+          ? "Password is required."
+          : "La contraseña es obligatoria.",
+      );
       return;
     }
     setDeleteLoading(true);
@@ -219,7 +232,11 @@ export default function AppLayout() {
       logout();
       navigate("/login");
     } catch {
-      setDeleteError(lang === "en" ? "Incorrect password or server error." : "Contraseña incorrecta o error del servidor.");
+      setDeleteError(
+        lang === "en"
+          ? "Incorrect password or server error."
+          : "Contraseña incorrecta o error del servidor.",
+      );
     } finally {
       setDeleteLoading(false);
     }
@@ -360,17 +377,22 @@ export default function AppLayout() {
                 <span className={styles.userName}>
                   {user?.firstName} {user?.lastName}
                 </span>
-                <span className={styles.userChevron}>{dropdownOpen ? "▴" : "▾"}</span>
+                <span className={styles.userChevron}>
+                  {dropdownOpen ? "▴" : "▾"}
+                </span>
               </button>
 
               {dropdownOpen && (
                 <div className={styles.userDropdown}>
                   <div className={styles.userDropdownHeader}>
                     <div className={styles.avatarLarge}>
-                      {user?.firstName?.[0]}{user?.lastName?.[0]}
+                      {user?.firstName?.[0]}
+                      {user?.lastName?.[0]}
                     </div>
                     <div>
-                      <p className={styles.dropdownName}>{user?.firstName} {user?.lastName}</p>
+                      <p className={styles.dropdownName}>
+                        {user?.firstName} {user?.lastName}
+                      </p>
                       <p className={styles.dropdownRole}>{user?.role}</p>
                     </div>
                   </div>
@@ -381,7 +403,10 @@ export default function AppLayout() {
                   <hr className={styles.dropdownDivider} />
                   <button
                     className={styles.dropdownItem}
-                    onClick={() => { setDropdownOpen(false); handleLogout(); }}
+                    onClick={() => {
+                      setDropdownOpen(false);
+                      handleLogout();
+                    }}
                   >
                     ⏻ {lang === "en" ? "Logout" : "Cerrar sesión"}
                   </button>
@@ -399,27 +424,43 @@ export default function AppLayout() {
 
       {/* ── Profile Modal ───────────────────────────────── */}
       {showProfile && (
-        <div className={styles.modalOverlay} onClick={() => setShowProfile(false)}>
-          <div className={styles.modal} onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
+        <div
+          className={styles.modalOverlay}
+          onClick={() => setShowProfile(false)}
+        >
+          <div
+            className={styles.modal}
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+          >
             <h2 className={styles.modalTitle}>
               {lang === "en" ? "My Profile" : "Mi Perfil"}
             </h2>
 
             <div className={styles.profileGrid}>
               <div>
-                <label className={styles.formLabel}>{lang === "en" ? "First Name" : "Nombre"}</label>
+                <label className={styles.formLabel}>
+                  {lang === "en" ? "First Name" : "Nombre"}
+                </label>
                 <input
                   className={styles.formInput}
                   value={profileForm.firstName}
-                  onChange={(e) => setProfileForm((f) => ({ ...f, firstName: e.target.value }))}
+                  onChange={(e) =>
+                    setProfileForm((f) => ({ ...f, firstName: e.target.value }))
+                  }
                 />
               </div>
               <div>
-                <label className={styles.formLabel}>{lang === "en" ? "Last Name" : "Apellido"}</label>
+                <label className={styles.formLabel}>
+                  {lang === "en" ? "Last Name" : "Apellido"}
+                </label>
                 <input
                   className={styles.formInput}
                   value={profileForm.lastName}
-                  onChange={(e) => setProfileForm((f) => ({ ...f, lastName: e.target.value }))}
+                  onChange={(e) =>
+                    setProfileForm((f) => ({ ...f, lastName: e.target.value }))
+                  }
                 />
               </div>
               <div className={styles.profileFullWidth}>
@@ -428,16 +469,22 @@ export default function AppLayout() {
                   className={styles.formInput}
                   type="email"
                   value={profileForm.email}
-                  onChange={(e) => setProfileForm((f) => ({ ...f, email: e.target.value }))}
+                  onChange={(e) =>
+                    setProfileForm((f) => ({ ...f, email: e.target.value }))
+                  }
                 />
               </div>
               <div className={styles.profileFullWidth}>
-                <label className={styles.formLabel}>{lang === "en" ? "Phone" : "Teléfono"}</label>
+                <label className={styles.formLabel}>
+                  {lang === "en" ? "Phone" : "Teléfono"}
+                </label>
                 <input
                   className={styles.formInput}
                   type="tel"
                   value={profileForm.phone}
-                  onChange={(e) => setProfileForm((f) => ({ ...f, phone: e.target.value }))}
+                  onChange={(e) =>
+                    setProfileForm((f) => ({ ...f, phone: e.target.value }))
+                  }
                 />
               </div>
             </div>
@@ -451,11 +498,17 @@ export default function AppLayout() {
 
             <div className={styles.modalActions}>
               {hasRole("owner") && (
-                <button className={styles.deleteAccBtn} onClick={openDeleteAccount}>
+                <button
+                  className={styles.deleteAccBtn}
+                  onClick={openDeleteAccount}
+                >
                   {lang === "en" ? "Delete Account" : "Eliminar cuenta"}
                 </button>
               )}
-              <button className={styles.cancelBtn} onClick={() => setShowProfile(false)}>
+              <button
+                className={styles.cancelBtn}
+                onClick={() => setShowProfile(false)}
+              >
                 {lang === "en" ? "Cancel" : "Cancelar"}
               </button>
               <button
@@ -463,7 +516,13 @@ export default function AppLayout() {
                 onClick={handleProfileSave}
                 disabled={profileSaving}
               >
-                {profileSaving ? (lang === "en" ? "Saving…" : "Guardando…") : (lang === "en" ? "Save" : "Guardar")}
+                {profileSaving
+                  ? lang === "en"
+                    ? "Saving…"
+                    : "Guardando…"
+                  : lang === "en"
+                    ? "Save"
+                    : "Guardar"}
               </button>
             </div>
           </div>
@@ -472,8 +531,16 @@ export default function AppLayout() {
 
       {/* ── Delete Account Modal ────────────────────────── */}
       {showDeleteAccount && (
-        <div className={styles.modalOverlay} onClick={() => setShowDeleteAccount(false)}>
-          <div className={styles.modal} onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
+        <div
+          className={styles.modalOverlay}
+          onClick={() => setShowDeleteAccount(false)}
+        >
+          <div
+            className={styles.modal}
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+          >
             <h2 className={`${styles.modalTitle} ${styles.dangerTitle}`}>
               ⚠️ {lang === "en" ? "Delete Account" : "Eliminar cuenta"}
             </h2>
@@ -494,10 +561,13 @@ export default function AppLayout() {
               onChange={(e) => setDeletePassword(e.target.value)}
             />
 
-            <label className={styles.formLabel} style={{ marginTop: "0.75rem" }}>
+            <label
+              className={styles.formLabel}
+              style={{ marginTop: "0.75rem" }}
+            >
               {lang === "en"
-                ? 'Type DELETE to confirm'
-                : 'Escribe DELETE para confirmar'}
+                ? "Type DELETE to confirm"
+                : "Escribe DELETE para confirmar"}
             </label>
             <input
               className={styles.formInput}
@@ -519,11 +589,19 @@ export default function AppLayout() {
               <button
                 className={styles.confirmDeleteBtn}
                 onClick={handleDeleteAccount}
-                disabled={deleteLoading || deleteConfirmWord !== "DELETE" || !deletePassword.trim()}
+                disabled={
+                  deleteLoading ||
+                  deleteConfirmWord !== "DELETE" ||
+                  !deletePassword.trim()
+                }
               >
                 {deleteLoading
-                  ? (lang === "en" ? "Deleting…" : "Eliminando…")
-                  : (lang === "en" ? "Delete Everything" : "Eliminar todo")}
+                  ? lang === "en"
+                    ? "Deleting…"
+                    : "Eliminando…"
+                  : lang === "en"
+                    ? "Delete Everything"
+                    : "Eliminar todo"}
               </button>
             </div>
           </div>
