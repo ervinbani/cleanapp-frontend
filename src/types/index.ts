@@ -238,6 +238,36 @@ export interface Role {
   _id: string;
   name: string;
   code: UserRole;
+  description?: string;
+  isActive?: boolean;
   isSystem?: boolean;
   permissions: (Permission | string)[];
+}
+
+// Messages
+export interface MessageUser {
+  _id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  role: UserRole;
+}
+
+export interface InternalMessage {
+  _id: string;
+  tenantId: string;
+  fromUserId: MessageUser | string;
+  toUserId: MessageUser | string;
+  body: string;
+  subject?: string | null;
+  isRead: boolean;
+  readAt?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface SendMessagePayload {
+  toUserId: string;
+  body: string;
+  subject?: string;
 }

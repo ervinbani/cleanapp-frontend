@@ -511,3 +511,105 @@
   opacity: 0.45;
   cursor: not-allowed;
 }
+
+/* ─── Role title row ──────────────────────────────────────────── */
+.roleTitleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.25rem;
+}
+
+.editRoleBtn {
+  padding: 0.4rem 0.85rem;
+  background: #fff;
+  color: #2563eb;
+  border: 1px solid #2563eb;
+  border-radius: 7px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+
+.editRoleBtn:hover {
+  background: #eff6ff;
+}
+
+/* ─── Delete role button (in form footer) ─────────────────────── */
+.deleteRoleBtn {
+  padding: 0.55rem 1.1rem;
+  background: #fff;
+  color: #dc2626;
+  border: 1px solid #dc2626;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.deleteRoleBtn:hover:not(:disabled) {
+  background: #fef2f2;
+}
+
+.deleteRoleBtn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ─── Danger zone (delete confirm) ───────────────────────────── */
+.dangerZone {
+  background: #fef2f2;
+  border: 1px solid #fca5a5;
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.dangerZoneText {
+  font-size: 0.875rem;
+  color: #991b1b;
+  margin: 0 0 0.75rem 0;
+}
+
+.dangerZoneActions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+}
+
+.confirmDeleteBtn {
+  padding: 0.5rem 1.1rem;
+  background: #dc2626;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.confirmDeleteBtn:hover:not(:disabled) {
+  background: #b91c1c;
+}
+
+.confirmDeleteBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ─── System role note ────────────────────────────────────────── */
+.systemRoleNote {
+  font-size: 0.825rem;
+  color: #6b7280;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 1rem;
+}

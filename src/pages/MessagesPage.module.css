@@ -1,0 +1,616 @@
+/* ─── Layout ─────────────────────────────────────────────────────────────── */
+
+.page {
+  display: flex;
+  height: 100%;
+  gap: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+}
+
+/* ─── Left sidebar ───────────────────────────────────────────────────────── */
+
+.sidebar {
+  width: 300px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid #e5e7eb;
+  background: #f9fafb;
+}
+
+.sidebarHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1rem 0.75rem;
+  flex-shrink: 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+}
+
+.composeBtn {
+  background: none;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  width: 34px;
+  height: 34px;
+  cursor: pointer;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+}
+
+.composeBtn:hover {
+  background: #e5e7eb;
+}
+
+/* ─── Conversation list ──────────────────────────────────────────────────── */
+
+.convList {
+  list-style: none;
+  margin: 0;
+  padding: 0.5rem 0;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.convItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.7rem 1rem;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+
+.convItem:hover {
+  background: #f3f4f6;
+}
+
+.convItemActive {
+  background: #eff6ff;
+}
+
+.convAvatar {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #2563eb;
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.unreadDot {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 10px;
+  height: 10px;
+  background: #ef4444;
+  border-radius: 50%;
+  border: 2px solid #f9fafb;
+}
+
+.convInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.convName {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #111827;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.unreadBadge {
+  background: #ef4444;
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 0 0.4rem;
+  line-height: 1.5;
+}
+
+.convPreview {
+  font-size: 0.8rem;
+  color: #6b7280;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 0.15rem;
+}
+
+.convTime {
+  font-size: 0.72rem;
+  color: #9ca3af;
+  flex-shrink: 0;
+  align-self: flex-start;
+  margin-top: 0.1rem;
+}
+
+/* ─── Conversation right column (time + menu) ────────────────────────────── */
+
+.convRight {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  flex-shrink: 0;
+  position: relative;
+  gap: 0.15rem;
+}
+
+.convMenuAnchor {
+  position: relative;
+}
+
+.convMenuBtn {
+  opacity: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0 3px;
+  font-size: 0.78rem;
+  line-height: 1;
+  border-radius: 4px;
+  color: #9ca3af;
+  transition:
+    opacity 0.15s,
+    background 0.15s;
+}
+
+.convItem:hover .convMenuBtn {
+  opacity: 1;
+}
+
+.convMenuBtn:hover {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+/* ─── Right thread panel ─────────────────────────────────────────────────── */
+
+.thread {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.threadHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.8rem 1.25rem;
+  border-bottom: 1px solid #e5e7eb;
+  flex-shrink: 0;
+  background: #fff;
+}
+
+.threadAvatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #2563eb;
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.threadName {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+/* ─── Bubbles ────────────────────────────────────────────────────────────── */
+
+.bubble {
+  position: relative;
+  max-width: 65%;
+  padding: 0.6rem 0.85rem;
+  border-radius: 14px;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.bubbleMine {
+  align-self: flex-end;
+  background: #2563eb;
+  color: #fff;
+  border-bottom-right-radius: 4px;
+}
+
+.bubbleTheirs {
+  align-self: flex-start;
+  background: #f3f4f6;
+  color: #111827;
+  border-bottom-left-radius: 4px;
+}
+
+.bubbleSubject {
+  font-weight: 700;
+  font-size: 0.82rem;
+  margin: 0 0 0.3rem;
+  opacity: 0.85;
+}
+
+.bubbleBody {
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.bubbleTime {
+  display: block;
+  font-size: 0.7rem;
+  margin-top: 0.35rem;
+  text-align: right;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 1px;
+}
+
+.bubbleTimeText {
+  opacity: 0.65;
+}
+
+.readMarkSent {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.5);
+  letter-spacing: -1px;
+}
+
+.readMarkRead {
+  font-size: 0.78rem;
+  color: #93c5fd;
+  letter-spacing: -1px;
+}
+
+/* ─── Bubble dropdown menu ────────────────────────────────────────────────────────── */
+
+.msgMenuAnchor {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  z-index: 10;
+}
+
+.msgMenuBtn {
+  opacity: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0 3px;
+  font-size: 0.8rem;
+  line-height: 1;
+  border-radius: 4px;
+  color: rgba(255, 255, 255, 0.85);
+  transition:
+    opacity 0.15s,
+    background 0.15s;
+}
+
+.bubbleTheirs .msgMenuBtn {
+  color: #6b7280;
+}
+
+.bubble:hover .msgMenuBtn {
+  opacity: 1;
+}
+
+.msgMenuBtn:hover {
+  background: rgba(0, 0, 0, 0.12);
+}
+
+.msgMenu {
+  position: absolute;
+  top: calc(100% + 2px);
+  right: 0;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.14);
+  list-style: none;
+  margin: 0;
+  padding: 0.25rem 0;
+  min-width: 130px;
+  z-index: 50;
+  white-space: nowrap;
+}
+
+.msgMenuItem {
+  display: block;
+  width: 100%;
+  padding: 0.5rem 0.85rem;
+  background: none;
+  border: none;
+  text-align: left;
+  font-size: 0.85rem;
+  font-family: inherit;
+  cursor: pointer;
+  color: #374151;
+  transition: background 0.12s;
+}
+
+.msgMenuItem:hover {
+  background: #f3f4f6;
+}
+
+.msgMenuItemDanger {
+  color: #ef4444;
+}
+
+.msgMenuItemDanger:hover {
+  background: #fef2f2;
+}
+
+/* ─── Reply box ──────────────────────────────────────────────────────────── */
+
+.replyBox {
+  display: flex;
+  gap: 0.75rem;
+  padding: 0.75rem 1.25rem;
+  border-top: 1px solid #e5e7eb;
+  flex-shrink: 0;
+  background: #fff;
+  align-items: flex-end;
+}
+
+.replyInput {
+  flex: 1;
+  resize: none;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  padding: 0.55rem 0.75rem;
+  font-size: 0.88rem;
+  font-family: inherit;
+  line-height: 1.5;
+  color: #111827;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.replyInput:focus {
+  border-color: #2563eb;
+}
+
+.replyBtn {
+  padding: 0.55rem 1.1rem;
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+
+.replyBtn:hover:not(:disabled) {
+  background: #1d4ed8;
+}
+
+.replyBtn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ─── Empty states ───────────────────────────────────────────────────────── */
+
+.empty {
+  padding: 1.5rem 1rem;
+  color: #9ca3af;
+  font-size: 0.88rem;
+  text-align: center;
+}
+
+.emptyThread {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #9ca3af;
+  font-size: 0.9rem;
+  padding: 2rem;
+  text-align: center;
+}
+
+/* ─── Compose modal ──────────────────────────────────────────────────────── */
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+}
+
+.modal {
+  background: #fff;
+  border-radius: 14px;
+  padding: 1.75rem;
+  width: 100%;
+  max-width: 500px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.modalTitle {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 0.75rem;
+}
+
+.formLabel {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #374151;
+  margin-top: 0.25rem;
+}
+
+.formInput,
+.formSelect {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-family: inherit;
+  color: #111827;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.15s;
+}
+
+.formInput:focus,
+.formSelect:focus {
+  border-color: #2563eb;
+}
+
+.formTextarea {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-family: inherit;
+  color: #111827;
+  outline: none;
+  resize: vertical;
+  box-sizing: border-box;
+  transition: border-color 0.15s;
+}
+
+.formTextarea:focus {
+  border-color: #2563eb;
+}
+
+.formError {
+  color: #ef4444;
+  font-size: 0.82rem;
+  margin: 0;
+}
+
+.modalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.cancelBtn {
+  padding: 0.5rem 1rem;
+  background: none;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  cursor: pointer;
+  color: #374151;
+  transition: background 0.12s;
+}
+
+.cancelBtn:hover {
+  background: #f3f4f6;
+}
+
+.sendBtn {
+  padding: 0.5rem 1.1rem;
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.sendBtn:hover:not(:disabled) {
+  background: #1d4ed8;
+}
+
+.sendBtn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.deleteDangerBtn {
+  padding: 0.5rem 1.1rem;
+  background: #ef4444;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.deleteDangerBtn:hover {
+  background: #dc2626;
+}
+
+.confirmBody {
+  font-size: 0.88rem;
+  color: #6b7280;
+  margin: 0 0 0.5rem;
+}
+
+/* ─── Responsive ─────────────────────────────────────────────────────────── */
+
+@media (max-width: 640px) {
+  .page {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    max-height: 45vh;
+    border-right: none;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .bubble {
+    max-width: 85%;
+  }
+}

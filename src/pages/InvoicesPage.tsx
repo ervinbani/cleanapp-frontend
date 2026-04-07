@@ -33,11 +33,21 @@ function getCustomer(inv: Invoice): Customer | null {
 }
 
 const STATUS_ORDER: InvoiceStatus[] = [
-  "draft", "sent", "paid", "partially_paid", "overdue", "void",
+  "draft",
+  "sent",
+  "paid",
+  "partially_paid",
+  "overdue",
+  "void",
 ];
 
 const PAYMENT_METHODS = [
-  "cash", "card", "bank_transfer", "stripe", "paypal", "other",
+  "cash",
+  "card",
+  "bank_transfer",
+  "stripe",
+  "paypal",
+  "other",
 ] as const;
 
 const CURRENCIES = ["USD", "EUR"] as const;
@@ -294,7 +304,12 @@ interface InvoiceFormProps {
   onSaved: () => void;
 }
 
-function InvoiceFormSection({ invoice, lang, onClose, onSaved }: InvoiceFormProps) {
+function InvoiceFormSection({
+  invoice,
+  lang,
+  onClose,
+  onSaved,
+}: InvoiceFormProps) {
   const isEdit = !!invoice;
   const l = formT[lang];
   const [form, setForm] = useState<InvoiceForm>(
@@ -363,12 +378,15 @@ function InvoiceFormSection({ invoice, lang, onClose, onSaved }: InvoiceFormProp
     doc.text(`# ${form.invoiceNumber}`, 14, 30);
 
     // Customer name
-    const customerName =
-      customers.find((c) => c._id === form.customerId);
+    const customerName = customers.find((c) => c._id === form.customerId);
     if (customerName) {
       doc.setFontSize(11);
       doc.setTextColor(17, 24, 39);
-      doc.text(`${l.customer.replace(" *", "")}: ${customerName.firstName} ${customerName.lastName}`, 14, 40);
+      doc.text(
+        `${l.customer.replace(" *", "")}: ${customerName.firstName} ${customerName.lastName}`,
+        14,
+        40,
+      );
     }
 
     // Dates
@@ -393,11 +411,13 @@ function InvoiceFormSection({ invoice, lang, onClose, onSaved }: InvoiceFormProp
     }
 
     // Status + Payment
-    const statusLabel = t[lang][`status_${form.status}` as keyof (typeof t)["en"]] ?? form.status;
+    const statusLabel =
+      t[lang][`status_${form.status}` as keyof (typeof t)["en"]] ?? form.status;
     doc.text(`${l.status}: ${statusLabel}`, 14, yPos);
     yPos += 6;
     if (form.paymentMethod) {
-      const pmLabel = l[`pm_${form.paymentMethod}` as keyof typeof l] ?? form.paymentMethod;
+      const pmLabel =
+        l[`pm_${form.paymentMethod}` as keyof typeof l] ?? form.paymentMethod;
       doc.text(`${l.paymentMethod}: ${pmLabel}`, 14, yPos);
       yPos += 6;
     }
@@ -407,7 +427,9 @@ function InvoiceFormSection({ invoice, lang, onClose, onSaved }: InvoiceFormProp
     // Items table
     autoTable(doc, {
       startY: yPos,
-      head: [[l.description, l.serviceType, l.quantity, l.unitPrice, l.lineTotal]],
+      head: [
+        [l.description, l.serviceType, l.quantity, l.unitPrice, l.lineTotal],
+      ],
       body: form.items
         .filter((it) => it.description.trim() || parseFloat(it.unitPrice) > 0)
         .map((it, i) => [
@@ -423,25 +445,35 @@ function InvoiceFormSection({ invoice, lang, onClose, onSaved }: InvoiceFormProp
     });
 
     // Totals
-    const finalY = (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 10;
+    const finalY =
+      (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable
+        .finalY + 10;
     doc.setFontSize(10);
     doc.setTextColor(107, 114, 128);
 
     const rightX = 196;
     let tY = finalY;
     doc.text("Subtotal:", rightX - 50, tY, { align: "right" });
-    doc.text(`${subtotal.toFixed(2)} ${form.currency}`, rightX, tY, { align: "right" });
+    doc.text(`${subtotal.toFixed(2)} ${form.currency}`, rightX, tY, {
+      align: "right",
+    });
     tY += 6;
     doc.text(`${l.discount}:`, rightX - 50, tY, { align: "right" });
-    doc.text(`-${discount.toFixed(2)} ${form.currency}`, rightX, tY, { align: "right" });
+    doc.text(`-${discount.toFixed(2)} ${form.currency}`, rightX, tY, {
+      align: "right",
+    });
     tY += 6;
     doc.text(`${l.taxRate}:`, rightX - 50, tY, { align: "right" });
-    doc.text(`${tax.toFixed(2)} ${form.currency}`, rightX, tY, { align: "right" });
+    doc.text(`${tax.toFixed(2)} ${form.currency}`, rightX, tY, {
+      align: "right",
+    });
     tY += 8;
     doc.setFontSize(12);
     doc.setTextColor(17, 24, 39);
     doc.text("Total:", rightX - 50, tY, { align: "right" });
-    doc.text(`${total.toFixed(2)} ${form.currency}`, rightX, tY, { align: "right" });
+    doc.text(`${total.toFixed(2)} ${form.currency}`, rightX, tY, {
+      align: "right",
+    });
 
     // Notes
     if (form.notes.trim()) {
@@ -475,7 +507,10 @@ function InvoiceFormSection({ invoice, lang, onClose, onSaved }: InvoiceFormProp
         dueDate: form.dueDate || undefined,
         servicePeriod:
           form.servicePeriodFrom || form.servicePeriodTo
-            ? { from: form.servicePeriodFrom || undefined, to: form.servicePeriodTo || undefined }
+            ? {
+                from: form.servicePeriodFrom || undefined,
+                to: form.servicePeriodTo || undefined,
+              }
             : undefined,
         status: form.status,
         currency: form.currency,
@@ -626,25 +661,35 @@ function InvoiceFormSection({ invoice, lang, onClose, onSaved }: InvoiceFormProp
           {form.items.map((item, idx) => (
             <div key={idx} className={styles.itemRow}>
               <div className={styles.formGroup}>
-                {idx === 0 && <label className={styles.label}>{l.description}</label>}
+                {idx === 0 && (
+                  <label className={styles.label}>{l.description}</label>
+                )}
                 <input
                   className={styles.input}
                   value={item.description}
-                  onChange={(e) => updateItem(idx, "description", e.target.value)}
+                  onChange={(e) =>
+                    updateItem(idx, "description", e.target.value)
+                  }
                   placeholder={l.description}
                 />
               </div>
               <div className={styles.formGroup}>
-                {idx === 0 && <label className={styles.label}>{l.serviceType}</label>}
+                {idx === 0 && (
+                  <label className={styles.label}>{l.serviceType}</label>
+                )}
                 <input
                   className={styles.input}
                   value={item.serviceType}
-                  onChange={(e) => updateItem(idx, "serviceType", e.target.value)}
+                  onChange={(e) =>
+                    updateItem(idx, "serviceType", e.target.value)
+                  }
                   placeholder={l.serviceType}
                 />
               </div>
               <div className={styles.formGroup}>
-                {idx === 0 && <label className={styles.label}>{l.quantity}</label>}
+                {idx === 0 && (
+                  <label className={styles.label}>{l.quantity}</label>
+                )}
                 <input
                   className={styles.input}
                   type="number"
@@ -655,7 +700,9 @@ function InvoiceFormSection({ invoice, lang, onClose, onSaved }: InvoiceFormProp
                 />
               </div>
               <div className={styles.formGroup}>
-                {idx === 0 && <label className={styles.label}>{l.unitPrice}</label>}
+                {idx === 0 && (
+                  <label className={styles.label}>{l.unitPrice}</label>
+                )}
                 <input
                   className={styles.input}
                   type="number"
@@ -666,7 +713,9 @@ function InvoiceFormSection({ invoice, lang, onClose, onSaved }: InvoiceFormProp
                 />
               </div>
               <div className={styles.formGroup}>
-                {idx === 0 && <label className={styles.label}>{l.lineTotal}</label>}
+                {idx === 0 && (
+                  <label className={styles.label}>{l.lineTotal}</label>
+                )}
                 <input
                   className={styles.input}
                   readOnly
@@ -696,7 +745,9 @@ function InvoiceFormSection({ invoice, lang, onClose, onSaved }: InvoiceFormProp
                 onChange={(e) => set("currency", e.target.value)}
               >
                 {CURRENCIES.map((c) => (
-                  <option key={c} value={c}>{c}</option>
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
                 ))}
               </select>
             </div>
@@ -747,23 +798,33 @@ function InvoiceFormSection({ invoice, lang, onClose, onSaved }: InvoiceFormProp
               <tbody>
                 <tr>
                   <td>Subtotal</td>
-                  <td>{subtotal.toFixed(2)} {form.currency}</td>
+                  <td>
+                    {subtotal.toFixed(2)} {form.currency}
+                  </td>
                 </tr>
                 {discount > 0 && (
                   <tr>
                     <td>{l.discount}</td>
-                    <td>-{discount.toFixed(2)} {form.currency}</td>
+                    <td>
+                      -{discount.toFixed(2)} {form.currency}
+                    </td>
                   </tr>
                 )}
                 {taxRate > 0 && (
                   <tr>
-                    <td>{l.taxRate} ({taxRate}%)</td>
-                    <td>{tax.toFixed(2)} {form.currency}</td>
+                    <td>
+                      {l.taxRate} ({taxRate}%)
+                    </td>
+                    <td>
+                      {tax.toFixed(2)} {form.currency}
+                    </td>
                   </tr>
                 )}
                 <tr className={styles.totalRow}>
                   <td>Total</td>
-                  <td>{total.toFixed(2)} {form.currency}</td>
+                  <td>
+                    {total.toFixed(2)} {form.currency}
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -790,8 +851,17 @@ function InvoiceFormSection({ invoice, lang, onClose, onSaved }: InvoiceFormProp
                 onClick={handleDownloadPdf}
                 disabled={saving}
               >
-                <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15">
-                  <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
+                <svg
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                  width="15"
+                  height="15"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
+                    clipRule="evenodd"
+                  />
                 </svg>
                 {l.downloadPdf}
               </button>
@@ -804,11 +874,7 @@ function InvoiceFormSection({ invoice, lang, onClose, onSaved }: InvoiceFormProp
             >
               {l.cancel}
             </button>
-            <button
-              type="submit"
-              className={styles.btnSave}
-              disabled={saving}
-            >
+            <button type="submit" className={styles.btnSave} disabled={saving}>
               {isEdit ? l.update : l.save}
             </button>
           </div>
@@ -838,7 +904,13 @@ export default function InvoicesPage() {
   const [colStatus, setColStatus] = useState("");
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_LIMIT));
-  const canWrite = hasRole("owner", "director", "manager_operations", "manager_hr", "staff");
+  const canWrite = hasRole(
+    "owner",
+    "director",
+    "manager_operations",
+    "manager_hr",
+    "staff",
+  );
   const canDelete = hasRole("owner");
 
   const [showForm, setShowForm] = useState(false);
@@ -871,8 +943,12 @@ export default function InvoicesPage() {
     }
   }, [page, search, apiStatus]);
 
-  useEffect(() => { fetchInvoices(); }, [fetchInvoices]);
-  useEffect(() => { setPage(1); }, [search, apiStatus]);
+  useEffect(() => {
+    fetchInvoices();
+  }, [fetchInvoices]);
+  useEffect(() => {
+    setPage(1);
+  }, [search, apiStatus]);
 
   const handleDelete = async (id: string) => {
     if (!window.confirm("Delete this invoice?")) return;
@@ -885,7 +961,10 @@ export default function InvoicesPage() {
   };
 
   const displayed = invoices.filter((inv) => {
-    if (colNumber && !inv.invoiceNumber.toLowerCase().includes(colNumber.toLowerCase()))
+    if (
+      colNumber &&
+      !inv.invoiceNumber.toLowerCase().includes(colNumber.toLowerCase())
+    )
       return false;
     const customer = getCustomer(inv);
     const customerName = customer
@@ -924,7 +1003,11 @@ export default function InvoicesPage() {
     });
     const headerRow = sheet.getRow(1);
     headerRow.font = { bold: true };
-    headerRow.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFE5E7EB" } };
+    headerRow.fill = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "FFE5E7EB" },
+    };
     const buffer = await workbook.xlsx.writeBuffer();
     const blob = new Blob([buffer], {
       type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -945,7 +1028,16 @@ export default function InvoicesPage() {
     doc.text(l.title, 14, 15);
     autoTable(doc, {
       startY: 22,
-      head: [[l.colNumber, l.colCustomer, l.colIssued, l.colDue, l.colTotal, l.colStatus]],
+      head: [
+        [
+          l.colNumber,
+          l.colCustomer,
+          l.colIssued,
+          l.colDue,
+          l.colTotal,
+          l.colStatus,
+        ],
+      ],
       body: displayed.map((inv) => {
         const customer = getCustomer(inv);
         return [
@@ -986,7 +1078,10 @@ export default function InvoicesPage() {
         <InvoiceFormSection
           lang={lang}
           onClose={closeForm}
-          onSaved={() => { closeForm(); fetchInvoices(); }}
+          onSaved={() => {
+            closeForm();
+            fetchInvoices();
+          }}
         />
       )}
       {editingInvoice && canWrite && (
@@ -994,211 +1089,267 @@ export default function InvoicesPage() {
           invoice={editingInvoice}
           lang={lang}
           onClose={closeForm}
-          onSaved={() => { closeForm(); fetchInvoices(); }}
+          onSaved={() => {
+            closeForm();
+            fetchInvoices();
+          }}
         />
       )}
 
-      {/* Toolbar */}
-      <div className={styles.toolbar}>
-        <div className={styles.searchWrap}>
-          <svg className={styles.searchIcon} viewBox="0 0 20 20" fill="currentColor">
-            <path
-              fillRule="evenodd"
-              d="M9 3a6 6 0 100 12A6 6 0 009 3zM1 9a8 8 0 1114.32 4.906l3.387 3.387a1 1 0 01-1.414 1.414l-3.387-3.387A8 8 0 011 9z"
-              clipRule="evenodd"
-            />
-          </svg>
-          <input
-            className={styles.searchInput}
-            placeholder={l.searchPlaceholder}
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-        </div>
-        <select
-          className={styles.filterSelect}
-          value={apiStatus}
-          onChange={(e) => setApiStatus(e.target.value as InvoiceStatus | "")}
-        >
-          <option value="">{l.allStatuses}</option>
-          {STATUS_ORDER.map((s) => (
-            <option key={s} value={s}>
-              {l[`status_${s}` as keyof typeof l]}
-            </option>
-          ))}
-        </select>
-        <div className={styles.exportBtns}>
-          <button className={styles.btnExcelExport} onClick={handleExportExcel}>
-            <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15">
-              <path fillRule="evenodd" d="M3 4a1 1 0 011-1h4a1 1 0 010 2H6.414l2.293 2.293a1 1 0 11-1.414 1.414L5 6.414V8a1 1 0 01-2 0V4zm9 1a1 1 0 110-2h4a1 1 0 011 1v4a1 1 0 11-2 0V6.414l-2.293 2.293a1 1 0 11-1.414-1.414L13.586 5H12zm-9 7a1 1 0 112 0v1.586l2.293-2.293a1 1 0 111.414 1.414L6.414 15H8a1 1 0 110 2H4a1 1 0 01-1-1v-4zm13-1a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 110-2h1.586l-2.293-2.293a1 1 0 111.414-1.414L17 13.586V12a1 1 0 011-1z" clipRule="evenodd" />
-            </svg>
-            {l.exportExcel}
-          </button>
-          <button className={styles.btnPdfExport} onClick={handleExportPdf}>
-            <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15">
-              <path fillRule="evenodd" d="M3 4a1 1 0 011-1h4a1 1 0 010 2H6.414l2.293 2.293a1 1 0 11-1.414 1.414L5 6.414V8a1 1 0 01-2 0V4zm9 1a1 1 0 110-2h4a1 1 0 011 1v4a1 1 0 11-2 0V6.414l-2.293 2.293a1 1 0 11-1.414-1.414L13.586 5H12zm-9 7a1 1 0 112 0v1.586l2.293-2.293a1 1 0 111.414 1.414L6.414 15H8a1 1 0 110 2H4a1 1 0 01-1-1v-4zm13-1a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 110-2h1.586l-2.293-2.293a1 1 0 111.414-1.414L17 13.586V12a1 1 0 011-1z" clipRule="evenodd" />
-            </svg>
-            {l.exportPdf}
-          </button>
-        </div>
-      </div>
-
-      {/* Table */}
-      <div className={styles.tableWrap}>
-        <table className={styles.table}>
-          <thead>
-            <tr className={styles.headRow}>
-              <th>{l.colNumber}</th>
-              <th>{l.colCustomer}</th>
-              <th>{l.colIssued}</th>
-              <th>{l.colDue}</th>
-              <th>{l.colTotal}</th>
-              <th>{l.colStatus}</th>
-              <th>{l.colActions}</th>
-            </tr>
-            <tr className={styles.filterRow}>
-              <th>
-                <input
-                  className={styles.colFilter}
-                  placeholder={l.filterNumber}
-                  value={colNumber}
-                  onChange={(e) => setColNumber(e.target.value)}
+      {/* Toolbar + Table + Pagination — hidden while form is open */}
+      {!showForm && !editingInvoice && (
+        <>
+          {/* Toolbar */}
+          <div className={styles.toolbar}>
+            <div className={styles.searchWrap}>
+              <svg
+                className={styles.searchIcon}
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M9 3a6 6 0 100 12A6 6 0 009 3zM1 9a8 8 0 1114.32 4.906l3.387 3.387a1 1 0 01-1.414 1.414l-3.387-3.387A8 8 0 011 9z"
+                  clipRule="evenodd"
                 />
-              </th>
-              <th>
-                <input
-                  className={styles.colFilter}
-                  placeholder={l.filterCustomer}
-                  value={colCustomer}
-                  onChange={(e) => setColCustomer(e.target.value)}
-                />
-              </th>
-              <th />
-              <th />
-              <th />
-              <th>
-                <select
-                  className={styles.colFilter}
-                  value={colStatus}
-                  onChange={(e) => setColStatus(e.target.value)}
+              </svg>
+              <input
+                className={styles.searchInput}
+                placeholder={l.searchPlaceholder}
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+            </div>
+            <select
+              className={styles.filterSelect}
+              value={apiStatus}
+              onChange={(e) =>
+                setApiStatus(e.target.value as InvoiceStatus | "")
+              }
+            >
+              <option value="">{l.allStatuses}</option>
+              {STATUS_ORDER.map((s) => (
+                <option key={s} value={s}>
+                  {l[`status_${s}` as keyof typeof l]}
+                </option>
+              ))}
+            </select>
+            <div className={styles.exportBtns}>
+              <button
+                className={styles.btnExcelExport}
+                onClick={handleExportExcel}
+              >
+                <svg
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                  width="15"
+                  height="15"
                 >
-                  <option value="">{l.filterStatus}</option>
-                  {STATUS_ORDER.map((s) => (
-                    <option key={s} value={s}>
-                      {l[`status_${s}` as keyof typeof l]}
-                    </option>
-                  ))}
-                </select>
-              </th>
-              <th />
-            </tr>
-          </thead>
-          <tbody>
-            {loading ? (
-              <tr>
-                <td colSpan={7} className={styles.empty}>{l.loading}</td>
-              </tr>
-            ) : displayed.length === 0 ? (
-              <tr>
-                <td colSpan={7} className={styles.empty}>{l.noResults}</td>
-              </tr>
-            ) : (
-              displayed.map((inv) => {
-                const customer = getCustomer(inv);
-                return (
-                  <tr key={inv._id} className={styles.bodyRow}>
-                    <td className={styles.invoiceNumCell}>{inv.invoiceNumber}</td>
-                    <td className={styles.customerCell}>
-                      {customer ? `${customer.firstName} ${customer.lastName}` : "—"}
-                    </td>
-                    <td className={styles.dateCell}>{formatDate(inv.issuedDate, lang)}</td>
-                    <td className={styles.dateCell}>{formatDate(inv.dueDate, lang)}</td>
-                    <td className={styles.amountCell}>
-                      {inv.total != null ? `${inv.total.toFixed(2)} ${inv.currency}` : "—"}
-                    </td>
-                    <td>
-                      <span className={`${styles.badge} ${styles[`badge_${inv.status}`]}`}>
-                        {l[`status_${inv.status}` as keyof typeof l]}
-                      </span>
-                    </td>
-                    <td>
-                      <div className={styles.actions}>
-                        <button className={styles.btnView}>
-                          <svg viewBox="0 0 20 20" fill="currentColor">
-                            <path d="M10 3C5 3 1.73 7.11 1.07 9.69a1 1 0 000 .62C1.73 12.89 5 17 10 17s8.27-4.11 8.93-6.69a1 1 0 000-.62C18.27 7.11 15 3 10 3zm0 11a4 4 0 110-8 4 4 0 010 8zm0-6a2 2 0 100 4 2 2 0 000-4z" />
-                          </svg>
-                          {l.btnView}
-                        </button>
-                        {canWrite && (
-                          <button
-                            className={styles.btnUpdate}
-                            onClick={() => { setShowForm(false); setEditingInvoice(inv); }}
-                          >
-                            <svg viewBox="0 0 20 20" fill="currentColor">
-                              <path d="M13.586 3.586a2 2 0 112.828 2.828l-9.5 9.5A2 2 0 015.5 16.5H4a1 1 0 01-1-1v-1.5a2 2 0 01.586-1.414l9.5-9.5z" />
-                            </svg>
-                            {l.btnUpdate}
-                          </button>
-                        )}
-                        {canDelete && (
-                          <button
-                            className={styles.btnDelete}
-                            onClick={() => handleDelete(inv._id)}
-                          >
-                            <svg viewBox="0 0 20 20" fill="currentColor">
-                              <path
-                                fillRule="evenodd"
-                                d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z"
-                                clipRule="evenodd"
-                              />
-                            </svg>
-                          </button>
-                        )}
-                      </div>
+                  <path
+                    fillRule="evenodd"
+                    d="M3 4a1 1 0 011-1h4a1 1 0 010 2H6.414l2.293 2.293a1 1 0 11-1.414 1.414L5 6.414V8a1 1 0 01-2 0V4zm9 1a1 1 0 110-2h4a1 1 0 011 1v4a1 1 0 11-2 0V6.414l-2.293 2.293a1 1 0 11-1.414-1.414L13.586 5H12zm-9 7a1 1 0 112 0v1.586l2.293-2.293a1 1 0 111.414 1.414L6.414 15H8a1 1 0 110 2H4a1 1 0 01-1-1v-4zm13-1a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 110-2h1.586l-2.293-2.293a1 1 0 111.414-1.414L17 13.586V12a1 1 0 011-1z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                {l.exportExcel}
+              </button>
+              <button className={styles.btnPdfExport} onClick={handleExportPdf}>
+                <svg
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                  width="15"
+                  height="15"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M3 4a1 1 0 011-1h4a1 1 0 010 2H6.414l2.293 2.293a1 1 0 11-1.414 1.414L5 6.414V8a1 1 0 01-2 0V4zm9 1a1 1 0 110-2h4a1 1 0 011 1v4a1 1 0 11-2 0V6.414l-2.293 2.293a1 1 0 11-1.414-1.414L13.586 5H12zm-9 7a1 1 0 112 0v1.586l2.293-2.293a1 1 0 111.414 1.414L6.414 15H8a1 1 0 110 2H4a1 1 0 01-1-1v-4zm13-1a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 110-2h1.586l-2.293-2.293a1 1 0 111.414-1.414L17 13.586V12a1 1 0 011-1z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                {l.exportPdf}
+              </button>
+            </div>
+          </div>
+
+          {/* Table */}
+          <div className={styles.tableWrap}>
+            <table className={styles.table}>
+              <thead>
+                <tr className={styles.headRow}>
+                  <th>{l.colNumber}</th>
+                  <th>{l.colCustomer}</th>
+                  <th>{l.colIssued}</th>
+                  <th>{l.colDue}</th>
+                  <th>{l.colTotal}</th>
+                  <th>{l.colStatus}</th>
+                  <th>{l.colActions}</th>
+                </tr>
+                <tr className={styles.filterRow}>
+                  <th>
+                    <input
+                      className={styles.colFilter}
+                      placeholder={l.filterNumber}
+                      value={colNumber}
+                      onChange={(e) => setColNumber(e.target.value)}
+                    />
+                  </th>
+                  <th>
+                    <input
+                      className={styles.colFilter}
+                      placeholder={l.filterCustomer}
+                      value={colCustomer}
+                      onChange={(e) => setColCustomer(e.target.value)}
+                    />
+                  </th>
+                  <th />
+                  <th />
+                  <th />
+                  <th>
+                    <select
+                      className={styles.colFilter}
+                      value={colStatus}
+                      onChange={(e) => setColStatus(e.target.value)}
+                    >
+                      <option value="">{l.filterStatus}</option>
+                      {STATUS_ORDER.map((s) => (
+                        <option key={s} value={s}>
+                          {l[`status_${s}` as keyof typeof l]}
+                        </option>
+                      ))}
+                    </select>
+                  </th>
+                  <th />
+                </tr>
+              </thead>
+              <tbody>
+                {loading ? (
+                  <tr>
+                    <td colSpan={7} className={styles.empty}>
+                      {l.loading}
                     </td>
                   </tr>
-                );
-              })
-            )}
-          </tbody>
-        </table>
-      </div>
+                ) : displayed.length === 0 ? (
+                  <tr>
+                    <td colSpan={7} className={styles.empty}>
+                      {l.noResults}
+                    </td>
+                  </tr>
+                ) : (
+                  displayed.map((inv) => {
+                    const customer = getCustomer(inv);
+                    return (
+                      <tr key={inv._id} className={styles.bodyRow}>
+                        <td className={styles.invoiceNumCell}>
+                          {inv.invoiceNumber}
+                        </td>
+                        <td className={styles.customerCell}>
+                          {customer
+                            ? `${customer.firstName} ${customer.lastName}`
+                            : "—"}
+                        </td>
+                        <td className={styles.dateCell}>
+                          {formatDate(inv.issuedDate, lang)}
+                        </td>
+                        <td className={styles.dateCell}>
+                          {formatDate(inv.dueDate, lang)}
+                        </td>
+                        <td className={styles.amountCell}>
+                          {inv.total != null
+                            ? `${inv.total.toFixed(2)} ${inv.currency}`
+                            : "—"}
+                        </td>
+                        <td>
+                          <span
+                            className={`${styles.badge} ${styles[`badge_${inv.status}`]}`}
+                          >
+                            {l[`status_${inv.status}` as keyof typeof l]}
+                          </span>
+                        </td>
+                        <td>
+                          <div className={styles.actions}>
+                            <button className={styles.btnView}>
+                              <svg viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M10 3C5 3 1.73 7.11 1.07 9.69a1 1 0 000 .62C1.73 12.89 5 17 10 17s8.27-4.11 8.93-6.69a1 1 0 000-.62C18.27 7.11 15 3 10 3zm0 11a4 4 0 110-8 4 4 0 010 8zm0-6a2 2 0 100 4 2 2 0 000-4z" />
+                              </svg>
+                              {l.btnView}
+                            </button>
+                            {canWrite && (
+                              <button
+                                className={styles.btnUpdate}
+                                onClick={() => {
+                                  setShowForm(false);
+                                  setEditingInvoice(inv);
+                                }}
+                              >
+                                <svg viewBox="0 0 20 20" fill="currentColor">
+                                  <path d="M13.586 3.586a2 2 0 112.828 2.828l-9.5 9.5A2 2 0 015.5 16.5H4a1 1 0 01-1-1v-1.5a2 2 0 01.586-1.414l9.5-9.5z" />
+                                </svg>
+                                {l.btnUpdate}
+                              </button>
+                            )}
+                            {canDelete && (
+                              <button
+                                className={styles.btnDelete}
+                                onClick={() => handleDelete(inv._id)}
+                              >
+                                <svg viewBox="0 0 20 20" fill="currentColor">
+                                  <path
+                                    fillRule="evenodd"
+                                    d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z"
+                                    clipRule="evenodd"
+                                  />
+                                </svg>
+                              </button>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
 
-      {/* Pagination */}
-      <div className={styles.pagination}>
-        <button
-          className={styles.pageBtn}
-          onClick={() => setPage((p) => Math.max(1, p - 1))}
-          disabled={page === 1}
-        >
-          {l.prev}
-        </button>
-        <div className={styles.pageNumbers}>
-          {pageRange.map((p, i) =>
-            p === "…" ? (
-              <span key={`ellipsis-${i}`} className={styles.ellipsis}>…</span>
-            ) : (
-              <button
-                key={p}
-                className={`${styles.pageNum} ${p === page ? styles.pageNumActive : ""}`}
-                onClick={() => setPage(p as number)}
-              >
-                {p}
-              </button>
-            ),
-          )}
-        </div>
-        <button
-          className={styles.pageBtn}
-          onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-          disabled={page === totalPages}
-        >
-          {l.next}
-        </button>
-        <span className={styles.pageInfo}>
-          {l.page} {page} {l.of} {totalPages} &bull; {total} total
-        </span>
-      </div>
+          {/* Pagination */}
+          <div className={styles.pagination}>
+            <button
+              className={styles.pageBtn}
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page === 1}
+            >
+              {l.prev}
+            </button>
+            <div className={styles.pageNumbers}>
+              {pageRange.map((p, i) =>
+                p === "…" ? (
+                  <span key={`ellipsis-${i}`} className={styles.ellipsis}>
+                    …
+                  </span>
+                ) : (
+                  <button
+                    key={p}
+                    className={`${styles.pageNum} ${p === page ? styles.pageNumActive : ""}`}
+                    onClick={() => setPage(p as number)}
+                  >
+                    {p}
+                  </button>
+                ),
+              )}
+            </div>
+            <button
+              className={styles.pageBtn}
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              disabled={page === totalPages}
+            >
+              {l.next}
+            </button>
+            <span className={styles.pageInfo}>
+              {l.page} {page} {l.of} {totalPages} &bull; {total} total
+            </span>
+          </div>
+        </>
+      )}
     </div>
   );
 }

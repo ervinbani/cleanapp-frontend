@@ -18,6 +18,22 @@ export const roleService = {
     apiClient
       .put<ApiResponse<Role>>(`/roles/${id}`, { permissionIds })
       .then((r) => r.data.data),
+
+  updateMeta: (
+    id: string,
+    data: {
+      name: string;
+      code: string;
+      description: string;
+      isActive: boolean;
+    },
+  ): Promise<Role> =>
+    apiClient
+      .put<ApiResponse<Role>>(`/roles/${id}`, data)
+      .then((r) => r.data.data),
+
+  deleteRole: (id: string): Promise<void> =>
+    apiClient.delete(`/roles/${id}`).then(() => undefined),
 };
 
 export const permissionService = {
