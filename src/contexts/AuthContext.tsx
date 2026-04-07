@@ -12,6 +12,7 @@ import {
   getMe,
 } from "../services/authService";
 import type { LoginCredentials, RegisterPayload } from "../types";
+import { QueryClient } from "@tanstack/react-query";
 
 // Static permission map derived from actual backend roles data.
 // Key = "entity.action", values match what /api/roles returns.
