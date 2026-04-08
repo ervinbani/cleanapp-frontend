@@ -24,8 +24,6 @@ interface AddUserForm {
   role: UserRole;
   preferredLanguage: "en" | "es";
   phone: string;
-  tenantName: string;
-  slug: string;
   isActive: boolean;
 }
 
@@ -37,8 +35,6 @@ const EMPTY_FORM: AddUserForm = {
   role: "staff",
   preferredLanguage: "en",
   phone: "",
-  tenantName: "",
-  slug: "",
   isActive: true,
 };
 
@@ -129,8 +125,6 @@ function AddUserModal({ lang, onClose, onSaved }: AddUserModalProps) {
         role: form.role,
         preferredLanguage: form.preferredLanguage,
         phone: form.phone.trim() || undefined,
-        tenantName: form.tenantName.trim() || undefined,
-        slug: form.slug.trim() || undefined,
         isActive: form.isActive,
       });
       onSaved();
@@ -269,45 +263,6 @@ function AddUserModal({ lang, onClose, onSaved }: AddUserModalProps) {
               value={form.phone}
               onChange={(e) => set("phone", e.target.value)}
             />
-          </div>
-
-          {/* Tenant Name + Slug */}
-          <div className={styles.formRow}>
-            <div className={styles.formGroup}>
-              <label className={styles.label}>{ml2.tenantName}</label>
-              <input
-                className={styles.input}
-                placeholder={ml2.placeholderTenant}
-                value={form.tenantName}
-                onChange={(e) => {
-                  const val = e.target.value;
-                  set("tenantName", val);
-                  set(
-                    "slug",
-                    val
-                      .toLowerCase()
-                      .replace(/[^a-z0-9]+/g, "-")
-                      .replace(/^-|-$/g, ""),
-                  );
-                }}
-              />
-              <span className={styles.hint}>{ml2.tenantNameHint}</span>
-            </div>
-            <div className={styles.formGroup}>
-              <label className={styles.label}>{ml2.slug}</label>
-              <input
-                className={styles.input}
-                placeholder={ml2.placeholderSlug}
-                value={form.slug}
-                onChange={(e) =>
-                  set(
-                    "slug",
-                    e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-"),
-                  )
-                }
-              />
-              <span className={styles.hint}>{ml2.slugHint}</span>
-            </div>
           </div>
 
           {/* Active toggle */}
