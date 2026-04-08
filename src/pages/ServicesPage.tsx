@@ -94,14 +94,19 @@ interface DropdownService {
   basePrice?: number;
 }
 
+type DurationUnit = "hours" | "days";
+type PriceUnit = "per_hour" | "per_job" | "per_day";
+
 interface ServiceForm {
   customerId: string;
   nameEn: string;
   nameEs: string;
   descriptionEn: string;
   descriptionEs: string;
-  durationMinutes: string;
+  durationValue: string;
+  durationUnit: DurationUnit;
   basePrice: string;
+  priceUnit: PriceUnit;
   isActive: boolean;
 }
 
@@ -111,10 +116,22 @@ const EMPTY_SERVICE_FORM: ServiceForm = {
   nameEs: "",
   descriptionEn: "",
   descriptionEs: "",
-  durationMinutes: "",
+  durationValue: "",
+  durationUnit: "hours",
   basePrice: "",
+  priceUnit: "per_job",
   isActive: true,
 };
+
+function minutesToDuration(minutes: number): { durationValue: string; durationUnit: DurationUnit } {
+  if (minutes % 480 === 0) return { durationValue: String(minutes / 480), durationUnit: "days" };
+  return { durationValue: String(minutes / 60), durationUnit: "hours" };
+}
+
+function durationToMinutes(value: string, unit: DurationUnit): number {
+  const n = Number(value);
+  return unit === "days" ? n * 480 : n * 60;
+}
 
 function serviceToForm(s: Service): ServiceForm {
   const customerId =
@@ -127,8 +144,11 @@ function serviceToForm(s: Service): ServiceForm {
     nameEs: s.name?.es ?? "",
     descriptionEn: s.description?.en ?? "",
     descriptionEs: s.description?.es ?? "",
-    durationMinutes: s.durationMinutes != null ? String(s.durationMinutes) : "",
+    ...(s.durationMinutes != null
+      ? minutesToDuration(s.durationMinutes)
+      : { durationValue: "", durationUnit: "hours" as DurationUnit }),
     basePrice: s.basePrice != null ? String(s.basePrice) : "",
+    priceUnit: (s.priceUnit as PriceUnit) ?? "per_job",
     isActive: s.isActive,
   };
 }
@@ -152,8 +172,13 @@ const mT = {
     description: "Description",
     descPlaceholder: "Enter a description...",
     namePlaceholder: "Service Name",
-    duration: "Duration (minutes)",
-    price: "Base Price ($)",
+    duration: "Duration",
+    unitHours: "Hours",
+    unitDays: "Days",
+    price: "Base Price",
+    unitPerHour: "/ hr",
+    unitPerJob: "/ job",
+    unitPerDay: "/ day",
     status: "Status",
     active: "Active",
     inactive: "Inactive",
@@ -174,8 +199,13 @@ const mT = {
     description: "Descripción",
     descPlaceholder: "Ingrese una descripción...",
     namePlaceholder: "Nombre del Servicio",
-    duration: "Duración (minutos)",
-    price: "Precio Base ($)",
+    duration: "Duración",
+    unitHours: "Horas",
+    unitDays: "Días",
+    price: "Precio Base",
+    unitPerHour: "/ hr",
+    unitPerJob: "/ trabajo",
+    unitPerDay: "/ día",
     status: "Estado",
     active: "Activo",
     inactive: "Inactivo",
@@ -225,7 +255,9 @@ function ServiceModal({ service, lang, onClose, onSaved }: ServiceModalProps) {
       nameEs: tmpl.name?.es ?? prev.nameEs,
       descriptionEn: tmpl.description?.en ?? prev.descriptionEn,
       descriptionEs: tmpl.description?.es ?? prev.descriptionEs,
-      durationMinutes: tmpl.durationMinutes != null ? String(tmpl.durationMinutes) : prev.durationMinutes,
+      ...(tmpl.durationMinutes != null
+        ? minutesToDuration(tmpl.durationMinutes)
+        : { durationValue: prev.durationValue, durationUnit: prev.durationUnit }),
       basePrice: tmpl.basePrice != null ? String(tmpl.basePrice) : prev.basePrice,
     }));
   };
@@ -251,10 +283,11 @@ function ServiceModal({ service, lang, onClose, onSaved }: ServiceModalProps) {
           es: form.descriptionEs.trim() || undefined,
         },
         durationMinutes:
-          form.durationMinutes !== ""
-            ? Number(form.durationMinutes)
+          form.durationValue !== ""
+            ? durationToMinutes(form.durationValue, form.durationUnit)
             : undefined,
         basePrice: form.basePrice !== "" ? Number(form.basePrice) : undefined,
+        priceUnit: form.priceUnit,
         isActive: form.isActive,
       };
       if (isEdit) {
@@ -401,24 +434,42 @@ function ServiceModal({ service, lang, onClose, onSaved }: ServiceModalProps) {
           <div className={styles.formRow}>
             <div className={styles.formGroup}>
               <label className={styles.label}>{l.duration}</label>
-              <input
-                className={styles.input}
-                type="number"
-                min="1"
-                value={form.durationMinutes}
-                onChange={(e) => set("durationMinutes", e.target.value)}
-              />
+              <div className={styles.durationRow}>
+                <input
+                  type="number"
+                  min="0.5"
+                  step="0.5"
+                  value={form.durationValue}
+                  onChange={(e) => set("durationValue", e.target.value)}
+                />
+                <select
+                  value={form.durationUnit}
+                  onChange={(e) => set("durationUnit", e.target.value as DurationUnit)}
+                >
+                  <option value="hours">{l.unitHours}</option>
+                  <option value="days">{l.unitDays}</option>
+                </select>
+              </div>
             </div>
             <div className={styles.formGroup}>
               <label className={styles.label}>{l.price}</label>
-              <input
-                className={styles.input}
-                type="number"
-                min="0"
-                step="0.01"
-                value={form.basePrice}
-                onChange={(e) => set("basePrice", e.target.value)}
-              />
+              <div className={styles.priceRow}>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={form.basePrice}
+                  onChange={(e) => set("basePrice", e.target.value)}
+                />
+                <select
+                  value={form.priceUnit}
+                  onChange={(e) => set("priceUnit", e.target.value as PriceUnit)}
+                >
+                  <option value="per_hour">{l.unitPerHour}</option>
+                  <option value="per_job">{l.unitPerJob}</option>
+                  <option value="per_day">{l.unitPerDay}</option>
+                </select>
+              </div>
             </div>
           </div>
 

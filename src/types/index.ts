@@ -100,6 +100,7 @@ export interface Service {
   description: { en?: string; es?: string };
   durationMinutes?: number;
   basePrice?: number;
+  priceUnit?: "per_hour" | "per_job" | "per_day";
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
