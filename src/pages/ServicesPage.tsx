@@ -81,34 +81,74 @@ const t = {
 };
 
 // ── Service Modal ────────────────────────────────────────────────────────────
+interface DropdownCustomer {
+  _id: string;
+  firstName: string;
+  lastName: string;
+}
+interface DropdownService {
+  _id: string;
+  name: { en: string; es: string };
+  description?: { en?: string; es?: string };
+  durationMinutes?: number;
+  basePrice?: number;
+}
+
+type DurationUnit = "hours" | "days";
+type PriceUnit = "per_hour" | "per_job" | "per_day";
+
 interface ServiceForm {
+  customerId: string;
   nameEn: string;
   nameEs: string;
   descriptionEn: string;
   descriptionEs: string;
-  durationMinutes: string;
+  durationValue: string;
+  durationUnit: DurationUnit;
   basePrice: string;
+  priceUnit: PriceUnit;
   isActive: boolean;
 }
 
 const EMPTY_SERVICE_FORM: ServiceForm = {
+  customerId: "",
   nameEn: "",
   nameEs: "",
   descriptionEn: "",
   descriptionEs: "",
-  durationMinutes: "",
+  durationValue: "",
+  durationUnit: "hours",
   basePrice: "",
+  priceUnit: "per_job",
   isActive: true,
 };
 
+function minutesToDuration(minutes: number): { durationValue: string; durationUnit: DurationUnit } {
+  if (minutes % 480 === 0) return { durationValue: String(minutes / 480), durationUnit: "days" };
+  return { durationValue: String(minutes / 60), durationUnit: "hours" };
+}
+
+function durationToMinutes(value: string, unit: DurationUnit): number {
+  const n = Number(value);
+  return unit === "days" ? n * 480 : n * 60;
+}
+
 function serviceToForm(s: Service): ServiceForm {
+  const customerId =
+    s.customerId && typeof s.customerId === "object"
+      ? (s.customerId as { _id: string })._id
+      : (s.customerId as string) ?? "";
   return {
+    customerId,
     nameEn: s.name?.en ?? "",
     nameEs: s.name?.es ?? "",
     descriptionEn: s.description?.en ?? "",
     descriptionEs: s.description?.es ?? "",
-    durationMinutes: s.durationMinutes != null ? String(s.durationMinutes) : "",
+    ...(s.durationMinutes != null
+      ? minutesToDuration(s.durationMinutes)
+      : { durationValue: "", durationUnit: "hours" as DurationUnit }),
     basePrice: s.basePrice != null ? String(s.basePrice) : "",
+    priceUnit: (s.priceUnit as PriceUnit) ?? "per_job",
     isActive: s.isActive,
   };
 }
@@ -124,12 +164,21 @@ const mT = {
   en: {
     addTitle: "Add Service",
     editTitle: "Edit Service",
-    name: "Service Name",
+    customer: "Customer",
+    selectCustomer: "— Select customer —",
+    serviceTemplate: "Service",
+    selectService: "— None —",
+    name: "Custom Service Name",
     description: "Description",
     descPlaceholder: "Enter a description...",
     namePlaceholder: "Service Name",
-    duration: "Duration (minutes)",
-    price: "Base Price ($)",
+    duration: "Duration",
+    unitHours: "Hours",
+    unitDays: "Days",
+    price: "Base Price",
+    unitPerHour: "/ hr",
+    unitPerJob: "/ job",
+    unitPerDay: "/ day",
     status: "Status",
     active: "Active",
     inactive: "Inactive",
@@ -137,16 +186,26 @@ const mT = {
     save: "Save",
     update: "Update",
     required: "Name is required for at least the EN tab.",
+    loadingOpts: "Loading options…",
   },
   es: {
     addTitle: "Agregar Servicio",
     editTitle: "Editar Servicio",
-    name: "Nombre",
+    customer: "Cliente",
+    selectCustomer: "— Seleccionar cliente —",
+    serviceTemplate: "Servicio",
+    selectService: "— Ninguno —",
+    name: "Nombre de Servicio Personalizado",
     description: "Descripción",
     descPlaceholder: "Ingrese una descripción...",
     namePlaceholder: "Nombre del Servicio",
-    duration: "Duración (minutos)",
-    price: "Precio Base ($)",
+    duration: "Duración",
+    unitHours: "Horas",
+    unitDays: "Días",
+    price: "Precio Base",
+    unitPerHour: "/ hr",
+    unitPerJob: "/ trabajo",
+    unitPerDay: "/ día",
     status: "Estado",
     active: "Activo",
     inactive: "Inactivo",
@@ -154,6 +213,7 @@ const mT = {
     save: "Guardar",
     update: "Actualizar",
     required: "El nombre es obligatorio al menos en el tab EN.",
+    loadingOpts: "Cargando opciones…",
   },
 };
 
@@ -166,9 +226,41 @@ function ServiceModal({ service, lang, onClose, onSaved }: ServiceModalProps) {
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState<"en" | "es">("en");
+  const [customers, setCustomers] = useState<DropdownCustomer[]>([]);
+  const [serviceTemplates, setServiceTemplates] = useState<DropdownService[]>([]);
+  const [loadingOptions, setLoadingOptions] = useState(true);
+
+  useEffect(() => {
+    Promise.all([
+      apiClient.get("/customers", { params: { limit: 200 } }),
+      apiClient.get("/services", { params: { limit: 200 } }),
+    ])
+      .then(([c, s]) => {
+        setCustomers((c.data as { data: DropdownCustomer[] }).data ?? []);
+        setServiceTemplates((s.data as { data: DropdownService[] }).data ?? []);
+      })
+      .catch(() => {})
+      .finally(() => setLoadingOptions(false));
+  }, []);
 
   const set = (field: keyof ServiceForm, value: string | boolean) =>
     setForm((prev) => ({ ...prev, [field]: value }));
+
+  const applyTemplate = (templateId: string) => {
+    const tmpl = serviceTemplates.find((s) => s._id === templateId);
+    if (!tmpl) return;
+    setForm((prev) => ({
+      ...prev,
+      nameEn: tmpl.name?.en ?? prev.nameEn,
+      nameEs: tmpl.name?.es ?? prev.nameEs,
+      descriptionEn: tmpl.description?.en ?? prev.descriptionEn,
+      descriptionEs: tmpl.description?.es ?? prev.descriptionEs,
+      ...(tmpl.durationMinutes != null
+        ? minutesToDuration(tmpl.durationMinutes)
+        : { durationValue: prev.durationValue, durationUnit: prev.durationUnit }),
+      basePrice: tmpl.basePrice != null ? String(tmpl.basePrice) : prev.basePrice,
+    }));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -181,6 +273,7 @@ function ServiceModal({ service, lang, onClose, onSaved }: ServiceModalProps) {
     setError("");
     try {
       const payload = {
+        customerId: form.customerId || undefined,
         name: {
           en: form.nameEn.trim(),
           es: form.nameEs.trim() || form.nameEn.trim(),
@@ -190,10 +283,11 @@ function ServiceModal({ service, lang, onClose, onSaved }: ServiceModalProps) {
           es: form.descriptionEs.trim() || undefined,
         },
         durationMinutes:
-          form.durationMinutes !== ""
-            ? Number(form.durationMinutes)
+          form.durationValue !== ""
+            ? durationToMinutes(form.durationValue, form.durationUnit)
             : undefined,
         basePrice: form.basePrice !== "" ? Number(form.basePrice) : undefined,
+        priceUnit: form.priceUnit,
         isActive: form.isActive,
       };
       if (isEdit) {
@@ -230,7 +324,46 @@ function ServiceModal({ service, lang, onClose, onSaved }: ServiceModalProps) {
           </button>
         </div>
 
+        {loadingOptions ? (
+          <p className={styles.modalLoading}>{l.loadingOpts}</p>
+        ) : (
         <form onSubmit={handleSubmit}>
+          {/* Customer + Service template */}
+          <div className={styles.formRow}>
+            <div className={styles.formGroup}>
+              <label className={styles.label}>{l.customer}</label>
+              <select
+                className={styles.input}
+                value={form.customerId}
+                onChange={(e) => set("customerId", e.target.value)}
+              >
+                <option value="">{l.selectCustomer}</option>
+                {customers.map((c) => (
+                  <option key={c._id} value={c._id}>
+                    {c.firstName} {c.lastName}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className={styles.formGroup}>
+              <label className={styles.label}>{l.serviceTemplate}</label>
+              <select
+                className={styles.input}
+                defaultValue=""
+                onChange={(e) => applyTemplate(e.target.value)}
+              >
+                <option value="">{l.selectService}</option>
+                {serviceTemplates
+                  .filter((s) => !service || s._id !== service._id)
+                  .map((s) => (
+                    <option key={s._id} value={s._id}>
+                      {s.name?.[lang] ?? s.name?.en}
+                    </option>
+                  ))}
+              </select>
+            </div>
+          </div>
+
           {/* Language tabs */}
           <div className={styles.langTabs}>
             <button
@@ -301,24 +434,42 @@ function ServiceModal({ service, lang, onClose, onSaved }: ServiceModalProps) {
           <div className={styles.formRow}>
             <div className={styles.formGroup}>
               <label className={styles.label}>{l.duration}</label>
-              <input
-                className={styles.input}
-                type="number"
-                min="1"
-                value={form.durationMinutes}
-                onChange={(e) => set("durationMinutes", e.target.value)}
-              />
+              <div className={styles.durationRow}>
+                <input
+                  type="number"
+                  min="0.5"
+                  step="0.5"
+                  value={form.durationValue}
+                  onChange={(e) => set("durationValue", e.target.value)}
+                />
+                <select
+                  value={form.durationUnit}
+                  onChange={(e) => set("durationUnit", e.target.value as DurationUnit)}
+                >
+                  <option value="hours">{l.unitHours}</option>
+                  <option value="days">{l.unitDays}</option>
+                </select>
+              </div>
             </div>
             <div className={styles.formGroup}>
               <label className={styles.label}>{l.price}</label>
-              <input
-                className={styles.input}
-                type="number"
-                min="0"
-                step="0.01"
-                value={form.basePrice}
-                onChange={(e) => set("basePrice", e.target.value)}
-              />
+              <div className={styles.priceRow}>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={form.basePrice}
+                  onChange={(e) => set("basePrice", e.target.value)}
+                />
+                <select
+                  value={form.priceUnit}
+                  onChange={(e) => set("priceUnit", e.target.value as PriceUnit)}
+                >
+                  <option value="per_hour">{l.unitPerHour}</option>
+                  <option value="per_job">{l.unitPerJob}</option>
+                  <option value="per_day">{l.unitPerDay}</option>
+                </select>
+              </div>
             </div>
           </div>
 
@@ -355,6 +506,7 @@ function ServiceModal({ service, lang, onClose, onSaved }: ServiceModalProps) {
             </button>
           </div>
         </form>
+        )}
       </div>
     </div>
   );
