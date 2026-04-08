@@ -452,6 +452,13 @@
   background: #f3f4f6;
 }
 
+.modalLoading {
+  padding: 1.5rem;
+  text-align: center;
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
 /* ─── Language tabs ───────────────────────────────────────────── */
 .langTabs {
   display: flex;

@@ -81,7 +81,21 @@ const t = {
 };
 
 // ── Service Modal ────────────────────────────────────────────────────────────
+interface DropdownCustomer {
+  _id: string;
+  firstName: string;
+  lastName: string;
+}
+interface DropdownService {
+  _id: string;
+  name: { en: string; es: string };
+  description?: { en?: string; es?: string };
+  durationMinutes?: number;
+  basePrice?: number;
+}
+
 interface ServiceForm {
+  customerId: string;
   nameEn: string;
   nameEs: string;
   descriptionEn: string;
@@ -92,6 +106,7 @@ interface ServiceForm {
 }
 
 const EMPTY_SERVICE_FORM: ServiceForm = {
+  customerId: "",
   nameEn: "",
   nameEs: "",
   descriptionEn: "",
@@ -102,7 +117,12 @@ const EMPTY_SERVICE_FORM: ServiceForm = {
 };
 
 function serviceToForm(s: Service): ServiceForm {
+  const customerId =
+    s.customerId && typeof s.customerId === "object"
+      ? (s.customerId as { _id: string })._id
+      : (s.customerId as string) ?? "";
   return {
+    customerId,
     nameEn: s.name?.en ?? "",
     nameEs: s.name?.es ?? "",
     descriptionEn: s.description?.en ?? "",
@@ -124,7 +144,11 @@ const mT = {
   en: {
     addTitle: "Add Service",
     editTitle: "Edit Service",
-    name: "Service Name",
+    customer: "Customer",
+    selectCustomer: "— Select customer —",
+    serviceTemplate: "Service",
+    selectService: "— None —",
+    name: "Custom Service Name",
     description: "Description",
     descPlaceholder: "Enter a description...",
     namePlaceholder: "Service Name",
@@ -137,11 +161,16 @@ const mT = {
     save: "Save",
     update: "Update",
     required: "Name is required for at least the EN tab.",
+    loadingOpts: "Loading options…",
   },
   es: {
     addTitle: "Agregar Servicio",
     editTitle: "Editar Servicio",
-    name: "Nombre",
+    customer: "Cliente",
+    selectCustomer: "— Seleccionar cliente —",
+    serviceTemplate: "Servicio",
+    selectService: "— Ninguno —",
+    name: "Nombre de Servicio Personalizado",
     description: "Descripción",
     descPlaceholder: "Ingrese una descripción...",
     namePlaceholder: "Nombre del Servicio",
@@ -154,6 +183,7 @@ const mT = {
     save: "Guardar",
     update: "Actualizar",
     required: "El nombre es obligatorio al menos en el tab EN.",
+    loadingOpts: "Cargando opciones…",
   },
 };
 
@@ -166,9 +196,39 @@ function ServiceModal({ service, lang, onClose, onSaved }: ServiceModalProps) {
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState<"en" | "es">("en");
+  const [customers, setCustomers] = useState<DropdownCustomer[]>([]);
+  const [serviceTemplates, setServiceTemplates] = useState<DropdownService[]>([]);
+  const [loadingOptions, setLoadingOptions] = useState(true);
+
+  useEffect(() => {
+    Promise.all([
+      apiClient.get("/customers", { params: { limit: 200 } }),
+      apiClient.get("/services", { params: { limit: 200 } }),
+    ])
+      .then(([c, s]) => {
+        setCustomers((c.data as { data: DropdownCustomer[] }).data ?? []);
+        setServiceTemplates((s.data as { data: DropdownService[] }).data ?? []);
+      })
+      .catch(() => {})
+      .finally(() => setLoadingOptions(false));
+  }, []);
 
   const set = (field: keyof ServiceForm, value: string | boolean) =>
     setForm((prev) => ({ ...prev, [field]: value }));
+
+  const applyTemplate = (templateId: string) => {
+    const tmpl = serviceTemplates.find((s) => s._id === templateId);
+    if (!tmpl) return;
+    setForm((prev) => ({
+      ...prev,
+      nameEn: tmpl.name?.en ?? prev.nameEn,
+      nameEs: tmpl.name?.es ?? prev.nameEs,
+      descriptionEn: tmpl.description?.en ?? prev.descriptionEn,
+      descriptionEs: tmpl.description?.es ?? prev.descriptionEs,
+      durationMinutes: tmpl.durationMinutes != null ? String(tmpl.durationMinutes) : prev.durationMinutes,
+      basePrice: tmpl.basePrice != null ? String(tmpl.basePrice) : prev.basePrice,
+    }));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -181,6 +241,7 @@ function ServiceModal({ service, lang, onClose, onSaved }: ServiceModalProps) {
     setError("");
     try {
       const payload = {
+        customerId: form.customerId || undefined,
         name: {
           en: form.nameEn.trim(),
           es: form.nameEs.trim() || form.nameEn.trim(),
@@ -230,7 +291,46 @@ function ServiceModal({ service, lang, onClose, onSaved }: ServiceModalProps) {
           </button>
         </div>
 
+        {loadingOptions ? (
+          <p className={styles.modalLoading}>{l.loadingOpts}</p>
+        ) : (
         <form onSubmit={handleSubmit}>
+          {/* Customer + Service template */}
+          <div className={styles.formRow}>
+            <div className={styles.formGroup}>
+              <label className={styles.label}>{l.customer}</label>
+              <select
+                className={styles.input}
+                value={form.customerId}
+                onChange={(e) => set("customerId", e.target.value)}
+              >
+                <option value="">{l.selectCustomer}</option>
+                {customers.map((c) => (
+                  <option key={c._id} value={c._id}>
+                    {c.firstName} {c.lastName}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className={styles.formGroup}>
+              <label className={styles.label}>{l.serviceTemplate}</label>
+              <select
+                className={styles.input}
+                defaultValue=""
+                onChange={(e) => applyTemplate(e.target.value)}
+              >
+                <option value="">{l.selectService}</option>
+                {serviceTemplates
+                  .filter((s) => !service || s._id !== service._id)
+                  .map((s) => (
+                    <option key={s._id} value={s._id}>
+                      {s.name?.[lang] ?? s.name?.en}
+                    </option>
+                  ))}
+              </select>
+            </div>
+          </div>
+
           {/* Language tabs */}
           <div className={styles.langTabs}>
             <button
@@ -355,6 +455,7 @@ function ServiceModal({ service, lang, onClose, onSaved }: ServiceModalProps) {
             </button>
           </div>
         </form>
+        )}
       </div>
     </div>
   );

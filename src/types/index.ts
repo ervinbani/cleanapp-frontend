@@ -95,6 +95,7 @@ export interface Customer {
 export interface Service {
   _id: string;
   tenantId: string;
+  customerId?: string | Customer;
   name: { en: string; es: string };
   description: { en?: string; es?: string };
   durationMinutes?: number;
