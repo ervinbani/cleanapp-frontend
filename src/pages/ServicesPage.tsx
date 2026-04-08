@@ -124,7 +124,7 @@ const mT = {
   en: {
     addTitle: "Add Service",
     editTitle: "Edit Service",
-    name: "Name",
+    name: "Service Name",
     description: "Description",
     descPlaceholder: "Enter a description...",
     namePlaceholder: "Service Name",
