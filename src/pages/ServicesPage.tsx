@@ -28,7 +28,6 @@ const t = {
     searchPlaceholder: "Search services...",
     colName: "Name",
     colDescription: "Description",
-    colDuration: "Duration",
     colPrice: "Base Price",
     colStatus: "Status",
     colActions: "Actions",
@@ -56,7 +55,6 @@ const t = {
     searchPlaceholder: "Buscar servicios...",
     colName: "Nombre",
     colDescription: "Descripción",
-    colDuration: "Duración",
     colPrice: "Precio Base",
     colStatus: "Estado",
     colActions: "Acciones",
@@ -90,11 +88,9 @@ interface DropdownService {
   _id: string;
   name: { en: string; es: string };
   description?: { en?: string; es?: string };
-  durationMinutes?: number;
   basePrice?: number;
 }
 
-type DurationUnit = "hours" | "days";
 type PriceUnit = "per_hour" | "per_job" | "per_day";
 
 interface ServiceForm {
@@ -103,8 +99,6 @@ interface ServiceForm {
   nameEs: string;
   descriptionEn: string;
   descriptionEs: string;
-  durationValue: string;
-  durationUnit: DurationUnit;
   basePrice: string;
   priceUnit: PriceUnit;
   isActive: boolean;
@@ -116,22 +110,10 @@ const EMPTY_SERVICE_FORM: ServiceForm = {
   nameEs: "",
   descriptionEn: "",
   descriptionEs: "",
-  durationValue: "",
-  durationUnit: "hours",
   basePrice: "",
   priceUnit: "per_job",
   isActive: true,
 };
-
-function minutesToDuration(minutes: number): { durationValue: string; durationUnit: DurationUnit } {
-  if (minutes % 480 === 0) return { durationValue: String(minutes / 480), durationUnit: "days" };
-  return { durationValue: String(minutes / 60), durationUnit: "hours" };
-}
-
-function durationToMinutes(value: string, unit: DurationUnit): number {
-  const n = Number(value);
-  return unit === "days" ? n * 480 : n * 60;
-}
 
 function serviceToForm(s: Service): ServiceForm {
   const customerId =
@@ -144,9 +126,6 @@ function serviceToForm(s: Service): ServiceForm {
     nameEs: s.name?.es ?? "",
     descriptionEn: s.description?.en ?? "",
     descriptionEs: s.description?.es ?? "",
-    ...(s.durationMinutes != null
-      ? minutesToDuration(s.durationMinutes)
-      : { durationValue: "", durationUnit: "hours" as DurationUnit }),
     basePrice: s.basePrice != null ? String(s.basePrice) : "",
     priceUnit: (s.priceUnit as PriceUnit) ?? "per_job",
     isActive: s.isActive,
@@ -172,9 +151,6 @@ const mT = {
     description: "Description",
     descPlaceholder: "Enter a description...",
     namePlaceholder: "Service Name",
-    duration: "Duration",
-    unitHours: "Hours",
-    unitDays: "Days",
     price: "Base Price",
     unitPerHour: "/ hr",
     unitPerJob: "/ job",
@@ -199,9 +175,6 @@ const mT = {
     description: "Descripción",
     descPlaceholder: "Ingrese una descripción...",
     namePlaceholder: "Nombre del Servicio",
-    duration: "Duración",
-    unitHours: "Horas",
-    unitDays: "Días",
     price: "Precio Base",
     unitPerHour: "/ hr",
     unitPerJob: "/ trabajo",
@@ -255,9 +228,6 @@ function ServiceModal({ service, lang, onClose, onSaved }: ServiceModalProps) {
       nameEs: tmpl.name?.es ?? prev.nameEs,
       descriptionEn: tmpl.description?.en ?? prev.descriptionEn,
       descriptionEs: tmpl.description?.es ?? prev.descriptionEs,
-      ...(tmpl.durationMinutes != null
-        ? minutesToDuration(tmpl.durationMinutes)
-        : { durationValue: prev.durationValue, durationUnit: prev.durationUnit }),
       basePrice: tmpl.basePrice != null ? String(tmpl.basePrice) : prev.basePrice,
     }));
   };
@@ -282,10 +252,6 @@ function ServiceModal({ service, lang, onClose, onSaved }: ServiceModalProps) {
           en: form.descriptionEn.trim() || undefined,
           es: form.descriptionEs.trim() || undefined,
         },
-        durationMinutes:
-          form.durationValue !== ""
-            ? durationToMinutes(form.durationValue, form.durationUnit)
-            : undefined,
         basePrice: form.basePrice !== "" ? Number(form.basePrice) : undefined,
         priceUnit: form.priceUnit,
         isActive: form.isActive,
@@ -432,25 +398,6 @@ function ServiceModal({ service, lang, onClose, onSaved }: ServiceModalProps) {
 
           {/* Shared fields */}
           <div className={styles.formRow}>
-            <div className={styles.formGroup}>
-              <label className={styles.label}>{l.duration}</label>
-              <div className={styles.durationRow}>
-                <input
-                  type="number"
-                  min="0.5"
-                  step="0.5"
-                  value={form.durationValue}
-                  onChange={(e) => set("durationValue", e.target.value)}
-                />
-                <select
-                  value={form.durationUnit}
-                  onChange={(e) => set("durationUnit", e.target.value as DurationUnit)}
-                >
-                  <option value="hours">{l.unitHours}</option>
-                  <option value="days">{l.unitDays}</option>
-                </select>
-              </div>
-            </div>
             <div className={styles.formGroup}>
               <label className={styles.label}>{l.price}</label>
               <div className={styles.priceRow}>
@@ -609,7 +556,6 @@ export default function ServicesPage() {
     ws.columns = [
       { header: l.colName, key: "name", width: 28 },
       { header: l.colDescription, key: "description", width: 40 },
-      { header: l.colDuration, key: "duration", width: 16 },
       { header: l.colPrice, key: "price", width: 14 },
       { header: l.colStatus, key: "status", width: 12 },
     ];
@@ -626,8 +572,6 @@ export default function ServicesPage() {
       ws.addRow({
         name: s.name?.[lang] ?? s.name?.en ?? "",
         description: s.description?.[lang] ?? s.description?.en ?? "",
-        duration:
-          s.durationMinutes != null ? `${s.durationMinutes} ${l.min}` : "",
         price: s.basePrice != null ? `$${s.basePrice.toFixed(2)}` : "",
         status: s.isActive ? l.active : l.inactive,
       });
@@ -655,12 +599,11 @@ export default function ServicesPage() {
     (doc as any).autoTable({
       startY: 22,
       head: [
-        [l.colName, l.colDescription, l.colDuration, l.colPrice, l.colStatus],
+        [l.colName, l.colDescription, l.colPrice, l.colStatus],
       ],
       body: displayed.map((s) => [
         s.name?.[lang] ?? s.name?.en ?? "",
         s.description?.[lang] ?? s.description?.en ?? "",
-        s.durationMinutes != null ? `${s.durationMinutes} ${l.min}` : "",
         s.basePrice != null ? `$${s.basePrice.toFixed(2)}` : "",
         s.isActive ? l.active : l.inactive,
       ]),
@@ -737,7 +680,6 @@ export default function ServicesPage() {
             <tr className={styles.headRow}>
               <th>{l.colName}</th>
               <th>{l.colDescription}</th>
-              <th>{l.colDuration}</th>
               <th>{l.colPrice}</th>
               <th>{l.colStatus}</th>
               <th>{l.colActions}</th>
@@ -760,7 +702,6 @@ export default function ServicesPage() {
                 />
               </th>
               <th />
-              <th />
               <th>
                 <select
                   className={styles.colFilter}
@@ -778,13 +719,13 @@ export default function ServicesPage() {
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan={6} className={styles.empty}>
+                <td colSpan={5} className={styles.empty}>
                   {l.loading}
                 </td>
               </tr>
             ) : displayed.length === 0 ? (
               <tr>
-                <td colSpan={6} className={styles.empty}>
+                <td colSpan={5} className={styles.empty}>
                   {l.noResults}
                 </td>
               </tr>
@@ -796,11 +737,6 @@ export default function ServicesPage() {
                   </td>
                   <td className={styles.descCell}>
                     {s.description?.[lang] ?? s.description?.en ?? "—"}
-                  </td>
-                  <td className={styles.durationCell}>
-                    {s.durationMinutes != null
-                      ? `${s.durationMinutes} ${l.min}`
-                      : "—"}
                   </td>
                   <td className={styles.priceCell}>
                     {s.basePrice != null ? `$${s.basePrice.toFixed(2)}` : "—"}
