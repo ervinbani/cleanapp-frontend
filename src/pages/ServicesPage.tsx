@@ -119,7 +119,7 @@ function serviceToForm(s: Service): ServiceForm {
   const customerId =
     s.customerId && typeof s.customerId === "object"
       ? (s.customerId as { _id: string })._id
-      : (s.customerId as string) ?? "";
+      : ((s.customerId as string) ?? "");
   return {
     customerId,
     nameEn: s.name?.en ?? "",
@@ -200,7 +200,9 @@ function ServiceModal({ service, lang, onClose, onSaved }: ServiceModalProps) {
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState<"en" | "es">("en");
   const [customers, setCustomers] = useState<DropdownCustomer[]>([]);
-  const [serviceTemplates, setServiceTemplates] = useState<DropdownService[]>([]);
+  const [serviceTemplates, setServiceTemplates] = useState<DropdownService[]>(
+    [],
+  );
   const [loadingOptions, setLoadingOptions] = useState(true);
 
   useEffect(() => {
@@ -228,7 +230,8 @@ function ServiceModal({ service, lang, onClose, onSaved }: ServiceModalProps) {
       nameEs: tmpl.name?.es ?? prev.nameEs,
       descriptionEn: tmpl.description?.en ?? prev.descriptionEn,
       descriptionEs: tmpl.description?.es ?? prev.descriptionEs,
-      basePrice: tmpl.basePrice != null ? String(tmpl.basePrice) : prev.basePrice,
+      basePrice:
+        tmpl.basePrice != null ? String(tmpl.basePrice) : prev.basePrice,
     }));
   };
 
@@ -293,166 +296,172 @@ function ServiceModal({ service, lang, onClose, onSaved }: ServiceModalProps) {
         {loadingOptions ? (
           <p className={styles.modalLoading}>{l.loadingOpts}</p>
         ) : (
-        <form onSubmit={handleSubmit}>
-          {/* Customer + Service template */}
-          <div className={styles.formRow}>
-            <div className={styles.formGroup}>
-              <label className={styles.label}>{l.customer}</label>
-              <select
-                className={styles.input}
-                value={form.customerId}
-                onChange={(e) => set("customerId", e.target.value)}
-              >
-                <option value="">{l.selectCustomer}</option>
-                {customers.map((c) => (
-                  <option key={c._id} value={c._id}>
-                    {c.firstName} {c.lastName}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className={styles.formGroup}>
-              <label className={styles.label}>{l.serviceTemplate}</label>
-              <select
-                className={styles.input}
-                defaultValue=""
-                onChange={(e) => applyTemplate(e.target.value)}
-              >
-                <option value="">{l.selectService}</option>
-                {serviceTemplates
-                  .filter((s) => !service || s._id !== service._id)
-                  .map((s) => (
-                    <option key={s._id} value={s._id}>
-                      {s.name?.[lang] ?? s.name?.en}
+          <form onSubmit={handleSubmit}>
+            {/* Customer + Service template */}
+            <div className={styles.formRow}>
+              <div className={styles.formGroup}>
+                <label className={styles.label}>{l.customer}</label>
+                <select
+                  className={styles.input}
+                  value={form.customerId}
+                  onChange={(e) => set("customerId", e.target.value)}
+                >
+                  <option value="">{l.selectCustomer}</option>
+                  {customers.map((c) => (
+                    <option key={c._id} value={c._id}>
+                      {c.firstName} {c.lastName}
                     </option>
                   ))}
-              </select>
-            </div>
-          </div>
-
-          {/* Language tabs */}
-          <div className={styles.langTabs}>
-            <button
-              type="button"
-              className={`${styles.langTab} ${activeTab === "en" ? styles.langTabActive : ""}`}
-              onClick={() => setActiveTab("en")}
-            >
-              EN
-            </button>
-            <button
-              type="button"
-              className={`${styles.langTab} ${activeTab === "es" ? styles.langTabActive : ""}`}
-              onClick={() => setActiveTab("es")}
-            >
-              ES
-            </button>
-          </div>
-
-          {/* Per-language fields */}
-          {activeTab === "en" && (
-            <div className={styles.langTabContent}>
-              <div className={styles.formGroup}>
-                <label className={styles.label}>{l.name}</label>
-                <input
-                  className={styles.input}
-                  placeholder={l.namePlaceholder}
-                  value={form.nameEn}
-                  onChange={(e) => set("nameEn", e.target.value)}
-                />
+                </select>
               </div>
               <div className={styles.formGroup}>
-                <label className={styles.label}>{l.description}</label>
-                <textarea
-                  className={styles.textarea}
-                  rows={4}
-                  placeholder={l.descPlaceholder}
-                  value={form.descriptionEn}
-                  onChange={(e) => set("descriptionEn", e.target.value)}
-                />
-              </div>
-            </div>
-          )}
-          {activeTab === "es" && (
-            <div className={styles.langTabContent}>
-              <div className={styles.formGroup}>
-                <label className={styles.label}>{l.name}</label>
-                <input
-                  className={styles.input}
-                  placeholder={l.namePlaceholder}
-                  value={form.nameEs}
-                  onChange={(e) => set("nameEs", e.target.value)}
-                />
-              </div>
-              <div className={styles.formGroup}>
-                <label className={styles.label}>{l.description}</label>
-                <textarea
-                  className={styles.textarea}
-                  rows={4}
-                  placeholder={l.descPlaceholder}
-                  value={form.descriptionEs}
-                  onChange={(e) => set("descriptionEs", e.target.value)}
-                />
-              </div>
-            </div>
-          )}
-
-          {/* Shared fields */}
-          <div className={styles.formRow}>
-            <div className={styles.formGroup}>
-              <label className={styles.label}>{l.price}</label>
-              <div className={styles.priceRow}>
-                <input
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  value={form.basePrice}
-                  onChange={(e) => set("basePrice", e.target.value)}
-                />
+                <label className={styles.label}>{l.serviceTemplate}</label>
                 <select
-                  value={form.priceUnit}
-                  onChange={(e) => set("priceUnit", e.target.value as PriceUnit)}
+                  className={styles.input}
+                  defaultValue=""
+                  onChange={(e) => applyTemplate(e.target.value)}
                 >
-                  <option value="per_hour">{l.unitPerHour}</option>
-                  <option value="per_job">{l.unitPerJob}</option>
-                  <option value="per_day">{l.unitPerDay}</option>
+                  <option value="">{l.selectService}</option>
+                  {serviceTemplates
+                    .filter((s) => !service || s._id !== service._id)
+                    .map((s) => (
+                      <option key={s._id} value={s._id}>
+                        {s.name?.[lang] ?? s.name?.en}
+                      </option>
+                    ))}
                 </select>
               </div>
             </div>
-          </div>
 
-          <div className={styles.formGroup}>
-            <label className={styles.label}>{l.status}</label>
-            <div className={styles.toggleRow}>
-              <label className={styles.toggleSwitch}>
-                <input
-                  type="checkbox"
-                  checked={form.isActive}
-                  onChange={(e) => set("isActive", e.target.checked)}
-                />
-                <span className={styles.toggleSlider} />
-              </label>
-              <span className={styles.toggleLabel}>
-                {form.isActive ? l.active : l.inactive}
-              </span>
+            {/* Language tabs */}
+            <div className={styles.langTabs}>
+              <button
+                type="button"
+                className={`${styles.langTab} ${activeTab === "en" ? styles.langTabActive : ""}`}
+                onClick={() => setActiveTab("en")}
+              >
+                EN
+              </button>
+              <button
+                type="button"
+                className={`${styles.langTab} ${activeTab === "es" ? styles.langTabActive : ""}`}
+                onClick={() => setActiveTab("es")}
+              >
+                ES
+              </button>
             </div>
-          </div>
 
-          {error && <p className={styles.formError}>{error}</p>}
+            {/* Per-language fields */}
+            {activeTab === "en" && (
+              <div className={styles.langTabContent}>
+                <div className={styles.formGroup}>
+                  <label className={styles.label}>{l.name}</label>
+                  <input
+                    className={styles.input}
+                    placeholder={l.namePlaceholder}
+                    value={form.nameEn}
+                    onChange={(e) => set("nameEn", e.target.value)}
+                  />
+                </div>
+                <div className={styles.formGroup}>
+                  <label className={styles.label}>{l.description}</label>
+                  <textarea
+                    className={styles.textarea}
+                    rows={4}
+                    placeholder={l.descPlaceholder}
+                    value={form.descriptionEn}
+                    onChange={(e) => set("descriptionEn", e.target.value)}
+                  />
+                </div>
+              </div>
+            )}
+            {activeTab === "es" && (
+              <div className={styles.langTabContent}>
+                <div className={styles.formGroup}>
+                  <label className={styles.label}>{l.name}</label>
+                  <input
+                    className={styles.input}
+                    placeholder={l.namePlaceholder}
+                    value={form.nameEs}
+                    onChange={(e) => set("nameEs", e.target.value)}
+                  />
+                </div>
+                <div className={styles.formGroup}>
+                  <label className={styles.label}>{l.description}</label>
+                  <textarea
+                    className={styles.textarea}
+                    rows={4}
+                    placeholder={l.descPlaceholder}
+                    value={form.descriptionEs}
+                    onChange={(e) => set("descriptionEs", e.target.value)}
+                  />
+                </div>
+              </div>
+            )}
 
-          <div className={styles.modalFooter}>
-            <button
-              type="button"
-              className={styles.btnCancel}
-              onClick={onClose}
-              disabled={saving}
-            >
-              {l.cancel}
-            </button>
-            <button type="submit" className={styles.btnSave} disabled={saving}>
-              {isEdit ? l.update : l.save}
-            </button>
-          </div>
-        </form>
+            {/* Shared fields */}
+            <div className={styles.formRow}>
+              <div className={styles.formGroup}>
+                <label className={styles.label}>{l.price}</label>
+                <div className={styles.priceRow}>
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={form.basePrice}
+                    onChange={(e) => set("basePrice", e.target.value)}
+                  />
+                  <select
+                    value={form.priceUnit}
+                    onChange={(e) =>
+                      set("priceUnit", e.target.value as PriceUnit)
+                    }
+                  >
+                    <option value="per_hour">{l.unitPerHour}</option>
+                    <option value="per_job">{l.unitPerJob}</option>
+                    <option value="per_day">{l.unitPerDay}</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.formGroup}>
+              <label className={styles.label}>{l.status}</label>
+              <div className={styles.toggleRow}>
+                <label className={styles.toggleSwitch}>
+                  <input
+                    type="checkbox"
+                    checked={form.isActive}
+                    onChange={(e) => set("isActive", e.target.checked)}
+                  />
+                  <span className={styles.toggleSlider} />
+                </label>
+                <span className={styles.toggleLabel}>
+                  {form.isActive ? l.active : l.inactive}
+                </span>
+              </div>
+            </div>
+
+            {error && <p className={styles.formError}>{error}</p>}
+
+            <div className={styles.modalFooter}>
+              <button
+                type="button"
+                className={styles.btnCancel}
+                onClick={onClose}
+                disabled={saving}
+              >
+                {l.cancel}
+              </button>
+              <button
+                type="submit"
+                className={styles.btnSave}
+                disabled={saving}
+              >
+                {isEdit ? l.update : l.save}
+              </button>
+            </div>
+          </form>
         )}
       </div>
     </div>
@@ -598,9 +607,7 @@ export default function ServicesPage() {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (doc as any).autoTable({
       startY: 22,
-      head: [
-        [l.colName, l.colDescription, l.colPrice, l.colStatus],
-      ],
+      head: [[l.colName, l.colDescription, l.colPrice, l.colStatus]],
       body: displayed.map((s) => [
         s.name?.[lang] ?? s.name?.en ?? "",
         s.description?.[lang] ?? s.description?.en ?? "",
