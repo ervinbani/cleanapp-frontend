@@ -232,135 +232,131 @@ function ServiceModal({ service, lang, onClose, onSaved }: ServiceModalProps) {
         </div>
 
         <form onSubmit={handleSubmit}>
-            {/* Language tabs */}
-            <div className={styles.langTabs}>
-              <button
-                type="button"
-                className={`${styles.langTab} ${activeTab === "en" ? styles.langTabActive : ""}`}
-                onClick={() => setActiveTab("en")}
-              >
-                EN
-              </button>
-              <button
-                type="button"
-                className={`${styles.langTab} ${activeTab === "es" ? styles.langTabActive : ""}`}
-                onClick={() => setActiveTab("es")}
-              >
-                ES
-              </button>
-            </div>
+          {/* Language tabs */}
+          <div className={styles.langTabs}>
+            <button
+              type="button"
+              className={`${styles.langTab} ${activeTab === "en" ? styles.langTabActive : ""}`}
+              onClick={() => setActiveTab("en")}
+            >
+              EN
+            </button>
+            <button
+              type="button"
+              className={`${styles.langTab} ${activeTab === "es" ? styles.langTabActive : ""}`}
+              onClick={() => setActiveTab("es")}
+            >
+              ES
+            </button>
+          </div>
 
-            {/* Per-language fields */}
-            {activeTab === "en" && (
-              <div className={styles.langTabContent}>
-                <div className={styles.formGroup}>
-                  <label className={styles.label}>{l.name}</label>
-                  <input
-                    className={styles.input}
-                    placeholder={l.namePlaceholder}
-                    value={form.nameEn}
-                    onChange={(e) => set("nameEn", e.target.value)}
-                  />
-                </div>
-                <div className={styles.formGroup}>
-                  <label className={styles.label}>{l.description}</label>
-                  <textarea
-                    className={styles.textarea}
-                    rows={4}
-                    placeholder={l.descPlaceholder}
-                    value={form.descriptionEn}
-                    onChange={(e) => set("descriptionEn", e.target.value)}
-                  />
-                </div>
-              </div>
-            )}
-            {activeTab === "es" && (
-              <div className={styles.langTabContent}>
-                <div className={styles.formGroup}>
-                  <label className={styles.label}>{l.name}</label>
-                  <input
-                    className={styles.input}
-                    placeholder={l.namePlaceholder}
-                    value={form.nameEs}
-                    onChange={(e) => set("nameEs", e.target.value)}
-                  />
-                </div>
-                <div className={styles.formGroup}>
-                  <label className={styles.label}>{l.description}</label>
-                  <textarea
-                    className={styles.textarea}
-                    rows={4}
-                    placeholder={l.descPlaceholder}
-                    value={form.descriptionEs}
-                    onChange={(e) => set("descriptionEs", e.target.value)}
-                  />
-                </div>
-              </div>
-            )}
-
-            {/* Shared fields */}
-            <div className={styles.formRow}>
+          {/* Per-language fields */}
+          {activeTab === "en" && (
+            <div className={styles.langTabContent}>
               <div className={styles.formGroup}>
-                <label className={styles.label}>{l.price}</label>
-                <div className={styles.priceRow}>
-                  <input
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    value={form.basePrice}
-                    onChange={(e) => set("basePrice", e.target.value)}
-                  />
-                  <select
-                    value={form.priceUnit}
-                    onChange={(e) =>
-                      set("priceUnit", e.target.value as PriceUnit)
-                    }
-                  >
-                    <option value="per_hour">{l.unitPerHour}</option>
-                    <option value="per_job">{l.unitPerJob}</option>
-                    <option value="per_day">{l.unitPerDay}</option>
-                  </select>
-                </div>
+                <label className={styles.label}>{l.name}</label>
+                <input
+                  className={styles.input}
+                  placeholder={l.namePlaceholder}
+                  value={form.nameEn}
+                  onChange={(e) => set("nameEn", e.target.value)}
+                />
+              </div>
+              <div className={styles.formGroup}>
+                <label className={styles.label}>{l.description}</label>
+                <textarea
+                  className={styles.textarea}
+                  rows={4}
+                  placeholder={l.descPlaceholder}
+                  value={form.descriptionEn}
+                  onChange={(e) => set("descriptionEn", e.target.value)}
+                />
               </div>
             </div>
+          )}
+          {activeTab === "es" && (
+            <div className={styles.langTabContent}>
+              <div className={styles.formGroup}>
+                <label className={styles.label}>{l.name}</label>
+                <input
+                  className={styles.input}
+                  placeholder={l.namePlaceholder}
+                  value={form.nameEs}
+                  onChange={(e) => set("nameEs", e.target.value)}
+                />
+              </div>
+              <div className={styles.formGroup}>
+                <label className={styles.label}>{l.description}</label>
+                <textarea
+                  className={styles.textarea}
+                  rows={4}
+                  placeholder={l.descPlaceholder}
+                  value={form.descriptionEs}
+                  onChange={(e) => set("descriptionEs", e.target.value)}
+                />
+              </div>
+            </div>
+          )}
 
+          {/* Shared fields */}
+          <div className={styles.formRow}>
             <div className={styles.formGroup}>
-              <label className={styles.label}>{l.status}</label>
-              <div className={styles.toggleRow}>
-                <label className={styles.toggleSwitch}>
-                  <input
-                    type="checkbox"
-                    checked={form.isActive}
-                    onChange={(e) => set("isActive", e.target.checked)}
-                  />
-                  <span className={styles.toggleSlider} />
-                </label>
-                <span className={styles.toggleLabel}>
-                  {form.isActive ? l.active : l.inactive}
-                </span>
+              <label className={styles.label}>{l.price}</label>
+              <div className={styles.priceRow}>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={form.basePrice}
+                  onChange={(e) => set("basePrice", e.target.value)}
+                />
+                <select
+                  value={form.priceUnit}
+                  onChange={(e) =>
+                    set("priceUnit", e.target.value as PriceUnit)
+                  }
+                >
+                  <option value="per_hour">{l.unitPerHour}</option>
+                  <option value="per_job">{l.unitPerJob}</option>
+                  <option value="per_day">{l.unitPerDay}</option>
+                </select>
               </div>
             </div>
+          </div>
 
-            {error && <p className={styles.formError}>{error}</p>}
-
-            <div className={styles.modalFooter}>
-              <button
-                type="button"
-                className={styles.btnCancel}
-                onClick={onClose}
-                disabled={saving}
-              >
-                {l.cancel}
-              </button>
-              <button
-                type="submit"
-                className={styles.btnSave}
-                disabled={saving}
-              >
-                {isEdit ? l.update : l.save}
-              </button>
+          <div className={styles.formGroup}>
+            <label className={styles.label}>{l.status}</label>
+            <div className={styles.toggleRow}>
+              <label className={styles.toggleSwitch}>
+                <input
+                  type="checkbox"
+                  checked={form.isActive}
+                  onChange={(e) => set("isActive", e.target.checked)}
+                />
+                <span className={styles.toggleSlider} />
+              </label>
+              <span className={styles.toggleLabel}>
+                {form.isActive ? l.active : l.inactive}
+              </span>
             </div>
-          </form>
+          </div>
+
+          {error && <p className={styles.formError}>{error}</p>}
+
+          <div className={styles.modalFooter}>
+            <button
+              type="button"
+              className={styles.btnCancel}
+              onClick={onClose}
+              disabled={saving}
+            >
+              {l.cancel}
+            </button>
+            <button type="submit" className={styles.btnSave} disabled={saving}>
+              {isEdit ? l.update : l.save}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );
