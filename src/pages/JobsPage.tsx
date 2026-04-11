@@ -255,7 +255,11 @@ const jmT = {
     status: "Status",
     price: "Price ($)",
     priceUnit: "Price Unit",
-    priceUnitLabels: { per_hour: "Hourly", per_job: "Fixed", per_day: "Daily" } as Record<string, string>,
+    priceUnitLabels: {
+      per_hour: "Hourly",
+      per_job: "Fixed",
+      per_day: "Daily",
+    } as Record<string, string>,
     timeDuration: "Duration",
     assignedUsers: "Assigned To",
     notesInternal: "Internal Notes",
@@ -289,7 +293,11 @@ const jmT = {
     status: "Estado",
     price: "Precio ($)",
     priceUnit: "Unidad de precio",
-    priceUnitLabels: { per_hour: "Por hora", per_job: "Fijo", per_day: "Por día" } as Record<string, string>,
+    priceUnitLabels: {
+      per_hour: "Por hora",
+      per_job: "Fijo",
+      per_day: "Por día",
+    } as Record<string, string>,
     timeDuration: "Duración",
     assignedUsers: "Asignado a",
     notesInternal: "Notas Internas",
@@ -425,7 +433,8 @@ function JobModal({ job, lang, onClose, onSaved }: JobModalProps) {
         status: form.status,
         price: form.price !== "" ? Number(form.price) : undefined,
         priceUnit: form.priceUnit || undefined,
-        timeDuration: form.timeDuration !== "" ? Number(form.timeDuration) : undefined,
+        timeDuration:
+          form.timeDuration !== "" ? Number(form.timeDuration) : undefined,
         assignedUsers: form.assignedUsers,
         notesInternal: form.notesInternal.trim() || undefined,
         notesCustomer: form.notesCustomer.trim() || undefined,
@@ -511,7 +520,10 @@ function JobModal({ job, lang, onClose, onSaved }: JobModalProps) {
                     setForm((prev) => ({
                       ...prev,
                       serviceId: id,
-                      price: svc?.basePrice != null ? String(svc.basePrice) : prev.price,
+                      price:
+                        svc?.basePrice != null
+                          ? String(svc.basePrice)
+                          : prev.price,
                       priceUnit: svc?.priceUnit ?? prev.priceUnit,
                     }));
                   }}
@@ -589,7 +601,9 @@ function JobModal({ job, lang, onClose, onSaved }: JobModalProps) {
                     value={form.priceUnit}
                     onChange={(e) => set("priceUnit", e.target.value)}
                   >
-                    <option value="per_hour">{l.priceUnitLabels.per_hour}</option>
+                    <option value="per_hour">
+                      {l.priceUnitLabels.per_hour}
+                    </option>
                     <option value="per_job">{l.priceUnitLabels.per_job}</option>
                     <option value="per_day">{l.priceUnitLabels.per_day}</option>
                   </select>
