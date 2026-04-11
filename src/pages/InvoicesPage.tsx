@@ -5,6 +5,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { invoiceService } from "../services/invoiceService";
 import apiClient from "../services/apiClient";
 import type { Invoice, InvoiceStatus, Customer } from "../types";
+import { jobService } from "../services/jobService";
 import styles from "./InvoicesPage.module.css";
 
 const PAGE_LIMIT = 20;
@@ -126,11 +127,12 @@ interface ItemForm {
   quantity: string;
   unit: string;
   unitPrice: string;
+  priceUnit: string;
 }
 
 interface InvoiceForm {
   customerId: string;
-  jobId: string;
+  jobIds: string[];
   invoiceNumber: string;
   issuedDate: string;
   dueDate: string;
@@ -151,11 +153,12 @@ const EMPTY_ITEM: ItemForm = {
   quantity: "1",
   unit: "hours",
   unitPrice: "",
+  priceUnit: "per_job",
 };
 
 const EMPTY_FORM: InvoiceForm = {
   customerId: "",
-  jobId: "",
+  jobIds: [],
   invoiceNumber: "",
   issuedDate: new Date().toISOString().slice(0, 10),
   dueDate: "",
@@ -175,14 +178,15 @@ function invoiceToForm(inv: Invoice): InvoiceForm {
     typeof inv.customerId === "object"
       ? (inv.customerId as Customer)._id
       : inv.customerId;
-  const jobId = inv.jobId
-    ? typeof inv.jobId === "object"
-      ? (inv.jobId as { _id: string })._id
-      : inv.jobId
-    : "";
+  // Support both old jobId (single) and new jobIds (array)
+  const jobIds: string[] = inv.jobIds
+    ? inv.jobIds.map((j) => (typeof j === "object" ? (j as { _id: string })._id : j))
+    : inv.jobId
+    ? [typeof inv.jobId === "object" ? (inv.jobId as { _id: string })._id : inv.jobId]
+    : [];
   return {
     customerId,
-    jobId,
+    jobIds,
     invoiceNumber: inv.invoiceNumber,
     issuedDate: inv.issuedDate ? inv.issuedDate.slice(0, 10) : "",
     dueDate: inv.dueDate ? inv.dueDate.slice(0, 10) : "",
@@ -205,6 +209,7 @@ function invoiceToForm(inv: Invoice): InvoiceForm {
           quantity: String(it.quantity ?? 1),
           unit: it.unit ?? "hours",
           unitPrice: String(it.unitPrice ?? ""),
+          priceUnit: "per_job",
         }))
       : [{ ...EMPTY_ITEM }],
   };
@@ -232,6 +237,8 @@ const formT = {
     itemsSection: "Items",
     description: "Description",
     serviceType: "Type",
+    priceUnit: "Price Type",
+    priceUnitLabels: { per_hour: "Hourly", per_job: "Fixed", per_day: "Daily" },
     quantity: "Qty",
     unit: "Unit",
     unitPrice: "Unit Price",
@@ -243,6 +250,9 @@ const formT = {
     downloadPdf: "Download PDF",
     required: "Customer and Invoice Number are required.",
     loadingOpts: "Loading options…",
+    linkedJob: "Linked Jobs",
+    selectJob: "— Add a job —",
+    noJobs: "No jobs for this customer",
     pm_cash: "Cash",
     pm_card: "Card",
     pm_bank_transfer: "Bank Transfer",
@@ -271,6 +281,8 @@ const formT = {
     itemsSection: "Artículos",
     description: "Descripción",
     serviceType: "Tipo",
+    priceUnit: "Tipo precio",
+    priceUnitLabels: { per_hour: "Por hora", per_job: "Fijo", per_day: "Por día" },
     quantity: "Cant.",
     unit: "Unidad",
     unitPrice: "Precio Unit.",
@@ -282,6 +294,9 @@ const formT = {
     downloadPdf: "Descargar PDF",
     required: "El cliente y el número de factura son obligatorios.",
     loadingOpts: "Cargando opciones…",
+    linkedJob: "Trabajos vinculados",
+    selectJob: "— Agregar trabajo —",
+    noJobs: "Sin trabajos para este cliente",
     pm_cash: "Efectivo",
     pm_card: "Tarjeta",
     pm_bank_transfer: "Transferencia",
@@ -295,6 +310,15 @@ interface DropdownCustomer {
   _id: string;
   firstName: string;
   lastName: string;
+}
+
+interface DropdownJob {
+  _id: string;
+  title?: string;
+  scheduledStart: string;
+  price?: number;
+  priceUnit?: string;
+  timeDuration?: number;
 }
 
 interface InvoiceFormProps {
@@ -319,6 +343,8 @@ function InvoiceFormSection({
   const [saving, setSaving] = useState(false);
   const [customers, setCustomers] = useState<DropdownCustomer[]>([]);
   const [loadingOptions, setLoadingOptions] = useState(true);
+  const [jobs, setJobs] = useState<DropdownJob[]>([]);
+  const [loadingJobs, setLoadingJobs] = useState(false);
 
   useEffect(() => {
     apiClient
@@ -329,6 +355,19 @@ function InvoiceFormSection({
       .catch(() => {})
       .finally(() => setLoadingOptions(false));
   }, []);
+
+  useEffect(() => {
+    if (!form.customerId) {
+      setJobs([]);
+      return;
+    }
+    setLoadingJobs(true);
+    jobService
+      .getAll({ customerId: form.customerId, limit: 200 })
+      .then((res) => setJobs(res.data as unknown as DropdownJob[]))
+      .catch(() => setJobs([]))
+      .finally(() => setLoadingJobs(false));
+  }, [form.customerId]);
 
   const set = <K extends keyof InvoiceForm>(field: K, value: InvoiceForm[K]) =>
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -417,7 +456,7 @@ function InvoiceFormSection({
     yPos += 6;
     if (form.paymentMethod) {
       const pmLabel =
-        l[`pm_${form.paymentMethod}` as keyof typeof l] ?? form.paymentMethod;
+        l[`pm_${form.paymentMethod}` as keyof typeof l] as string | undefined ?? form.paymentMethod;
       doc.text(`${l.paymentMethod}: ${pmLabel}`, 14, yPos);
       yPos += 6;
     }
@@ -501,7 +540,8 @@ function InvoiceFormSection({
     try {
       const payload: Record<string, unknown> = {
         customerId: form.customerId,
-        jobId: form.jobId || undefined,
+        jobIds: form.jobIds.length ? form.jobIds : undefined,
+        jobId: form.jobIds[0] || undefined,
         invoiceNumber: form.invoiceNumber.trim(),
         issuedDate: form.issuedDate || undefined,
         dueDate: form.dueDate || undefined,
@@ -567,14 +607,17 @@ function InvoiceFormSection({
         <p>{l.loadingOpts}</p>
       ) : (
         <form onSubmit={handleSubmit}>
-          {/* Customer + Invoice Number */}
+          {/* Customer row */}
           <div className={styles.formRow}>
             <div className={styles.formGroup}>
               <label className={styles.label}>{l.customer}</label>
               <select
                 className={styles.input}
                 value={form.customerId}
-                onChange={(e) => set("customerId", e.target.value)}
+                onChange={(e) => {
+                  set("customerId", e.target.value);
+                  setForm((prev) => ({ ...prev, customerId: e.target.value, jobIds: [] }));
+                }}
                 required
               >
                 <option value="">{l.selectCustomer}</option>
@@ -594,6 +637,102 @@ function InvoiceFormSection({
                 required
               />
             </div>
+          </div>
+
+          {/* Linked Jobs picker */}
+          <div className={styles.formGroup}>
+            <label className={styles.label}>{l.linkedJob}</label>
+            <div className={styles.jobPickerRow}>
+              <select
+                className={styles.input}
+                defaultValue=""
+                disabled={loadingJobs || !form.customerId}
+                onChange={(e) => {
+                  const id = e.target.value;
+                  if (!id || form.jobIds.includes(id)) return;
+                  const job = jobs.find((j) => j._id === id);
+                  setForm((prev) => {
+                    // per_job = fixed price, qty always 1; otherwise use timeDuration (fallback 1 if 0/unset)
+                    const qty =
+                      job?.priceUnit === "per_job"
+                        ? 1
+                        : job?.timeDuration || 1;
+                    const unitPrice = job?.price ?? 0;
+                    const newItem: ItemForm = {
+                      description: job?.title || id.slice(-6),
+                      serviceType: `job:${id}`,
+                      quantity: String(qty),
+                      unit:
+                        job?.priceUnit === "per_day"
+                          ? "days"
+                          : job?.priceUnit === "per_hour"
+                          ? "hours"
+                          : "job",
+                      unitPrice: String(unitPrice),
+                      priceUnit: job?.priceUnit || "per_job",
+                    };
+                    const items =
+                      prev.items.length === 1 &&
+                      !prev.items[0].description &&
+                      !prev.items[0].unitPrice
+                        ? [newItem]
+                        : [...prev.items, newItem];
+                    return { ...prev, jobIds: [...prev.jobIds, id], items };
+                  });
+                  e.target.value = "";
+                }}
+              >
+                <option value="">
+                  {!form.customerId
+                    ? l.selectCustomer
+                    : loadingJobs
+                    ? l.loadingOpts
+                    : jobs.filter((j) => !form.jobIds.includes(j._id)).length === 0
+                    ? l.noJobs
+                    : l.selectJob}
+                </option>
+                {jobs
+                  .filter((j) => !form.jobIds.includes(j._id))
+                  .map((j) => (
+                    <option key={j._id} value={j._id}>
+                      {j.title || j._id.slice(-6)} — {new Date(j.scheduledStart).toLocaleDateString()}
+                    </option>
+                  ))}
+              </select>
+            </div>
+            {form.jobIds.length > 0 && (
+              <div className={styles.jobTagList}>
+                {form.jobIds.map((id) => {
+                  const job = jobs.find((j) => j._id === id);
+                  return (
+                    <span key={id} className={styles.jobTag}>
+                      {job
+                        ? `${job.title || id.slice(-6)} — ${new Date(job.scheduledStart).toLocaleDateString()}`
+                        : id.slice(-6)}
+                      <button
+                        type="button"
+                        className={styles.jobTagRemove}
+                        onClick={() =>
+                          setForm((prev) => {
+                            const remaining = prev.jobIds.filter((j) => j !== id);
+                            const items = prev.items.filter(
+                              (it) => it.serviceType !== `job:${id}`,
+                            );
+                            return {
+                              ...prev,
+                              jobIds: remaining,
+                              items: items.length ? items : [{ ...EMPTY_ITEM }],
+                            };
+                          })
+                        }
+                      >
+                        ×
+                      </button>
+                    </span>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
           {/* Dates */}
@@ -625,7 +764,7 @@ function InvoiceFormSection({
               >
                 {STATUS_ORDER.map((s) => (
                   <option key={s} value={s}>
-                    {formT[lang][`pm_${s}` as keyof typeof l] ??
+                    {(formT[lang][`pm_${s}` as keyof typeof l] as string | undefined) ??
                       t[lang][`status_${s}` as keyof (typeof t)["en"]]}
                   </option>
                 ))}
@@ -675,16 +814,40 @@ function InvoiceFormSection({
               </div>
               <div className={styles.formGroup}>
                 {idx === 0 && (
-                  <label className={styles.label}>{l.serviceType}</label>
+                  <label className={styles.label}>
+                    {item.serviceType.startsWith("job:") ? l.priceUnit : l.serviceType}
+                  </label>
                 )}
-                <input
-                  className={styles.input}
-                  value={item.serviceType}
-                  onChange={(e) =>
-                    updateItem(idx, "serviceType", e.target.value)
-                  }
-                  placeholder={l.serviceType}
-                />
+                {item.serviceType.startsWith("job:") ? (
+                  <select
+                    className={styles.input}
+                    value={item.priceUnit}
+                    onChange={(e) => {
+                      const pu = e.target.value;
+                      updateItem(idx, "priceUnit", pu);
+                      updateItem(
+                        idx,
+                        "unit",
+                        pu === "per_day" ? "days" : pu === "per_hour" ? "hours" : "job",
+                      );
+                    }}
+                  >
+                    {(Object.entries(
+                      (l as unknown as { priceUnitLabels: Record<string, string> }).priceUnitLabels,
+                    ) as [string, string][]).map(([val, label]) => (
+                      <option key={val} value={val}>
+                        {label}
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <input
+                    className={styles.input}
+                    value={item.serviceType}
+                    onChange={(e) => updateItem(idx, "serviceType", e.target.value)}
+                    placeholder={l.serviceType}
+                  />
+                )}
               </div>
               <div className={styles.formGroup}>
                 {idx === 0 && (
@@ -785,7 +948,7 @@ function InvoiceFormSection({
                 <option value="">{l.selectPayment}</option>
                 {PAYMENT_METHODS.map((pm) => (
                   <option key={pm} value={pm}>
-                    {l[`pm_${pm}` as keyof typeof l]}
+                    {l[`pm_${pm}` as keyof typeof l] as string}
                   </option>
                 ))}
               </select>

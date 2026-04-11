@@ -148,6 +148,7 @@ export interface Invoice {
   tenantId: string;
   customerId: string | Customer;
   jobId?: string | Job;
+  jobIds?: (string | Job)[];
   invoiceNumber: string;
   customerSnapshot?: {
     name?: string;
