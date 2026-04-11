@@ -381,13 +381,11 @@ function JobModal({ job, lang, onClose, onSaved }: JobModalProps) {
   const set = <K extends keyof JobForm>(field: K, value: JobForm[K]) =>
     setForm((prev) => ({ ...prev, [field]: value }));
   // Auto-calculate scheduledEnd from start + duration + priceUnit
-  const calcEnd = (
-    start: string,
-    duration: string,
-    unit: string,
-  ): string => {
+  const calcEnd = (start: string, duration: string, unit: string): string => {
     if (!start || !duration || unit === "per_job") return "";
-    const ms = Number(duration) * (unit === "per_day" ? 24 * 60 * 60 * 1000 : 60 * 60 * 1000);
+    const ms =
+      Number(duration) *
+      (unit === "per_day" ? 24 * 60 * 60 * 1000 : 60 * 60 * 1000);
     if (!ms) return "";
     const end = new Date(new Date(start).getTime() + ms);
     // format to datetime-local in local time (YYYY-MM-DDTHH:mm)
@@ -399,21 +397,26 @@ function JobModal({ job, lang, onClose, onSaved }: JobModalProps) {
     setForm((prev) => ({
       ...prev,
       scheduledStart: value,
-      scheduledEnd: calcEnd(value, prev.timeDuration, prev.priceUnit) || prev.scheduledEnd,
+      scheduledEnd:
+        calcEnd(value, prev.timeDuration, prev.priceUnit) || prev.scheduledEnd,
     }));
 
   const handleDurationChange = (value: string) =>
     setForm((prev) => ({
       ...prev,
       timeDuration: value,
-      scheduledEnd: calcEnd(prev.scheduledStart, value, prev.priceUnit) || prev.scheduledEnd,
+      scheduledEnd:
+        calcEnd(prev.scheduledStart, value, prev.priceUnit) ||
+        prev.scheduledEnd,
     }));
 
   const handlePriceUnitChange = (value: string) =>
     setForm((prev) => ({
       ...prev,
       priceUnit: value,
-      scheduledEnd: calcEnd(prev.scheduledStart, prev.timeDuration, value) || prev.scheduledEnd,
+      scheduledEnd:
+        calcEnd(prev.scheduledStart, prev.timeDuration, value) ||
+        prev.scheduledEnd,
     }));
 
   const toggleUser = (id: string) =>
@@ -598,9 +601,14 @@ function JobModal({ job, lang, onClose, onSaved }: JobModalProps) {
               <div className={styles.formGroup}>
                 <label className={styles.label}>
                   {l.scheduledEnd}
-                  {form.scheduledEnd && calcEnd(form.scheduledStart, form.timeDuration, form.priceUnit) === form.scheduledEnd && (
-                    <span className={styles.autoCalcBadge}>auto</span>
-                  )}
+                  {form.scheduledEnd &&
+                    calcEnd(
+                      form.scheduledStart,
+                      form.timeDuration,
+                      form.priceUnit,
+                    ) === form.scheduledEnd && (
+                      <span className={styles.autoCalcBadge}>auto</span>
+                    )}
                 </label>
                 <input
                   className={styles.input}
