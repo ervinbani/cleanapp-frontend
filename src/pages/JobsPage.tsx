@@ -144,6 +144,8 @@ interface JobForm {
   scheduledEnd: string;
   status: JobStatus;
   price: string;
+  priceUnit: string;
+  timeDuration: string;
   assignedUsers: string[];
   notesInternal: string;
   notesCustomer: string;
@@ -163,6 +165,8 @@ const EMPTY_JOB_FORM: JobForm = {
   scheduledEnd: "",
   status: "scheduled",
   price: "",
+  priceUnit: "per_job",
+  timeDuration: "",
   assignedUsers: [],
   notesInternal: "",
   notesCustomer: "",
@@ -202,6 +206,8 @@ function jobToForm(j: Job): JobForm {
     scheduledEnd: j.scheduledEnd ? isoToLocal(j.scheduledEnd) : "",
     status: j.status,
     price: j.price != null ? String(j.price) : "",
+    priceUnit: j.priceUnit ?? "per_job",
+    timeDuration: j.timeDuration != null ? String(j.timeDuration) : "",
     assignedUsers: assignedUserIds,
     notesInternal: j.notesInternal ?? "",
     notesCustomer: j.notesCustomer ?? "",
@@ -248,6 +254,9 @@ const jmT = {
     scheduledEnd: "Scheduled End",
     status: "Status",
     price: "Price ($)",
+    priceUnit: "Price Unit",
+    priceUnitLabels: { per_hour: "Hourly", per_job: "Fixed", per_day: "Daily" } as Record<string, string>,
+    timeDuration: "Duration",
     assignedUsers: "Assigned To",
     notesInternal: "Internal Notes",
     notesCustomer: "Customer Notes",
@@ -279,6 +288,9 @@ const jmT = {
     scheduledEnd: "Fin Programado",
     status: "Estado",
     price: "Precio ($)",
+    priceUnit: "Unidad de precio",
+    priceUnitLabels: { per_hour: "Por hora", per_job: "Fijo", per_day: "Por día" } as Record<string, string>,
+    timeDuration: "Duración",
     assignedUsers: "Asignado a",
     notesInternal: "Notas Internas",
     notesCustomer: "Notas para el Cliente",
@@ -308,6 +320,8 @@ interface DropdownCustomer {
 interface DropdownService {
   _id: string;
   name: { en: string; es: string };
+  basePrice?: number;
+  priceUnit?: string;
 }
 interface DropdownUser {
   _id: string;
@@ -410,6 +424,8 @@ function JobModal({ job, lang, onClose, onSaved }: JobModalProps) {
           : undefined,
         status: form.status,
         price: form.price !== "" ? Number(form.price) : undefined,
+        priceUnit: form.priceUnit || undefined,
+        timeDuration: form.timeDuration !== "" ? Number(form.timeDuration) : undefined,
         assignedUsers: form.assignedUsers,
         notesInternal: form.notesInternal.trim() || undefined,
         notesCustomer: form.notesCustomer.trim() || undefined,
@@ -489,7 +505,16 @@ function JobModal({ job, lang, onClose, onSaved }: JobModalProps) {
                 <select
                   className={styles.input}
                   value={form.serviceId}
-                  onChange={(e) => set("serviceId", e.target.value)}
+                  onChange={(e) => {
+                    const id = e.target.value;
+                    const svc = services.find((s) => s._id === id);
+                    setForm((prev) => ({
+                      ...prev,
+                      serviceId: id,
+                      price: svc?.basePrice != null ? String(svc.basePrice) : prev.price,
+                      priceUnit: svc?.priceUnit ?? prev.priceUnit,
+                    }));
+                  }}
                 >
                   <option value="">{l.selectService}</option>
                   {services.map((s) => (
@@ -534,8 +559,8 @@ function JobModal({ job, lang, onClose, onSaved }: JobModalProps) {
               </div>
             </div>
 
-            {/* Status + Price */}
-            <div className={styles.formRow}>
+            {/* Status + Price + Duration */}
+            <div className={styles.formRow3}>
               <div className={styles.formGroup}>
                 <label className={styles.label}>{l.status}</label>
                 <select
@@ -552,13 +577,33 @@ function JobModal({ job, lang, onClose, onSaved }: JobModalProps) {
               </div>
               <div className={styles.formGroup}>
                 <label className={styles.label}>{l.price}</label>
+                <div className={styles.priceRow}>
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={form.price}
+                    onChange={(e) => set("price", e.target.value)}
+                  />
+                  <select
+                    value={form.priceUnit}
+                    onChange={(e) => set("priceUnit", e.target.value)}
+                  >
+                    <option value="per_hour">{l.priceUnitLabels.per_hour}</option>
+                    <option value="per_job">{l.priceUnitLabels.per_job}</option>
+                    <option value="per_day">{l.priceUnitLabels.per_day}</option>
+                  </select>
+                </div>
+              </div>
+              <div className={styles.formGroup}>
+                <label className={styles.label}>{l.timeDuration}</label>
                 <input
                   className={styles.input}
                   type="number"
                   min="0"
-                  step="0.01"
-                  value={form.price}
-                  onChange={(e) => set("price", e.target.value)}
+                  step="1"
+                  value={form.timeDuration}
+                  onChange={(e) => set("timeDuration", e.target.value)}
                 />
               </div>
             </div>

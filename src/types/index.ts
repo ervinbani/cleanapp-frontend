@@ -127,6 +127,8 @@ export interface Job {
   notesCustomer?: string;
   recurringRuleId?: string;
   price?: number;
+  priceUnit?: "per_hour" | "per_job" | "per_day";
+  timeDuration?: number;
   invoiceId?: string;
   createdAt: string;
   updatedAt: string;

@@ -568,6 +568,13 @@
   margin-bottom: 0;
 }
 
+.formRow3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 0;
+}
+
 .formGroup {
   display: flex;
   flex-direction: column;
@@ -599,6 +606,44 @@
 .input:focus {
   border-color: #3b82f6;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+.priceRow {
+  display: flex;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  overflow: hidden;
+  width: 100%;
+  box-sizing: border-box;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.priceRow:focus-within {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+.priceRow input {
+  flex: 1;
+  border: none;
+  padding: 0.55rem 0.75rem;
+  font-size: 0.95rem;
+  color: #111827;
+  outline: none;
+  background: transparent;
+  min-width: 0;
+}
+
+.priceRow select {
+  border: none;
+  border-left: 1px solid #d1d5db;
+  padding: 0.55rem 0.5rem 0.55rem 0.6rem;
+  font-size: 0.9rem;
+  color: #374151;
+  background: #f9fafb;
+  outline: none;
+  cursor: pointer;
+  min-width: 80px;
 }
 
 .textarea {
