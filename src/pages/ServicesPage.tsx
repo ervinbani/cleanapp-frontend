@@ -29,6 +29,8 @@ const t = {
     colName: "Name",
     colDescription: "Description",
     colPrice: "Base Price",
+    colPriceUnit: "Unit",
+    priceUnitLabels: { per_hour: "Hourly", per_job: "Fixed", per_day: "Daily" } as Record<string, string>,
     colStatus: "Status",
     colActions: "Actions",
     btnView: "View",
@@ -56,6 +58,8 @@ const t = {
     colName: "Nombre",
     colDescription: "Descripción",
     colPrice: "Precio Base",
+    colPriceUnit: "Unidad",
+    priceUnitLabels: { per_hour: "Por hora", per_job: "Fijo", per_day: "Por día" } as Record<string, string>,
     colStatus: "Estado",
     colActions: "Acciones",
     btnView: "Ver",
@@ -460,6 +464,7 @@ export default function ServicesPage() {
       { header: l.colName, key: "name", width: 28 },
       { header: l.colDescription, key: "description", width: 40 },
       { header: l.colPrice, key: "price", width: 14 },
+      { header: l.colPriceUnit, key: "priceUnit", width: 12 },
       { header: l.colStatus, key: "status", width: 12 },
     ];
     const headerRow = ws.getRow(1);
@@ -476,6 +481,7 @@ export default function ServicesPage() {
         name: s.name?.[lang] ?? s.name?.en ?? "",
         description: s.description?.[lang] ?? s.description?.en ?? "",
         price: s.basePrice != null ? `$${s.basePrice.toFixed(2)}` : "",
+        priceUnit: s.priceUnit ? (l.priceUnitLabels[s.priceUnit] ?? s.priceUnit) : "",
         status: s.isActive ? l.active : l.inactive,
       });
     });
@@ -501,11 +507,12 @@ export default function ServicesPage() {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (doc as any).autoTable({
       startY: 22,
-      head: [[l.colName, l.colDescription, l.colPrice, l.colStatus]],
+      head: [[l.colName, l.colDescription, l.colPrice, l.colPriceUnit, l.colStatus]],
       body: displayed.map((s) => [
         s.name?.[lang] ?? s.name?.en ?? "",
         s.description?.[lang] ?? s.description?.en ?? "",
         s.basePrice != null ? `$${s.basePrice.toFixed(2)}` : "",
+        s.priceUnit ? (l.priceUnitLabels[s.priceUnit] ?? s.priceUnit) : "",
         s.isActive ? l.active : l.inactive,
       ]),
       headStyles: { fillColor: [37, 99, 235] },
@@ -582,6 +589,7 @@ export default function ServicesPage() {
               <th>{l.colName}</th>
               <th>{l.colDescription}</th>
               <th>{l.colPrice}</th>
+              <th>{l.colPriceUnit}</th>
               <th>{l.colStatus}</th>
               <th>{l.colActions}</th>
             </tr>
@@ -603,6 +611,7 @@ export default function ServicesPage() {
                 />
               </th>
               <th />
+              <th />
               <th>
                 <select
                   className={styles.colFilter}
@@ -620,13 +629,13 @@ export default function ServicesPage() {
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan={5} className={styles.empty}>
+                <td colSpan={6} className={styles.empty}>
                   {l.loading}
                 </td>
               </tr>
             ) : displayed.length === 0 ? (
               <tr>
-                <td colSpan={5} className={styles.empty}>
+                <td colSpan={6} className={styles.empty}>
                   {l.noResults}
                 </td>
               </tr>
@@ -641,6 +650,9 @@ export default function ServicesPage() {
                   </td>
                   <td className={styles.priceCell}>
                     {s.basePrice != null ? `$${s.basePrice.toFixed(2)}` : "—"}
+                  </td>
+                  <td className={styles.priceCell}>
+                    {s.priceUnit ? (l.priceUnitLabels[s.priceUnit] ?? s.priceUnit) : "—"}
                   </td>
                   <td>
                     <span
