@@ -33,7 +33,9 @@
   white-space: nowrap;
 }
 
-.addBtn:hover { background: #1d4ed8; }
+.addBtn:hover {
+  background: #1d4ed8;
+}
 
 /* ─── Toolbar ─────────────────────────────────────────────────── */
 .toolbar {
@@ -75,7 +77,9 @@
   transition: border-color 0.15s;
 }
 
-.searchInput:focus { border-color: #2563eb; }
+.searchInput:focus {
+  border-color: #2563eb;
+}
 
 .filterSelect {
   padding: 0.5rem 0.75rem;
@@ -89,7 +93,9 @@
   transition: border-color 0.15s;
 }
 
-.filterSelect:focus { border-color: #2563eb; }
+.filterSelect:focus {
+  border-color: #2563eb;
+}
 
 /* ─── Export buttons ──────────────────────────────────────────── */
 .exportBtns {
@@ -111,17 +117,38 @@
   font-weight: 600;
   cursor: pointer;
   white-space: nowrap;
-  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  transition:
+    background 0.15s,
+    color 0.15s,
+    border-color 0.15s;
 }
 
 .btnExcelExport svg,
-.btnPdfExport svg { width: 15px; height: 15px; flex-shrink: 0; }
+.btnPdfExport svg {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+}
 
-.btnExcelExport { background: #f0fdf4; border-color: #86efac; color: #15803d; }
-.btnExcelExport:hover { background: #dcfce7; border-color: #4ade80; }
+.btnExcelExport {
+  background: #f0fdf4;
+  border-color: #86efac;
+  color: #15803d;
+}
+.btnExcelExport:hover {
+  background: #dcfce7;
+  border-color: #4ade80;
+}
 
-.btnPdfExport { background: #fef2f2; border-color: #fca5a5; color: #b91c1c; }
-.btnPdfExport:hover { background: #fee2e2; border-color: #f87171; }
+.btnPdfExport {
+  background: #fef2f2;
+  border-color: #fca5a5;
+  color: #b91c1c;
+}
+.btnPdfExport:hover {
+  background: #fee2e2;
+  border-color: #f87171;
+}
 
 /* ─── Table wrapper ───────────────────────────────────────────── */
 .tableWrap {
@@ -172,7 +199,9 @@
   transition: border-color 0.15s;
 }
 
-.colFilter:focus { border-color: #2563eb; }
+.colFilter:focus {
+  border-color: #2563eb;
+}
 
 .bodyRow td {
   padding: 0.85rem 1rem;
@@ -181,13 +210,32 @@
   vertical-align: middle;
 }
 
-.bodyRow:last-child td { border-bottom: none; }
-.bodyRow:hover td { background: #f8faff; }
+.bodyRow:last-child td {
+  border-bottom: none;
+}
+.bodyRow:hover td {
+  background: #f8faff;
+}
 
-.invoiceNumCell { font-weight: 600; color: #111827 !important; white-space: nowrap; }
-.customerCell { color: #374151; white-space: nowrap; }
-.dateCell { white-space: nowrap; color: #374151; font-size: 0.82rem; }
-.amountCell { white-space: nowrap; font-weight: 500; color: #374151; }
+.invoiceNumCell {
+  font-weight: 600;
+  color: #111827 !important;
+  white-space: nowrap;
+}
+.customerCell {
+  color: #374151;
+  white-space: nowrap;
+}
+.dateCell {
+  white-space: nowrap;
+  color: #374151;
+  font-size: 0.82rem;
+}
+.amountCell {
+  white-space: nowrap;
+  font-weight: 500;
+  color: #374151;
+}
 
 .empty {
   text-align: center;
@@ -206,12 +254,30 @@
   white-space: nowrap;
 }
 
-.badge_draft { background: #f3f4f6; color: #6b7280; }
-.badge_sent { background: #dbeafe; color: #1d4ed8; }
-.badge_paid { background: #d1fae5; color: #065f46; }
-.badge_partially_paid { background: #fef3c7; color: #92400e; }
-.badge_overdue { background: #fee2e2; color: #991b1b; }
-.badge_void { background: #f3f4f6; color: #9ca3af; }
+.badge_draft {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+.badge_sent {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+.badge_paid {
+  background: #d1fae5;
+  color: #065f46;
+}
+.badge_partially_paid {
+  background: #fef3c7;
+  color: #92400e;
+}
+.badge_overdue {
+  background: #fee2e2;
+  color: #991b1b;
+}
+.badge_void {
+  background: #f3f4f6;
+  color: #9ca3af;
+}
 
 /* ─── Action buttons ──────────────────────────────────────────── */
 .actions {
@@ -233,21 +299,46 @@
   font-weight: 500;
   cursor: pointer;
   white-space: nowrap;
-  transition: background 0.15s, color 0.15s;
+  transition:
+    background 0.15s,
+    color 0.15s;
 }
 
 .btnView svg,
 .btnUpdate svg,
-.btnDelete svg { width: 13px; height: 13px; flex-shrink: 0; }
+.btnDelete svg {
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+}
 
-.btnView { background: #fff; border-color: #d1d5db; color: #374151; }
-.btnView:hover { background: #f3f4f6; }
+.btnView {
+  background: #fff;
+  border-color: #d1d5db;
+  color: #374151;
+}
+.btnView:hover {
+  background: #f3f4f6;
+}
 
-.btnUpdate { background: #fff; border-color: #d1d5db; color: #374151; }
-.btnUpdate:hover { background: #f3f4f6; }
+.btnUpdate {
+  background: #fff;
+  border-color: #d1d5db;
+  color: #374151;
+}
+.btnUpdate:hover {
+  background: #f3f4f6;
+}
 
-.btnDelete { background: #fff; border-color: #fca5a5; color: #ef4444; padding: 0.3rem 0.5rem; }
-.btnDelete:hover { background: #fef2f2; }
+.btnDelete {
+  background: #fff;
+  border-color: #fca5a5;
+  color: #ef4444;
+  padding: 0.3rem 0.5rem;
+}
+.btnDelete:hover {
+  background: #fef2f2;
+}
 
 /* ─── Pagination ──────────────────────────────────────────────── */
 .pagination {
@@ -269,13 +360,26 @@
   font-size: 0.82rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.15s, color 0.15s;
+  transition:
+    background 0.15s,
+    color 0.15s;
 }
 
-.pageBtn:hover:not(:disabled) { background: #eff6ff; color: #2563eb; border-color: #93c5fd; }
-.pageBtn:disabled { opacity: 0.4; cursor: default; }
+.pageBtn:hover:not(:disabled) {
+  background: #eff6ff;
+  color: #2563eb;
+  border-color: #93c5fd;
+}
+.pageBtn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
 
-.pageNumbers { display: flex; align-items: center; gap: 0.25rem; }
+.pageNumbers {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
 
 .pageNum {
   min-width: 32px;
@@ -288,10 +392,17 @@
   font-size: 0.82rem;
   font-weight: 500;
   cursor: pointer;
-  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  transition:
+    background 0.15s,
+    color 0.15s,
+    border-color 0.15s;
 }
 
-.pageNum:hover { background: #eff6ff; color: #2563eb; border-color: #93c5fd; }
+.pageNum:hover {
+  background: #eff6ff;
+  color: #2563eb;
+  border-color: #93c5fd;
+}
 
 .pageNumActive {
   background: #2563eb !important;
@@ -300,8 +411,17 @@
   font-weight: 700;
 }
 
-.ellipsis { padding: 0 0.25rem; color: #9ca3af; font-size: 0.85rem; user-select: none; }
-.pageInfo { font-size: 0.8rem; color: #9ca3af; margin-left: 0.5rem; }
+.ellipsis {
+  padding: 0 0.25rem;
+  color: #9ca3af;
+  font-size: 0.85rem;
+  user-select: none;
+}
+.pageInfo {
+  font-size: 0.8rem;
+  color: #9ca3af;
+  margin-left: 0.5rem;
+}
 
 /* ─── Inline Form ──────────────────────────────────────────────── */
 .formSection {
@@ -335,10 +455,15 @@
   cursor: pointer;
   padding: 0.1rem 0.4rem;
   border-radius: 4px;
-  transition: color 0.15s, background 0.15s;
+  transition:
+    color 0.15s,
+    background 0.15s;
 }
 
-.formCloseBtn:hover { color: #374151; background: #f3f4f6; }
+.formCloseBtn:hover {
+  color: #374151;
+  background: #f3f4f6;
+}
 
 .formRow {
   display: grid;
@@ -422,7 +547,10 @@
   box-sizing: border-box;
 }
 
-.input:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15); }
+.input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
 
 .textarea {
   border: 1px solid #d1d5db;
@@ -438,7 +566,10 @@
   box-sizing: border-box;
 }
 
-.textarea:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15); }
+.textarea:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
 
 .sectionDivider {
   font-size: 0.75rem;
@@ -473,7 +604,9 @@
   margin-bottom: 1rem;
 }
 
-.btnRemoveItem:hover { background: #fee2e2; }
+.btnRemoveItem:hover {
+  background: #fee2e2;
+}
 
 .btnAddItem {
   background: none;
@@ -483,11 +616,16 @@
   font-size: 0.875rem;
   padding: 0.4rem 0.9rem;
   cursor: pointer;
-  transition: border-color 0.15s, color 0.15s;
+  transition:
+    border-color 0.15s,
+    color 0.15s;
   margin-bottom: 1rem;
 }
 
-.btnAddItem:hover { border-color: #3b82f6; color: #3b82f6; }
+.btnAddItem:hover {
+  border-color: #3b82f6;
+  color: #3b82f6;
+}
 
 /* ─── Totals ──────────────────────────────────────────────────── */
 .totalsWrap {
@@ -551,7 +689,9 @@
   transition: background 0.15s;
 }
 
-.btnCancel:hover { background: #f9fafb; }
+.btnCancel:hover {
+  background: #f9fafb;
+}
 
 .btnSave {
   padding: 0.55rem 1.25rem;
@@ -565,8 +705,14 @@
   transition: background 0.15s;
 }
 
-.btnSave:hover { background: #2563eb; }
-.btnSave:disabled, .btnCancel:disabled { opacity: 0.5; cursor: not-allowed; }
+.btnSave:hover {
+  background: #2563eb;
+}
+.btnSave:disabled,
+.btnCancel:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
 
 /* ─── Download PDF button ─────────────────────────────────────── */
 .btnDownloadPdf {
@@ -581,11 +727,23 @@
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.15s, border-color 0.15s;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
   margin-right: auto;
 }
 
-.btnDownloadPdf:hover { background: #fee2e2; border-color: #f87171; }
-.btnDownloadPdf:disabled { opacity: 0.5; cursor: not-allowed; }
+.btnDownloadPdf:hover {
+  background: #fee2e2;
+  border-color: #f87171;
+}
+.btnDownloadPdf:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
 
-.btnDownloadPdf svg { width: 15px; height: 15px; flex-shrink: 0; }
+.btnDownloadPdf svg {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+}
