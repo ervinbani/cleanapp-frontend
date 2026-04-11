@@ -95,10 +95,8 @@ export interface Customer {
 export interface Service {
   _id: string;
   tenantId: string;
-  customerId?: string | Customer;
   name: { en: string; es: string };
   description: { en?: string; es?: string };
-  durationMinutes?: number;
   basePrice?: number;
   priceUnit?: "per_hour" | "per_job" | "per_day";
   isActive: boolean;
