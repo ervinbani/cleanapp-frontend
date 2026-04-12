@@ -19,7 +19,12 @@ type ToolbarButtonProps = {
   children: React.ReactNode;
 };
 
-function ToolbarButton({ onClick, active, title, children }: ToolbarButtonProps) {
+function ToolbarButton({
+  onClick,
+  active,
+  title,
+  children,
+}: ToolbarButtonProps) {
   return (
     <button
       type="button"
@@ -35,7 +40,11 @@ function ToolbarButton({ onClick, active, title, children }: ToolbarButtonProps)
   );
 }
 
-export default function RichTextEditor({ value, onChange, placeholder }: Props) {
+export default function RichTextEditor({
+  value,
+  onChange,
+  placeholder,
+}: Props) {
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -99,14 +108,18 @@ export default function RichTextEditor({ value, onChange, placeholder }: Props) 
         <ToolbarButton
           title="Heading 1"
           active={editor.isActive("heading", { level: 1 })}
-          onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
+          onClick={() =>
+            editor.chain().focus().toggleHeading({ level: 1 }).run()
+          }
         >
           H1
         </ToolbarButton>
         <ToolbarButton
           title="Heading 2"
           active={editor.isActive("heading", { level: 2 })}
-          onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
+          onClick={() =>
+            editor.chain().focus().toggleHeading({ level: 2 }).run()
+          }
         >
           H2
         </ToolbarButton>
@@ -176,7 +189,9 @@ export default function RichTextEditor({ value, onChange, placeholder }: Props) 
         <label className={styles.colorLabel} title="Text color">
           <span
             className={styles.colorPreview}
-            style={{ background: editor.getAttributes("textStyle").color || "#111827" }}
+            style={{
+              background: editor.getAttributes("textStyle").color || "#111827",
+            }}
           />
           A
           <input
