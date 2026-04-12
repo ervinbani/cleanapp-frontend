@@ -527,16 +527,85 @@ function InvoiceFormSection({
       align: "right",
     });
 
-    // Notes
-    if (form.notes.trim()) {
+    // Notes — render rich HTML with colors to PDF
+    const renderRichHtml = (
+      html: string,
+      startY: number,
+      leftX: number,
+      maxW: number,
+    ): number => {
+      const DEFAULT_COLOR: [number, number, number] = [55, 65, 81];
+
+      const parseRgb = (color: string): [number, number, number] => {
+        const m = color.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
+        if (m) return [+m[1], +m[2], +m[3]];
+        const h = color.match(/^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i);
+        if (h)
+          return [parseInt(h[1], 16), parseInt(h[2], 16), parseInt(h[3], 16)];
+        return DEFAULT_COLOR;
+      };
+
+      type Run = { text: string; color: [number, number, number] };
+      const getRuns = (node: Node, inheritColor?: string): Run[] => {
+        const runs: Run[] = [];
+        if (node.nodeType === Node.TEXT_NODE) {
+          const text = node.textContent ?? "";
+          if (text)
+            runs.push({
+              text,
+              color: inheritColor ? parseRgb(inheritColor) : DEFAULT_COLOR,
+            });
+        } else if (node.nodeType === Node.ELEMENT_NODE) {
+          const el = node as HTMLElement;
+          const color = el.style?.color || inheritColor;
+          for (const child of el.childNodes) getRuns(child, color).forEach((r) => runs.push(r));
+        }
+        return runs;
+      };
+
+      const container = document.createElement("div");
+      container.innerHTML = html;
+      const blocks = container.querySelectorAll("p, h1, h2, h3, li");
+
+      let cy = startY;
+      blocks.forEach((block) => {
+        const tag = block.tagName;
+        const fs = tag === "H1" ? 13 : tag === "H2" ? 11 : 9;
+        const lh = tag === "H1" ? 7 : tag === "H2" ? 6 : 5;
+        doc.setFontSize(fs);
+
+        const runs = getRuns(block);
+        let cx = leftX;
+
+        runs.forEach(({ text, color }) => {
+          doc.setTextColor(...color);
+          const words = text.split(/(\s+)/);
+          words.forEach((word) => {
+            if (!word) return;
+            const w = doc.getTextWidth(word);
+            if (cx + w > leftX + maxW && cx > leftX) {
+              cy += lh;
+              cx = leftX;
+            }
+            doc.text(word, cx, cy);
+            cx += w;
+          });
+        });
+
+        cy += lh;
+        doc.setFontSize(9);
+      });
+
+      return cy;
+    };
+
+    if (form.notes && form.notes.replace(/<[^>]*>/g, "").trim()) {
       tY += 14;
       doc.setFontSize(9);
       doc.setTextColor(107, 114, 128);
       doc.text(`${l.notes}:`, 14, tY);
       tY += 5;
-      doc.setTextColor(55, 65, 81);
-      const lines = doc.splitTextToSize(form.notes, 180);
-      doc.text(lines, 14, tY);
+      tY = renderRichHtml(form.notes, tY, 14, 180);
     }
 
     doc.save(`invoice-${form.invoiceNumber || "draft"}.pdf`);
