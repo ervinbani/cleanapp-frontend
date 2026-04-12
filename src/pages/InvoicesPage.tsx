@@ -492,7 +492,8 @@ function InvoiceFormSection({
         } else if (node.nodeType === Node.ELEMENT_NODE) {
           const el = node as HTMLElement;
           const color = el.style?.color || inheritColor;
-          for (const child of el.childNodes) getRuns(child, color).forEach((r) => runs.push(r));
+          for (const child of el.childNodes)
+            getRuns(child, color).forEach((r) => runs.push(r));
         }
         return runs;
       };
@@ -789,7 +790,9 @@ function InvoiceFormSection({
                     {(formT[lang][`pm_${s}` as keyof typeof l] as
                       | string
                       | undefined) ??
-                      (l[`status_${s}` as keyof typeof l] as string | undefined)}
+                      (l[`status_${s}` as keyof typeof l] as
+                        | string
+                        | undefined)}
                   </option>
                 ))}
               </select>

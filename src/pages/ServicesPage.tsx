@@ -64,7 +64,11 @@ interface ServiceModalProps {
   onSaved: () => void;
 }
 
-function ServiceModal({ service, onClose, onSaved }: Omit<ServiceModalProps, "lang">) {
+function ServiceModal({
+  service,
+  onClose,
+  onSaved,
+}: Omit<ServiceModalProps, "lang">) {
   const isEdit = !!service;
   const l = useTrans("servicesModal");
   const [form, setForm] = useState<ServiceForm>(

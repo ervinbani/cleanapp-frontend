@@ -51,8 +51,6 @@ const STATUS_COLORS: Record<string, string> = {
   no_show: "#6b7280",
 };
 
-
-
 interface ActivityItem {
   id: string;
   icon: string;
@@ -176,11 +174,22 @@ export default function DashboardPage() {
 
     // Jobs → show last 5 by updatedAt
     const sortedJobs = [...allJobs]
-      .sort((a, b) => new Date(b.updatedAt ?? b.scheduledStart).getTime() - new Date(a.updatedAt ?? a.scheduledStart).getTime())
+      .sort(
+        (a, b) =>
+          new Date(b.updatedAt ?? b.scheduledStart).getTime() -
+          new Date(a.updatedAt ?? a.scheduledStart).getTime(),
+      )
       .slice(0, 5);
 
     sortedJobs.forEach((job) => {
-      const icon = job.status === "completed" ? "✅" : job.status === "in_progress" ? "🔄" : job.status === "canceled" ? "❌" : "📅";
+      const icon =
+        job.status === "completed"
+          ? "✅"
+          : job.status === "in_progress"
+            ? "🔄"
+            : job.status === "canceled"
+              ? "❌"
+              : "📅";
       const color = STATUS_COLORS[job.status] ?? "#3b82f6";
       items.push({
         id: `job-${job._id}`,
@@ -328,157 +337,159 @@ export default function DashboardPage() {
 
       {/* Calendar + Activity row */}
       <div className={styles.bottomRow}>
-      <div className={styles.calendarCard}>
-        {/* Header */}
-        <div className={styles.calendarHeader}>
-          <div className={styles.calendarTitle}>
-            <span className={styles.calendarIcon}>📅</span>
-            <span>{labels.calendar}</span>
-          </div>
-          <div className={styles.calendarFilters}>
-            <button
-              className={`${styles.filterBtn} ${!myJobsMode ? styles.filterBtnActive : ""}`}
-              onClick={() => setMyJobsMode(false)}
-            >
-              {labels.allJobs}
-            </button>
-            <button
-              className={`${styles.filterBtn} ${myJobsMode ? styles.filterBtnActive : ""}`}
-              onClick={() => setMyJobsMode(true)}
-            >
-              {labels.myJobs}
-            </button>
-          </div>
-        </div>
-
-        {/* Month navigation */}
-        <div className={styles.calendarNav}>
-          <button
-            className={styles.navBtn}
-            onClick={prevMonth}
-            aria-label="Previous month"
-          >
-            ‹
-          </button>
-          <span className={styles.calendarMonthLabel}>
-            {monthNames[calendarDate.getMonth()]} {calendarDate.getFullYear()}
-          </span>
-          <button
-            className={styles.navBtn}
-            onClick={nextMonth}
-            aria-label="Next month"
-          >
-            ›
-          </button>
-        </div>
-
-        {/* Grid */}
-        <div className={styles.calendarGrid}>
-          {weekdays.map((d, i) => (
-            <div key={i} className={styles.weekdayLabel}>
-              {d}
+        <div className={styles.calendarCard}>
+          {/* Header */}
+          <div className={styles.calendarHeader}>
+            <div className={styles.calendarTitle}>
+              <span className={styles.calendarIcon}>📅</span>
+              <span>{labels.calendar}</span>
             </div>
-          ))}
-          {calendarCells.map((day, i) => {
-            if (day === null) return <div key={`empty-${i}`} />;
-            const isToday = isCurrentMonth && day === today.getDate();
-            const dayJobs = jobsByDay[day] ?? [];
-            const isHovered = hoveredDay === day;
-            return (
-              <div
-                key={day}
-                className={`${styles.calendarDay} ${isToday ? styles.today : ""} ${dayJobs.length > 0 ? styles.hasJobs : ""}`}
-                onMouseEnter={() => dayJobs.length > 0 && setHoveredDay(day)}
-                onMouseLeave={() => setHoveredDay(null)}
+            <div className={styles.calendarFilters}>
+              <button
+                className={`${styles.filterBtn} ${!myJobsMode ? styles.filterBtnActive : ""}`}
+                onClick={() => setMyJobsMode(false)}
               >
-                <span className={styles.dayNumber}>{day}</span>
-                {dayJobs.slice(0, 2).map((job) => (
-                  <div
-                    key={job._id}
-                    className={styles.jobPill}
-                    style={{
-                      backgroundColor: STATUS_COLORS[job.status] ?? "#3b82f6",
-                    }}
-                    onClick={() => navigate("/jobs")}
-                    title={`${formatJobTime(job.scheduledStart)} ${job.title ?? ""}`}
-                  >
-                    <span className={styles.jobPillDot} />
-                    <span className={styles.jobPillText}>
-                      {formatJobTime(job.scheduledStart)}{" "}
-                      {job.title ?? job.status}
-                    </span>
-                  </div>
-                ))}
-                {dayJobs.length > 2 && (
-                  <span className={styles.moreJobs}>+{dayJobs.length - 2}</span>
-                )}
-                {/* Tooltip on hover */}
-                {isHovered && dayJobs.length > 0 && (
-                  <div className={styles.dayTooltip}>
-                    {dayJobs.map((job) => (
-                      <div
-                        key={job._id}
-                        className={styles.tooltipRow}
-                        onClick={() => navigate("/jobs")}
-                      >
-                        <span
-                          className={styles.tooltipDot}
-                          style={{
-                            backgroundColor:
-                              STATUS_COLORS[job.status] ?? "#3b82f6",
-                          }}
-                        />
-                        <span>
-                          {formatJobTime(job.scheduledStart)}{" "}
-                          {job.title ?? job.status}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                {labels.allJobs}
+              </button>
+              <button
+                className={`${styles.filterBtn} ${myJobsMode ? styles.filterBtnActive : ""}`}
+                onClick={() => setMyJobsMode(true)}
+              >
+                {labels.myJobs}
+              </button>
+            </div>
+          </div>
+
+          {/* Month navigation */}
+          <div className={styles.calendarNav}>
+            <button
+              className={styles.navBtn}
+              onClick={prevMonth}
+              aria-label="Previous month"
+            >
+              ‹
+            </button>
+            <span className={styles.calendarMonthLabel}>
+              {monthNames[calendarDate.getMonth()]} {calendarDate.getFullYear()}
+            </span>
+            <button
+              className={styles.navBtn}
+              onClick={nextMonth}
+              aria-label="Next month"
+            >
+              ›
+            </button>
+          </div>
+
+          {/* Grid */}
+          <div className={styles.calendarGrid}>
+            {weekdays.map((d, i) => (
+              <div key={i} className={styles.weekdayLabel}>
+                {d}
               </div>
-            );
-          })}
+            ))}
+            {calendarCells.map((day, i) => {
+              if (day === null) return <div key={`empty-${i}`} />;
+              const isToday = isCurrentMonth && day === today.getDate();
+              const dayJobs = jobsByDay[day] ?? [];
+              const isHovered = hoveredDay === day;
+              return (
+                <div
+                  key={day}
+                  className={`${styles.calendarDay} ${isToday ? styles.today : ""} ${dayJobs.length > 0 ? styles.hasJobs : ""}`}
+                  onMouseEnter={() => dayJobs.length > 0 && setHoveredDay(day)}
+                  onMouseLeave={() => setHoveredDay(null)}
+                >
+                  <span className={styles.dayNumber}>{day}</span>
+                  {dayJobs.slice(0, 2).map((job) => (
+                    <div
+                      key={job._id}
+                      className={styles.jobPill}
+                      style={{
+                        backgroundColor: STATUS_COLORS[job.status] ?? "#3b82f6",
+                      }}
+                      onClick={() => navigate("/jobs")}
+                      title={`${formatJobTime(job.scheduledStart)} ${job.title ?? ""}`}
+                    >
+                      <span className={styles.jobPillDot} />
+                      <span className={styles.jobPillText}>
+                        {formatJobTime(job.scheduledStart)}{" "}
+                        {job.title ?? job.status}
+                      </span>
+                    </div>
+                  ))}
+                  {dayJobs.length > 2 && (
+                    <span className={styles.moreJobs}>
+                      +{dayJobs.length - 2}
+                    </span>
+                  )}
+                  {/* Tooltip on hover */}
+                  {isHovered && dayJobs.length > 0 && (
+                    <div className={styles.dayTooltip}>
+                      {dayJobs.map((job) => (
+                        <div
+                          key={job._id}
+                          className={styles.tooltipRow}
+                          onClick={() => navigate("/jobs")}
+                        >
+                          <span
+                            className={styles.tooltipDot}
+                            style={{
+                              backgroundColor:
+                                STATUS_COLORS[job.status] ?? "#3b82f6",
+                            }}
+                          />
+                          <span>
+                            {formatJobTime(job.scheduledStart)}{" "}
+                            {job.title ?? job.status}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          {Object.keys(jobsByDay).length === 0 && (
+            <p className={styles.noJobs}>{labels.noJobs}</p>
+          )}
         </div>
 
-        {Object.keys(jobsByDay).length === 0 && (
-          <p className={styles.noJobs}>{labels.noJobs}</p>
-        )}
-      </div>
-
-      {/* Recent Activity */}
-      <div className={styles.activityCard}>
-        <h3 className={styles.activityTitle}>{labels.recentActivity}</h3>
-        {activityItems.length === 0 ? (
-          <p className={styles.noActivity}>{labels.noActivity}</p>
-        ) : (
-          <ul className={styles.activityList}>
-            {activityItems.map((item) => (
-              <li
-                key={item.id}
-                className={styles.activityItem}
-                onClick={item.onClick}
-                role={item.onClick ? "button" : undefined}
-                tabIndex={item.onClick ? 0 : undefined}
-                onKeyDown={(e) => e.key === "Enter" && item.onClick?.()}
-              >
-                <span
-                  className={styles.activityIcon}
-                  style={{ background: `${item.color}18`, color: item.color }}
+        {/* Recent Activity */}
+        <div className={styles.activityCard}>
+          <h3 className={styles.activityTitle}>{labels.recentActivity}</h3>
+          {activityItems.length === 0 ? (
+            <p className={styles.noActivity}>{labels.noActivity}</p>
+          ) : (
+            <ul className={styles.activityList}>
+              {activityItems.map((item) => (
+                <li
+                  key={item.id}
+                  className={styles.activityItem}
+                  onClick={item.onClick}
+                  role={item.onClick ? "button" : undefined}
+                  tabIndex={item.onClick ? 0 : undefined}
+                  onKeyDown={(e) => e.key === "Enter" && item.onClick?.()}
                 >
-                  {item.icon}
-                </span>
-                <span className={styles.activityText}>{item.text}</span>
-                <span className={styles.activityTime}>
-                  {timeAgo(item.time, lang)}
-                </span>
-              </li>
-            ))}
-          </ul>
-        )}
+                  <span
+                    className={styles.activityIcon}
+                    style={{ background: `${item.color}18`, color: item.color }}
+                  >
+                    {item.icon}
+                  </span>
+                  <span className={styles.activityText}>{item.text}</span>
+                  <span className={styles.activityTime}>
+                    {timeAgo(item.time, lang)}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       </div>
-
-      </div>{/* end bottomRow */}
+      {/* end bottomRow */}
     </div>
   );
 }
