@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { useLang } from "../contexts/LangContext";
+import { useTrans } from "../i18n";
 import { useAuth } from "../contexts/AuthContext";
 import apiClient from "../services/apiClient";
 import type { User, UserRole } from "../types";
@@ -606,73 +607,6 @@ const ROLES: UserRole[] = [
   "worker",
 ];
 
-const t = {
-  en: {
-    title: "Users",
-    addUser: "+ Add User",
-    searchPlaceholder: "Search users...",
-    colName: "Name",
-    colEmail: "Email",
-    colPhone: "Phone",
-    colRole: "Role",
-    colStatus: "Status",
-    colLastLogin: "Last Login",
-    colActions: "Actions",
-    btnView: "View",
-    btnUpdate: "Update",
-    filterName: "Filter name…",
-    filterEmail: "Filter email…",
-    filterPhone: "Filter phone…",
-    filterRole: "Filter role…",
-    filterStatus: "Filter status…",
-    allRoles: "All roles",
-    allStatuses: "All statuses",
-    active: "Active",
-    inactive: "Inactive",
-    never: "Never",
-    prev: "← Prev",
-    next: "Next →",
-    noResults: "No users found.",
-    loading: "Loading…",
-    page: "Page",
-    of: "of",
-    exportExcel: "Export Excel",
-    exportPdf: "Export PDF",
-  },
-  es: {
-    title: "Usuarios",
-    addUser: "+ Agregar Usuario",
-    searchPlaceholder: "Buscar usuarios...",
-    colName: "Nombre",
-    colEmail: "Correo",
-    colPhone: "Teléfono",
-    colRole: "Rol",
-    colStatus: "Estado",
-    colLastLogin: "Último Acceso",
-    colActions: "Acciones",
-    btnView: "Ver",
-    btnUpdate: "Editar",
-    filterName: "Filtrar nombre…",
-    filterEmail: "Filtrar correo…",
-    filterPhone: "Filtrar teléfono…",
-    filterRole: "Filtrar rol…",
-    filterStatus: "Filtrar estado…",
-    allRoles: "Todos los roles",
-    allStatuses: "Todos los estados",
-    active: "Activo",
-    inactive: "Inactivo",
-    never: "Nunca",
-    prev: "← Prev",
-    next: "Siguiente →",
-    noResults: "No se encontraron usuarios.",
-    loading: "Cargando…",
-    page: "Página",
-    of: "de",
-    exportExcel: "Exportar Excel",
-    exportPdf: "Exportar PDF",
-  },
-};
-
 function formatLastLogin(date?: string, never?: string): string {
   if (!date) return never ?? "Never";
   return new Intl.DateTimeFormat(undefined, {
@@ -684,7 +618,7 @@ function formatLastLogin(date?: string, never?: string): string {
 export default function UsersPage() {
   const { lang } = useLang();
   const { hasRole } = useAuth();
-  const l = t[lang];
+  const l = useTrans("users");
 
   const [users, setUsers] = useState<User[]>([]);
   const [total, setTotal] = useState(0);

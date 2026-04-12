@@ -7,6 +7,7 @@ import { invoiceService } from "../services/invoiceService";
 import apiClient from "../services/apiClient";
 import { useLang } from "../contexts/LangContext";
 import { useAuth } from "../contexts/AuthContext";
+import { useTrans } from "../i18n";
 import type { Customer, Invoice, Job } from "../types";
 
 const WEEKDAYS_EN = ["S", "M", "T", "W", "T", "F", "S"];
@@ -50,38 +51,7 @@ const STATUS_COLORS: Record<string, string> = {
   no_show: "#6b7280",
 };
 
-const t = {
-  en: {
-    heading: "Dashboard",
-    totalClients: "Total Clients",
-    totalJobs: "Total Jobs",
-    totalServices: "Services",
-    calendar: "Calendar",
-    allJobs: "All Jobs",
-    myJobs: "My Jobs",
-    noJobs: "No jobs this month",
-    newJob: "+ New Job",
-    newClient: "+ New Client",
-    newInvoice: "+ New Invoice",
-    recentActivity: "Recent Activity",
-    noActivity: "No recent activity",
-  },
-  es: {
-    heading: "Inicio",
-    totalClients: "Clientes",
-    totalJobs: "Trabajos",
-    totalServices: "Servicios",
-    calendar: "Calendario",
-    allJobs: "Todos",
-    myJobs: "Mis Trabajos",
-    noJobs: "Sin trabajos este mes",
-    newJob: "+ Nuevo Trabajo",
-    newClient: "+ Nuevo Cliente",
-    newInvoice: "+ Nueva Factura",
-    recentActivity: "Actividad Reciente",
-    noActivity: "Sin actividad reciente",
-  },
-};
+
 
 interface ActivityItem {
   id: string;
@@ -268,7 +238,7 @@ export default function DashboardPage() {
   const nextMonth = () =>
     setCalendarDate((d) => new Date(d.getFullYear(), d.getMonth() + 1, 1));
 
-  const labels = t[lang];
+  const labels = useTrans("dashboard");
   const monthNames = lang === "es" ? MONTH_NAMES_ES : MONTH_NAMES_EN;
   const weekdays = lang === "es" ? WEEKDAYS_ES : WEEKDAYS_EN;
 

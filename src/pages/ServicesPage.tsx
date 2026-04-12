@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { useLang } from "../contexts/LangContext";
+import { useTrans } from "../i18n";
 import { useAuth } from "../contexts/AuthContext";
 import apiClient from "../services/apiClient";
 import type { Service } from "../types";
@@ -20,75 +21,6 @@ function getPageRange(current: number, total: number): (number | "…")[] {
     return [1, "…", total - 4, total - 3, total - 2, total - 1, total];
   return [1, "…", current - 1, current, current + 1, "…", total];
 }
-
-const t = {
-  en: {
-    title: "Services",
-    addService: "+ Add Service",
-    searchPlaceholder: "Search services...",
-    colName: "Name",
-    colDescription: "Description",
-    colPrice: "Base Price",
-    colPriceUnit: "Unit",
-    priceUnitLabels: {
-      per_hour: "Hourly",
-      per_job: "Fixed",
-      per_day: "Daily",
-    } as Record<string, string>,
-    colStatus: "Status",
-    colActions: "Actions",
-    btnView: "View",
-    btnUpdate: "Update",
-    filterName: "Filter name…",
-    filterDescription: "Filter description…",
-    filterStatus: "Filter status…",
-    allStatuses: "All statuses",
-    active: "Active",
-    inactive: "Inactive",
-    prev: "← Prev",
-    next: "Next →",
-    noResults: "No services found.",
-    loading: "Loading…",
-    page: "Page",
-    of: "of",
-    min: "min",
-    exportExcel: "Export Excel",
-    exportPdf: "Export PDF",
-  },
-  es: {
-    title: "Servicios",
-    addService: "+ Agregar Servicio",
-    searchPlaceholder: "Buscar servicios...",
-    colName: "Nombre",
-    colDescription: "Descripción",
-    colPrice: "Precio Base",
-    colPriceUnit: "Unidad",
-    priceUnitLabels: {
-      per_hour: "Por hora",
-      per_job: "Fijo",
-      per_day: "Por día",
-    } as Record<string, string>,
-    colStatus: "Estado",
-    colActions: "Acciones",
-    btnView: "Ver",
-    btnUpdate: "Editar",
-    filterName: "Filtrar nombre…",
-    filterDescription: "Filtrar descripción…",
-    filterStatus: "Filtrar estado…",
-    allStatuses: "Todos los estados",
-    active: "Activo",
-    inactive: "Inactivo",
-    prev: "← Prev",
-    next: "Siguiente →",
-    noResults: "No se encontraron servicios.",
-    loading: "Cargando…",
-    page: "Página",
-    of: "de",
-    min: "min",
-    exportExcel: "Exportar Excel",
-    exportPdf: "Exportar PDF",
-  },
-};
 
 // ── Service Modal ────────────────────────────────────────────────────────────
 type PriceUnit = "per_hour" | "per_job" | "per_day";
@@ -132,50 +64,9 @@ interface ServiceModalProps {
   onSaved: () => void;
 }
 
-const mT = {
-  en: {
-    addTitle: "Add Service",
-    editTitle: "Edit Service",
-    name: "Name",
-    description: "Description",
-    descPlaceholder: "Enter a description...",
-    namePlaceholder: "Service Name",
-    price: "Base Price",
-    unitPerHour: "/ hr",
-    unitPerJob: "/ job",
-    unitPerDay: "/ day",
-    status: "Status",
-    active: "Active",
-    inactive: "Inactive",
-    cancel: "Cancel",
-    save: "Save",
-    update: "Update",
-    required: "Name is required for at least the EN tab.",
-  },
-  es: {
-    addTitle: "Agregar Servicio",
-    editTitle: "Editar Servicio",
-    name: "Nombre",
-    description: "Descripción",
-    descPlaceholder: "Ingrese una descripción...",
-    namePlaceholder: "Nombre del Servicio",
-    price: "Precio Base",
-    unitPerHour: "/ hr",
-    unitPerJob: "/ trabajo",
-    unitPerDay: "/ día",
-    status: "Estado",
-    active: "Activo",
-    inactive: "Inactivo",
-    cancel: "Cancelar",
-    save: "Guardar",
-    update: "Actualizar",
-    required: "El nombre es obligatorio al menos en el tab EN.",
-  },
-};
-
-function ServiceModal({ service, lang, onClose, onSaved }: ServiceModalProps) {
+function ServiceModal({ service, onClose, onSaved }: Omit<ServiceModalProps, "lang">) {
   const isEdit = !!service;
-  const l = mT[lang];
+  const l = useTrans("servicesModal");
   const [form, setForm] = useState<ServiceForm>(
     isEdit ? serviceToForm(service!) : EMPTY_SERVICE_FORM,
   );
@@ -378,7 +269,7 @@ function ServiceModal({ service, lang, onClose, onSaved }: ServiceModalProps) {
 export default function ServicesPage() {
   const { lang } = useLang();
   const { hasRole } = useAuth();
-  const l = t[lang];
+  const l = useTrans("services");
 
   const [services, setServices] = useState<Service[]>([]);
   const [total, setTotal] = useState(0);
@@ -756,7 +647,6 @@ export default function ServicesPage() {
 
       {showAddModal && canWrite && (
         <ServiceModal
-          lang={lang}
           onClose={() => setShowAddModal(false)}
           onSaved={() => {
             setShowAddModal(false);
@@ -767,7 +657,6 @@ export default function ServicesPage() {
       {editingService && canWrite && (
         <ServiceModal
           service={editingService}
-          lang={lang}
           onClose={() => setEditingService(null)}
           onSaved={() => {
             setEditingService(null);

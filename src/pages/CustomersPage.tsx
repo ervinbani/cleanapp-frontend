@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useLang } from "../contexts/LangContext";
+import { useTrans } from "../i18n";
 import { useAuth } from "../contexts/AuthContext";
 import { customerService } from "../services/customerService";
 import type { CustomerSource } from "../services/customerService";
@@ -24,65 +25,6 @@ function getPageRange(current: number, total: number): (number | "…")[] {
     return [1, "…", total - 4, total - 3, total - 2, total - 1, total];
   return [1, "…", current - 1, current, current + 1, "…", total];
 }
-
-const t = {
-  en: {
-    title: "Clients",
-    addClient: "+ Add Client",
-    searchPlaceholder: "Search clients...",
-    colName: "Name",
-    colEmail: "Email",
-    colCountry: "Country",
-    colStatus: "Status",
-    colSource: "Source",
-    colActions: "Actions",
-    btnView: "View",
-    btnUpdate: "Update",
-    allStatuses: "All statuses",
-    allSources: "All sources",
-    filterName: "Filter name…",
-    filterEmail: "Filter email…",
-    filterCountry: "Filter country…",
-    filterStatus: "Filter status…",
-    filterSource: "Filter source…",
-    prev: "← Prev",
-    next: "Next →",
-    noResults: "No clients found.",
-    loading: "Loading…",
-    page: "Page",
-    of: "of",
-    exportExcel: "Export Excel",
-    exportPdf: "Export PDF",
-  },
-  es: {
-    title: "Clientes",
-    addClient: "+ Agregar Cliente",
-    searchPlaceholder: "Buscar clientes...",
-    colName: "Nombre",
-    colEmail: "Correo",
-    colCountry: "País",
-    colStatus: "Estado",
-    colSource: "Fuente",
-    colActions: "Acciones",
-    btnView: "Ver",
-    btnUpdate: "Editar",
-    allStatuses: "Todos los estados",
-    allSources: "Todas las fuentes",
-    filterName: "Filtrar nombre…",
-    filterEmail: "Filtrar correo…",
-    filterCountry: "Filtrar país…",
-    filterStatus: "Filtrar estado…",
-    filterSource: "Filtrar fuente…",
-    prev: "← Prev",
-    next: "Siguiente →",
-    noResults: "No se encontraron clientes.",
-    loading: "Cargando…",
-    page: "Página",
-    of: "de",
-    exportExcel: "Exportar Excel",
-    exportPdf: "Exportar PDF",
-  },
-};
 
 // ─── CustomerModal (Add + Edit) ────────────────────────────────────────
 interface CustomerForm {
@@ -484,7 +426,7 @@ function CustomerModal({
 export default function CustomersPage() {
   const { lang } = useLang();
   const { hasRole } = useAuth();
-  const l = t[lang];
+  const l = useTrans("customers");
 
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [total, setTotal] = useState(0);

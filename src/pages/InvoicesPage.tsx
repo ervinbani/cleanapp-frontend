@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useLang } from "../contexts/LangContext";
+import { useTrans } from "../i18n";
 import { useAuth } from "../contexts/AuthContext";
 import { invoiceService } from "../services/invoiceService";
 import apiClient from "../services/apiClient";
@@ -53,73 +54,6 @@ const PAYMENT_METHODS = [
 ] as const;
 
 const CURRENCIES = ["USD", "EUR"] as const;
-
-const t = {
-  en: {
-    title: "Invoices",
-    addInvoice: "+ Add Invoice",
-    searchPlaceholder: "Search invoices...",
-    colNumber: "Invoice #",
-    colCustomer: "Customer",
-    colIssued: "Issued",
-    colDue: "Due Date",
-    colTotal: "Total",
-    colStatus: "Status",
-    colActions: "Actions",
-    btnView: "View",
-    btnUpdate: "Update",
-    allStatuses: "All statuses",
-    filterNumber: "Filter number…",
-    filterCustomer: "Filter customer…",
-    filterStatus: "Filter status…",
-    prev: "← Prev",
-    next: "Next →",
-    noResults: "No invoices found.",
-    loading: "Loading…",
-    page: "Page",
-    of: "of",
-    status_draft: "Draft",
-    status_sent: "Sent",
-    status_paid: "Paid",
-    status_partially_paid: "Partially Paid",
-    status_overdue: "Overdue",
-    status_void: "Void",
-    exportExcel: "Export Excel",
-    exportPdf: "Export PDF",
-  },
-  es: {
-    title: "Facturas",
-    addInvoice: "+ Agregar Factura",
-    searchPlaceholder: "Buscar facturas...",
-    colNumber: "Factura #",
-    colCustomer: "Cliente",
-    colIssued: "Emitida",
-    colDue: "Vencimiento",
-    colTotal: "Total",
-    colStatus: "Estado",
-    colActions: "Acciones",
-    btnView: "Ver",
-    btnUpdate: "Editar",
-    allStatuses: "Todos los estados",
-    filterNumber: "Filtrar número…",
-    filterCustomer: "Filtrar cliente…",
-    filterStatus: "Filtrar estado…",
-    prev: "← Prev",
-    next: "Siguiente →",
-    noResults: "No se encontraron facturas.",
-    loading: "Cargando…",
-    page: "Página",
-    of: "de",
-    status_draft: "Borrador",
-    status_sent: "Enviada",
-    status_paid: "Pagada",
-    status_partially_paid: "Pago Parcial",
-    status_overdue: "Vencida",
-    status_void: "Anulada",
-    exportExcel: "Exportar Excel",
-    exportPdf: "Exportar PDF",
-  },
-};
 
 // ── Invoice Form (inline) ────────────────────────────────────────────────
 interface ItemForm {
@@ -462,7 +396,7 @@ function InvoiceFormSection({
 
     // Status + Payment
     const statusLabel =
-      t[lang][`status_${form.status}` as keyof (typeof t)["en"]] ?? form.status;
+      l[`status_${form.status}` as keyof typeof l] ?? form.status;
     doc.text(`${l.status}: ${statusLabel}`, 14, yPos);
     yPos += 6;
     if (form.paymentMethod) {
@@ -855,7 +789,7 @@ function InvoiceFormSection({
                     {(formT[lang][`pm_${s}` as keyof typeof l] as
                       | string
                       | undefined) ??
-                      t[lang][`status_${s}` as keyof (typeof t)["en"]]}
+                      (l[`status_${s}` as keyof typeof l] as string | undefined)}
                   </option>
                 ))}
               </select>
@@ -1155,7 +1089,7 @@ function InvoiceFormSection({
 export default function InvoicesPage() {
   const { lang } = useLang();
   const { hasRole } = useAuth();
-  const l = t[lang];
+  const l = useTrans("invoices");
 
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [total, setTotal] = useState(0);

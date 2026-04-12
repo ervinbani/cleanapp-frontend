@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useLang } from "../contexts/LangContext";
+import { useTrans } from "../i18n";
 import { useAuth } from "../contexts/AuthContext";
 import { jobService } from "../services/jobService";
 import apiClient from "../services/apiClient";
@@ -60,75 +61,6 @@ const STATUS_ORDER: JobStatus[] = [
   "canceled",
   "no_show",
 ];
-
-const t = {
-  en: {
-    title: "Jobs",
-    addJob: "+ Add Job",
-    searchPlaceholder: "Search jobs...",
-    colTitle: "Title",
-    colCustomer: "Customer",
-    colService: "Service",
-    colScheduled: "Scheduled",
-    colStatus: "Status",
-    colAssigned: "Assigned To",
-    colPrice: "Price",
-    colActions: "Actions",
-    btnView: "View",
-    btnUpdate: "Update",
-    allStatuses: "All statuses",
-    filterTitle: "Filter title…",
-    filterCustomer: "Filter customer…",
-    filterStatus: "Filter status…",
-    prev: "← Prev",
-    next: "Next →",
-    noResults: "No jobs found.",
-    loading: "Loading…",
-    page: "Page",
-    of: "of",
-    status_scheduled: "Scheduled",
-    status_confirmed: "Confirmed",
-    status_in_progress: "In Progress",
-    status_completed: "Completed",
-    status_canceled: "Canceled",
-    status_no_show: "No Show",
-    exportExcel: "Export Excel",
-    exportPdf: "Export PDF",
-  },
-  es: {
-    title: "Trabajos",
-    addJob: "+ Agregar Trabajo",
-    searchPlaceholder: "Buscar trabajos...",
-    colTitle: "Título",
-    colCustomer: "Cliente",
-    colService: "Servicio",
-    colScheduled: "Programado",
-    colStatus: "Estado",
-    colAssigned: "Asignado a",
-    colPrice: "Precio",
-    colActions: "Acciones",
-    btnView: "Ver",
-    btnUpdate: "Editar",
-    allStatuses: "Todos los estados",
-    filterTitle: "Filtrar título…",
-    filterCustomer: "Filtrar cliente…",
-    filterStatus: "Filtrar estado…",
-    prev: "← Prev",
-    next: "Siguiente →",
-    noResults: "No se encontraron trabajos.",
-    loading: "Cargando…",
-    page: "Página",
-    of: "de",
-    status_scheduled: "Programado",
-    status_confirmed: "Confirmado",
-    status_in_progress: "En Progreso",
-    status_completed: "Completado",
-    status_canceled: "Cancelado",
-    status_no_show: "No Presentado",
-    exportExcel: "Exportar Excel",
-    exportPdf: "Exportar PDF",
-  },
-};
 
 // ── Job Modal ────────────────────────────────────────────────────────────
 interface ChecklistItem {
@@ -842,7 +774,7 @@ export default function JobsPage() {
   const { lang } = useLang();
   const { hasPermission, hasRole } = useAuth();
   const isWorker = hasRole("worker", "cleaner");
-  const l = t[lang];
+  const l = useTrans("jobs");
 
   const [jobs, setJobs] = useState<Job[]>([]);
   const [total, setTotal] = useState(0);
