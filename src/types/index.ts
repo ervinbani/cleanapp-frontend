@@ -199,6 +199,36 @@ export interface ApiResponse<T> {
   error?: string;
 }
 
+export type RecurringFrequency = "daily" | "weekly" | "biweekly" | "monthly";
+
+export interface RecurringRule {
+  _id: string;
+  tenantId: string;
+  customerId: string | Customer;
+  serviceId?: string | Service;
+  frequency: RecurringFrequency;
+  dayOfWeek?: number; // 0=Sun … 6=Sat (weekly/biweekly)
+  dayOfMonth?: number; // 1-31 (monthly)
+  startDate: string; // YYYY-MM-DD
+  endDate?: string; // YYYY-MM-DD
+  startTime: string; // HH:MM UTC
+  timeDuration?: number; // hours
+  title?: string;
+  price?: number;
+  priceUnit?: "per_hour" | "per_job" | "per_day";
+  propertyAddress?: {
+    street?: string;
+    city?: string;
+    state?: string;
+    zipCode?: string;
+    country?: string;
+  };
+  assignedUsers: (string | User)[];
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 // Auth
 export interface LoginCredentials {
   email: string;
