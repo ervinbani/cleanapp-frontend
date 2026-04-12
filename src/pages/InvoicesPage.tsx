@@ -6,6 +6,7 @@ import { invoiceService } from "../services/invoiceService";
 import apiClient from "../services/apiClient";
 import type { Invoice, InvoiceStatus, Customer } from "../types";
 import { jobService } from "../services/jobService";
+import RichTextEditor from "../components/RichTextEditor";
 import styles from "./InvoicesPage.module.css";
 
 const PAGE_LIMIT = 20;
@@ -1030,11 +1031,10 @@ function InvoiceFormSection({
           {/* Notes */}
           <div className={styles.formGroup}>
             <label className={styles.label}>{l.notes}</label>
-            <textarea
-              className={styles.textarea}
-              rows={3}
+            <RichTextEditor
               value={form.notes}
-              onChange={(e) => set("notes", e.target.value)}
+              onChange={(html) => set("notes", html)}
+              placeholder={l.notes}
             />
           </div>
 
