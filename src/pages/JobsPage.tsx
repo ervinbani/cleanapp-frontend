@@ -212,6 +212,29 @@ const jmT = {
     update: "Update",
     required: "Customer and Scheduled Start are required.",
     loadingOpts: "Loading options…",
+    tabOnce: "One-time",
+    tabRecurring: "Recurring",
+    frequency: "Frequency",
+    freq_daily: "Every day",
+    freq_weekly: "Weekly",
+    freq_biweekly: "Every 2 weeks",
+    freq_monthly: "Monthly",
+    dayOfWeek: "Day of week",
+    dayOfMonth: "Day of month",
+    startDate: "Start date *",
+    endDate: "End date (optional)",
+    startTime: "Start time (UTC) *",
+    saveRecurring: "Create Rule",
+    requiredRecurring: "Customer, start date and start time are required.",
+    recurringSuccess: (n: number) =>
+      `Rule created. ${n} job${n !== 1 ? "s" : ""} generated.`,
+    isRecurringLabel: "Recurring job",
+    validity: "Validity",
+    dailySchedule: "Daily schedule",
+    monthlySchedule: "Monthly schedule (optional)",
+    everyDay: "everyday",
+    everyMonth: "every month",
+    months: ["january","february","march","april","may","june","july","august","september","october","november","december"],
   },
   es: {
     addTitle: "Agregar Trabajo",
@@ -250,6 +273,29 @@ const jmT = {
     update: "Actualizar",
     required: "El cliente y la fecha de inicio son obligatorios.",
     loadingOpts: "Cargando opciones…",
+    tabOnce: "Único",
+    tabRecurring: "Recurrente",
+    frequency: "Frecuencia",
+    freq_daily: "Todos los días",
+    freq_weekly: "Semanal",
+    freq_biweekly: "Cada 2 semanas",
+    freq_monthly: "Mensual",
+    dayOfWeek: "Día de la semana",
+    dayOfMonth: "Día del mes",
+    startDate: "Fecha de inicio *",
+    endDate: "Fecha de fin (opcional)",
+    startTime: "Hora de inicio (UTC) *",
+    saveRecurring: "Crear Regla",
+    requiredRecurring: "Cliente, fecha de inicio y hora son obligatorios.",
+    recurringSuccess: (n: number) =>
+      `Regla creada. ${n} trabajo${n !== 1 ? "s" : ""} generado${n !== 1 ? "s" : ""}.`,
+    isRecurringLabel: "Trabajo recurrente",
+    validity: "Validez",
+    dailySchedule: "Horario diario",
+    monthlySchedule: "Horario mensual (opcional)",
+    everyDay: "todos los días",
+    everyMonth: "todos los meses",
+    months: ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"],
   },
 };
 
@@ -291,6 +337,18 @@ function JobModal({ job, lang, onClose, onSaved }: JobModalProps) {
   const [users, setUsers] = useState<DropdownUser[]>([]);
   const [loadingOptions, setLoadingOptions] = useState(true);
   const [checklistTab, setChecklistTab] = useState<"en" | "es">("en");
+  const [isRecurring, setIsRecurring] = useState(false);
+  const [rDaysOfWeek, setRDaysOfWeek] = useState<number[]>([0,1,2,3,4,5,6]);
+  const [rMonthsOfYear, setRMonthsOfYear] = useState<number[]>([1,2,3,4,5,6,7,8,9,10,11,12]);
+  const [rStartDate, setRStartDate] = useState("");
+  const [rEndDate, setREndDate] = useState("");
+  const [rStartTime, setRStartTime] = useState("08:00");
+  // Mon=1..Sun=0, displayed Mon→Sun then "everyday"
+  const WEEKDAYS = lang === "es"
+    ? ["lunes","martes","miércoles","jueves","viernes","sábado","domingo"]
+    : ["monday","tuesday","wednesday","thursday","friday","saturday","sunday"];
+  // Sun=0 but display order: Mon(1),Tue(2),...Sat(6),Sun(0)
+  const WEEKDAY_ORDER = [1,2,3,4,5,6,0];
 
   useEffect(() => {
     Promise.all([
@@ -386,47 +444,80 @@ function JobModal({ job, lang, onClose, onSaved }: JobModalProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.customerId || !form.scheduledStart) {
-      setError(l.required);
-      return;
+    if (!form.customerId) { setError(l.required); return; }
+    if (isRecurring && !isEdit && (!rStartDate || !rStartTime)) {
+      setError(l.requiredRecurring); return;
+    }
+    if (!isRecurring && (isEdit || !isEdit) && !form.scheduledStart) {
+      setError(l.required); return;
     }
     setSaving(true);
     setError("");
     try {
-      const payload = {
-        customerId: form.customerId,
-        serviceId: form.serviceId || undefined,
-        title: form.title.trim() || undefined,
-        scheduledStart: new Date(form.scheduledStart).toISOString(),
-        scheduledEnd: form.scheduledEnd
-          ? new Date(form.scheduledEnd).toISOString()
-          : undefined,
-        status: form.status,
-        price: form.price !== "" ? Number(form.price) : undefined,
-        priceUnit: form.priceUnit || undefined,
-        timeDuration:
-          form.timeDuration !== "" ? Number(form.timeDuration) : undefined,
-        assignedUsers: form.assignedUsers,
-        notesInternal: form.notesInternal.trim() || undefined,
-        notesCustomer: form.notesCustomer.trim() || undefined,
-        propertyAddress: {
-          street: form.street.trim() || undefined,
-          city: form.city.trim() || undefined,
-          state: form.state.trim() || undefined,
-          zipCode: form.zipCode.trim() || undefined,
-          country: form.country.trim() || undefined,
-        },
-        checklist: form.checklist
-          .filter((item) => item.labelEn.trim() || item.labelEs.trim())
-          .map((item) => ({
-            label: { en: item.labelEn.trim(), es: item.labelEs.trim() },
-            completed: false,
-          })),
-      };
-      if (isEdit) {
-        await jobService.update(job!._id, payload);
+      if (isRecurring && !isEdit) {
+        // Derive frequency from day selection
+        const allDays = rDaysOfWeek.length === 7;
+        const freq = allDays ? "daily" : "weekly";
+        const payload = {
+          customerId: form.customerId,
+          serviceId: form.serviceId || undefined,
+          frequency: freq,
+          daysOfWeek: rDaysOfWeek,
+          monthsOfYear: rMonthsOfYear.length > 0 ? rMonthsOfYear : undefined,
+          startDate: rStartDate,
+          endDate: rEndDate || undefined,
+          startTime: rStartTime,
+          timeDuration: form.timeDuration !== "" ? Number(form.timeDuration) : undefined,
+          title: form.title.trim() || undefined,
+          price: form.price !== "" ? Number(form.price) : undefined,
+          priceUnit: form.priceUnit,
+          assignedUsers: form.assignedUsers,
+          propertyAddress: {
+            street: form.street.trim() || undefined,
+            city: form.city.trim() || undefined,
+            state: form.state.trim() || undefined,
+            zipCode: form.zipCode.trim() || undefined,
+            country: form.country.trim() || undefined,
+          },
+        };
+        const result = await recurringService.create(payload);
+        alert(l.recurringSuccess(result.jobsGenerated));
       } else {
-        await jobService.create(payload);
+        const payload = {
+          customerId: form.customerId,
+          serviceId: form.serviceId || undefined,
+          title: form.title.trim() || undefined,
+          scheduledStart: new Date(form.scheduledStart).toISOString(),
+          scheduledEnd: form.scheduledEnd
+            ? new Date(form.scheduledEnd).toISOString()
+            : undefined,
+          status: form.status,
+          price: form.price !== "" ? Number(form.price) : undefined,
+          priceUnit: form.priceUnit || undefined,
+          timeDuration:
+            form.timeDuration !== "" ? Number(form.timeDuration) : undefined,
+          assignedUsers: form.assignedUsers,
+          notesInternal: form.notesInternal.trim() || undefined,
+          notesCustomer: form.notesCustomer.trim() || undefined,
+          propertyAddress: {
+            street: form.street.trim() || undefined,
+            city: form.city.trim() || undefined,
+            state: form.state.trim() || undefined,
+            zipCode: form.zipCode.trim() || undefined,
+            country: form.country.trim() || undefined,
+          },
+          checklist: form.checklist
+            .filter((item) => item.labelEn.trim() || item.labelEs.trim())
+            .map((item) => ({
+              label: { en: item.labelEn.trim(), es: item.labelEs.trim() },
+              completed: false,
+            })),
+        };
+        if (isEdit) {
+          await jobService.update(job!._id, payload);
+        } else {
+          await jobService.create(payload);
+        }
       }
       onSaved();
     } catch (err: unknown) {
@@ -519,55 +610,158 @@ function JobModal({ job, lang, onClose, onSaved }: JobModalProps) {
               />
             </div>
 
-            {/* Scheduled Start + End */}
-            <div className={styles.formRow}>
-              <div className={styles.formGroup}>
-                <label className={styles.label}>{l.scheduledStart}</label>
+            {/* Recurring checkbox (create only) */}
+            {!isEdit && (
+              <label className={styles.recurringToggle}>
                 <input
-                  className={styles.input}
-                  type="datetime-local"
-                  value={form.scheduledStart}
-                  onChange={(e) => handleStartChange(e.target.value)}
-                  required
+                  type="checkbox"
+                  checked={isRecurring}
+                  onChange={(e) => setIsRecurring(e.target.checked)}
                 />
+                🔄 {l.isRecurringLabel}
+              </label>
+            )}
+
+            {/* ── One-time: datetime pickers ── */}
+            {(!isRecurring || isEdit) && (
+              <div className={styles.formRow}>
+                <div className={styles.formGroup}>
+                  <label className={styles.label}>{l.scheduledStart}</label>
+                  <input
+                    className={styles.input}
+                    type="datetime-local"
+                    value={form.scheduledStart}
+                    onChange={(e) => handleStartChange(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className={styles.formGroup}>
+                  <label className={styles.label}>
+                    {l.scheduledEnd}
+                    {form.scheduledEnd &&
+                      calcEnd(form.scheduledStart, form.timeDuration, form.priceUnit) === form.scheduledEnd && (
+                        <span className={styles.autoCalcBadge}>auto</span>
+                      )}
+                  </label>
+                  <input
+                    className={styles.input}
+                    type="datetime-local"
+                    value={form.scheduledEnd}
+                    onChange={(e) => set("scheduledEnd", e.target.value)}
+                  />
+                </div>
               </div>
-              <div className={styles.formGroup}>
-                <label className={styles.label}>
-                  {l.scheduledEnd}
-                  {form.scheduledEnd &&
-                    calcEnd(
-                      form.scheduledStart,
-                      form.timeDuration,
-                      form.priceUnit,
-                    ) === form.scheduledEnd && (
-                      <span className={styles.autoCalcBadge}>auto</span>
-                    )}
-                </label>
-                <input
-                  className={styles.input}
-                  type="datetime-local"
-                  value={form.scheduledEnd}
-                  onChange={(e) => set("scheduledEnd", e.target.value)}
-                />
-              </div>
-            </div>
+            )}
+
+            {/* ── Recurring: validity + schedule ── */}
+            {isRecurring && !isEdit && (
+              <>
+                {/* Validity */}
+                <p className={styles.sectionDivider}>{l.validity}</p>
+                <div className={styles.formRow}>
+                  <div className={styles.formGroup}>
+                    <label className={styles.label}>{l.startDate}</label>
+                    <input type="date" className={styles.input} value={rStartDate}
+                      onChange={(e) => setRStartDate(e.target.value)} required />
+                  </div>
+                  <div className={styles.formGroup}>
+                    <label className={styles.label}>{l.endDate}</label>
+                    <input type="date" className={styles.input} value={rEndDate}
+                      onChange={(e) => setREndDate(e.target.value)} />
+                  </div>
+                </div>
+                <div className={styles.formRow}>
+                  <div className={styles.formGroup}>
+                    <label className={styles.label}>{l.startTime}</label>
+                    <input type="time" className={styles.input} value={rStartTime}
+                      onChange={(e) => setRStartTime(e.target.value)} required />
+                  </div>
+                </div>
+
+                {/* Daily schedule */}
+                <p className={styles.sectionDivider}>{l.dailySchedule}</p>
+                <div className={styles.dayGrid}>
+                  {WEEKDAY_ORDER.map((dayIdx, pos) => (
+                    <label key={dayIdx} className={styles.dayChip}>
+                      <input
+                        type="checkbox"
+                        checked={rDaysOfWeek.includes(dayIdx)}
+                        onChange={() =>
+                          setRDaysOfWeek((prev) =>
+                            prev.includes(dayIdx)
+                              ? prev.filter((x) => x !== dayIdx)
+                              : [...prev, dayIdx].sort()
+                          )
+                        }
+                      />
+                      {WEEKDAYS[pos]}
+                    </label>
+                  ))}
+                  <label className={`${styles.dayChip} ${styles.isEveryday}`}>
+                    <input
+                      type="checkbox"
+                      checked={rDaysOfWeek.length === 7}
+                      onChange={() =>
+                        setRDaysOfWeek(rDaysOfWeek.length === 7 ? [1] : [0,1,2,3,4,5,6])
+                      }
+                    />
+                    {l.everyDay}
+                  </label>
+                </div>
+
+                {/* Monthly schedule */}
+                <p className={styles.sectionDivider}>{l.monthlySchedule}</p>
+                <div className={styles.dayGrid}>
+                  {l.months.map((mName, i) => (
+                    <label key={i} className={styles.dayChip}>
+                      <input
+                        type="checkbox"
+                        checked={rMonthsOfYear.includes(i + 1)}
+                        onChange={() =>
+                          setRMonthsOfYear((prev) =>
+                            prev.includes(i + 1)
+                              ? prev.filter((x) => x !== i + 1)
+                              : [...prev, i + 1].sort()
+                          )
+                        }
+                      />
+                      {mName}
+                    </label>
+                  ))}
+                  <label className={`${styles.dayChip} ${styles.isEveryday}`}>
+                    <input
+                      type="checkbox"
+                      checked={rMonthsOfYear.length === 12}
+                      onChange={() =>
+                        setRMonthsOfYear(
+                          rMonthsOfYear.length === 12 ? [] : [1,2,3,4,5,6,7,8,9,10,11,12]
+                        )
+                      }
+                    />
+                    {l.everyMonth}
+                  </label>
+                </div>
+              </>
+            )}
 
             {/* Status + Price + Duration */}
             <div className={styles.formRow3}>
-              <div className={styles.formGroup}>
-                <label className={styles.label}>{l.status}</label>
-                <select
-                  className={styles.input}
-                  value={form.status}
-                  onChange={(e) => set("status", e.target.value as JobStatus)}
-                >
-                  {JOB_STATUSES.map((s) => (
-                    <option key={s} value={s}>
-                      {STATUS_LABELS[s][lang]}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              {(!isRecurring || isEdit) && (
+                <div className={styles.formGroup}>
+                  <label className={styles.label}>{l.status}</label>
+                  <select
+                    className={styles.input}
+                    value={form.status}
+                    onChange={(e) => set("status", e.target.value as JobStatus)}
+                  >
+                    {JOB_STATUSES.map((s) => (
+                      <option key={s} value={s}>
+                        {STATUS_LABELS[s][lang]}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
               <div className={styles.formGroup}>
                 <label className={styles.label}>{l.price}</label>
                 <div className={styles.priceRow}>
@@ -624,27 +818,29 @@ function JobModal({ job, lang, onClose, onSaved }: JobModalProps) {
               </div>
             </div>
 
-            {/* Notes */}
-            <div className={styles.formRow}>
-              <div className={styles.formGroup}>
-                <label className={styles.label}>{l.notesInternal}</label>
-                <textarea
-                  className={styles.textarea}
-                  rows={3}
-                  value={form.notesInternal}
-                  onChange={(e) => set("notesInternal", e.target.value)}
-                />
+            {/* Notes (one-time / edit only) */}
+            {(!isRecurring || isEdit) && (
+              <div className={styles.formRow}>
+                <div className={styles.formGroup}>
+                  <label className={styles.label}>{l.notesInternal}</label>
+                  <textarea
+                    className={styles.textarea}
+                    rows={3}
+                    value={form.notesInternal}
+                    onChange={(e) => set("notesInternal", e.target.value)}
+                  />
+                </div>
+                <div className={styles.formGroup}>
+                  <label className={styles.label}>{l.notesCustomer}</label>
+                  <textarea
+                    className={styles.textarea}
+                    rows={3}
+                    value={form.notesCustomer}
+                    onChange={(e) => set("notesCustomer", e.target.value)}
+                  />
+                </div>
               </div>
-              <div className={styles.formGroup}>
-                <label className={styles.label}>{l.notesCustomer}</label>
-                <textarea
-                  className={styles.textarea}
-                  rows={3}
-                  value={form.notesCustomer}
-                  onChange={(e) => set("notesCustomer", e.target.value)}
-                />
-              </div>
-            </div>
+            )}
 
             {/* Property Address */}
             <p className={styles.sectionDivider}>{l.addressSection}</p>
@@ -693,56 +889,60 @@ function JobModal({ job, lang, onClose, onSaved }: JobModalProps) {
               />
             </div>
 
-            {/* Checklist */}
-            <p className={styles.sectionDivider}>{l.checklistSection}</p>
-            <div className={styles.langTabs}>
-              <button
-                type="button"
-                className={`${styles.langTab} ${checklistTab === "en" ? styles.langTabActive : ""}`}
-                onClick={() => setChecklistTab("en")}
-              >
-                EN
-              </button>
-              <button
-                type="button"
-                className={`${styles.langTab} ${checklistTab === "es" ? styles.langTabActive : ""}`}
-                onClick={() => setChecklistTab("es")}
-              >
-                ES
-              </button>
-            </div>
-            {form.checklist.map((item, idx) => (
-              <div key={idx} className={styles.checklistRow}>
-                <input
-                  className={styles.input}
-                  placeholder={
-                    checklistTab === "en" ? l.checkItemEn : l.checkItemEs
-                  }
-                  value={checklistTab === "en" ? item.labelEn : item.labelEs}
-                  onChange={(e) =>
-                    updateChecklistItem(
-                      idx,
-                      checklistTab === "en" ? "labelEn" : "labelEs",
-                      e.target.value,
-                    )
-                  }
-                />
+            {/* Checklist (one-time / edit only) */}
+            {(!isRecurring || isEdit) && (
+              <>
+                <p className={styles.sectionDivider}>{l.checklistSection}</p>
+                <div className={styles.langTabs}>
+                  <button
+                    type="button"
+                    className={`${styles.langTab} ${checklistTab === "en" ? styles.langTabActive : ""}`}
+                    onClick={() => setChecklistTab("en")}
+                  >
+                    EN
+                  </button>
+                  <button
+                    type="button"
+                    className={`${styles.langTab} ${checklistTab === "es" ? styles.langTabActive : ""}`}
+                    onClick={() => setChecklistTab("es")}
+                  >
+                    ES
+                  </button>
+                </div>
+                {form.checklist.map((item, idx) => (
+                  <div key={idx} className={styles.checklistRow}>
+                    <input
+                      className={styles.input}
+                      placeholder={
+                        checklistTab === "en" ? l.checkItemEn : l.checkItemEs
+                      }
+                      value={checklistTab === "en" ? item.labelEn : item.labelEs}
+                      onChange={(e) =>
+                        updateChecklistItem(
+                          idx,
+                          checklistTab === "en" ? "labelEn" : "labelEs",
+                          e.target.value,
+                        )
+                      }
+                    />
+                    <button
+                      type="button"
+                      className={styles.btnRemoveItem}
+                      onClick={() => removeChecklistItem(idx)}
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
                 <button
                   type="button"
-                  className={styles.btnRemoveItem}
-                  onClick={() => removeChecklistItem(idx)}
+                  className={styles.btnAddItem}
+                  onClick={addChecklistItem}
                 >
-                  ✕
+                  {l.addItem}
                 </button>
-              </div>
-            ))}
-            <button
-              type="button"
-              className={styles.btnAddItem}
-              onClick={addChecklistItem}
-            >
-              {l.addItem}
-            </button>
+              </>
+            )}
 
             {error && <p className={styles.formError}>{error}</p>}
 
@@ -760,7 +960,7 @@ function JobModal({ job, lang, onClose, onSaved }: JobModalProps) {
                 className={styles.btnSave}
                 disabled={saving}
               >
-                {isEdit ? l.update : l.save}
+                {isEdit ? l.update : isRecurring ? l.saveRecurring : l.save}
               </button>
             </div>
           </form>
@@ -769,365 +969,6 @@ function JobModal({ job, lang, onClose, onSaved }: JobModalProps) {
     </div>
   );
 }
-// ─────────────────────────────────────────────────────────────────────────────
-
-// ── Recurring Rule Modal ──────────────────────────────────────────────────────
-const FREQUENCIES = ["daily", "weekly", "biweekly", "monthly"] as const;
-const WEEKDAYS_EN = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-const WEEKDAYS_ES = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
-
-interface RecurringForm {
-  customerId: string;
-  serviceId: string;
-  frequency: "daily" | "weekly" | "biweekly" | "monthly";
-  dayOfWeek: string;
-  dayOfMonth: string;
-  startDate: string;
-  endDate: string;
-  startTime: string;
-  timeDuration: string;
-  title: string;
-  price: string;
-  priceUnit: "per_hour" | "per_job" | "per_day";
-  assignedUsers: string[];
-  street: string;
-  city: string;
-  state: string;
-  zipCode: string;
-  country: string;
-}
-
-const EMPTY_RECURRING: RecurringForm = {
-  customerId: "",
-  serviceId: "",
-  frequency: "weekly",
-  dayOfWeek: "1",
-  dayOfMonth: "1",
-  startDate: "",
-  endDate: "",
-  startTime: "08:00",
-  timeDuration: "8",
-  title: "",
-  price: "",
-  priceUnit: "per_job",
-  assignedUsers: [],
-  street: "",
-  city: "",
-  state: "",
-  zipCode: "",
-  country: "",
-};
-
-const rmT = {
-  en: {
-    title: "New Recurring Job",
-    subtitle: "Creates a master rule and generates jobs automatically.",
-    customer: "Customer *",
-    service: "Service",
-    selectCustomer: "— Select customer —",
-    selectService: "— None —",
-    jobTitle: "Job Title",
-    frequency: "Frequency",
-    freq_daily: "Every day",
-    freq_weekly: "Weekly",
-    freq_biweekly: "Every 2 weeks",
-    freq_monthly: "Monthly",
-    dayOfWeek: "Day of week",
-    dayOfMonth: "Day of month",
-    startDate: "Start date *",
-    endDate: "End date (optional)",
-    startTime: "Start time (UTC) *",
-    timeDuration: "Duration (hours)",
-    price: "Price ($)",
-    priceUnit: "Unit",
-    assignedUsers: "Assigned To",
-    addressSection: "Property Address",
-    street: "Street",
-    city: "City",
-    stateLabel: "State",
-    zipCode: "Zip Code",
-    country: "Country",
-    cancel: "Cancel",
-    save: "Create Rule",
-    saving: "Creating…",
-    required: "Customer, frequency, start date and start time are required.",
-    success: (n: number) => `Rule created. ${n} job${n !== 1 ? "s" : ""} generated.`,
-    priceUnitLabels: { per_hour: "/ hr", per_job: "/ job", per_day: "/ day" } as Record<string, string>,
-  },
-  es: {
-    title: "Nuevo Trabajo Recurrente",
-    subtitle: "Crea una regla y genera los trabajos automáticamente.",
-    customer: "Cliente *",
-    service: "Servicio",
-    selectCustomer: "— Seleccionar cliente —",
-    selectService: "— Ninguno —",
-    jobTitle: "Título del Trabajo",
-    frequency: "Frecuencia",
-    freq_daily: "Todos los días",
-    freq_weekly: "Semanal",
-    freq_biweekly: "Cada 2 semanas",
-    freq_monthly: "Mensual",
-    dayOfWeek: "Día de la semana",
-    dayOfMonth: "Día del mes",
-    startDate: "Fecha de inicio *",
-    endDate: "Fecha de fin (opcional)",
-    startTime: "Hora de inicio (UTC) *",
-    timeDuration: "Duración (horas)",
-    price: "Precio ($)",
-    priceUnit: "Unidad",
-    assignedUsers: "Asignado a",
-    addressSection: "Dirección de la Propiedad",
-    street: "Calle",
-    city: "Ciudad",
-    stateLabel: "Estado/Provincia",
-    zipCode: "Código Postal",
-    country: "País",
-    cancel: "Cancelar",
-    save: "Crear Regla",
-    saving: "Creando…",
-    required: "Cliente, frecuencia, fecha de inicio y hora son obligatorios.",
-    success: (n: number) => `Regla creada. ${n} trabajo${n !== 1 ? "s" : ""} generado${n !== 1 ? "s" : ""}.`,
-    priceUnitLabels: { per_hour: "/ hr", per_job: "/ trabajo", per_day: "/ día" } as Record<string, string>,
-  },
-};
-
-interface RecurringModalProps {
-  lang: "en" | "es";
-  onClose: () => void;
-  onSaved: () => void;
-}
-
-function RecurringModal({ lang, onClose, onSaved }: RecurringModalProps) {
-  const l = rmT[lang];
-  const weekdays = lang === "es" ? WEEKDAYS_ES : WEEKDAYS_EN;
-  const [form, setForm] = useState<RecurringForm>(EMPTY_RECURRING);
-  const [error, setError] = useState("");
-  const [saving, setSaving] = useState(false);
-  const [customers, setCustomers] = useState<DropdownCustomer[]>([]);
-  const [services, setServices] = useState<DropdownService[]>([]);
-  const [users, setUsers] = useState<DropdownUser[]>([]);
-  const [loadingOptions, setLoadingOptions] = useState(true);
-
-  useEffect(() => {
-    Promise.all([
-      apiClient.get("/customers", { params: { limit: 200 } }),
-      apiClient.get("/services", { params: { limit: 200 } }),
-      apiClient.get("/users", { params: { limit: 200 } }),
-    ])
-      .then(([c, s, u]) => {
-        setCustomers((c.data as { data: DropdownCustomer[] }).data ?? []);
-        setServices((s.data as { data: DropdownService[] }).data ?? []);
-        setUsers(((u.data as { data: DropdownUser[] }).data ?? []).filter((usr) => usr.isActive));
-      })
-      .catch(() => {})
-      .finally(() => setLoadingOptions(false));
-  }, []);
-
-  const set = <K extends keyof RecurringForm>(field: K, value: RecurringForm[K]) =>
-    setForm((prev) => ({ ...prev, [field]: value }));
-
-  const toggleUser = (id: string) =>
-    setForm((prev) => ({
-      ...prev,
-      assignedUsers: prev.assignedUsers.includes(id)
-        ? prev.assignedUsers.filter((u) => u !== id)
-        : [...prev.assignedUsers, id],
-    }));
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!form.customerId || !form.startDate || !form.startTime) {
-      setError(l.required);
-      return;
-    }
-    setSaving(true);
-    setError("");
-    try {
-      const payload = {
-        customerId: form.customerId,
-        serviceId: form.serviceId || undefined,
-        frequency: form.frequency,
-        dayOfWeek: ["weekly", "biweekly"].includes(form.frequency) ? Number(form.dayOfWeek) : undefined,
-        dayOfMonth: form.frequency === "monthly" ? Number(form.dayOfMonth) : undefined,
-        startDate: form.startDate,
-        endDate: form.endDate || undefined,
-        startTime: form.startTime,
-        timeDuration: form.timeDuration ? Number(form.timeDuration) : undefined,
-        title: form.title.trim() || undefined,
-        price: form.price ? Number(form.price) : undefined,
-        priceUnit: form.priceUnit,
-        assignedUsers: form.assignedUsers,
-        propertyAddress: {
-          street: form.street || undefined,
-          city: form.city || undefined,
-          state: form.state || undefined,
-          zipCode: form.zipCode || undefined,
-          country: form.country || undefined,
-        },
-      };
-      const result = await recurringService.create(payload);
-      alert(l.success(result.jobsGenerated));
-      onSaved();
-    } catch (err: unknown) {
-      const msg = (err as { response?: { data?: { error?: string; message?: string } } })
-        ?.response?.data?.error ??
-        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ??
-        "Error creating recurring rule.";
-      setError(msg);
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  return (
-    <div className={styles.modalOverlay} onClick={onClose}>
-      <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-        <div className={styles.modalHeader}>
-          <h3 className={styles.modalTitle}>{l.title}</h3>
-          <p style={{ fontSize: "0.8rem", color: "#6b7280", marginTop: 2 }}>{l.subtitle}</p>
-        </div>
-        {loadingOptions ? (
-          <p style={{ padding: "2rem", textAlign: "center", color: "#6b7280" }}>Loading…</p>
-        ) : (
-          <form onSubmit={handleSubmit} className={styles.modalForm}>
-            {/* Customer + Service */}
-            <div className={styles.formRow}>
-              <label className={styles.formLabel}>{l.customer}</label>
-              <select className={styles.formInput} value={form.customerId} onChange={(e) => set("customerId", e.target.value)} required>
-                <option value="">{l.selectCustomer}</option>
-                {customers.map((c) => (
-                  <option key={c._id} value={c._id}>{c.firstName} {c.lastName}</option>
-                ))}
-              </select>
-            </div>
-            <div className={styles.formRow}>
-              <label className={styles.formLabel}>{l.service}</label>
-              <select className={styles.formInput} value={form.serviceId} onChange={(e) => set("serviceId", e.target.value)}>
-                <option value="">{l.selectService}</option>
-                {services.map((s) => (
-                  <option key={s._id} value={s._id}>{s.name?.[lang] ?? s.name?.en}</option>
-                ))}
-              </select>
-            </div>
-            <div className={styles.formRow}>
-              <label className={styles.formLabel}>{l.jobTitle}</label>
-              <input className={styles.formInput} value={form.title} onChange={(e) => set("title", e.target.value)} />
-            </div>
-
-            {/* Frequency */}
-            <div className={styles.formRow}>
-              <label className={styles.formLabel}>{l.frequency}</label>
-              <select className={styles.formInput} value={form.frequency} onChange={(e) => set("frequency", e.target.value as RecurringForm["frequency"])}>
-                {FREQUENCIES.map((f) => (
-                  <option key={f} value={f}>{l[`freq_${f}` as keyof typeof l] as string}</option>
-                ))}
-              </select>
-            </div>
-            {(form.frequency === "weekly" || form.frequency === "biweekly") && (
-              <div className={styles.formRow}>
-                <label className={styles.formLabel}>{l.dayOfWeek}</label>
-                <select className={styles.formInput} value={form.dayOfWeek} onChange={(e) => set("dayOfWeek", e.target.value)}>
-                  {weekdays.map((d, i) => <option key={i} value={i}>{d}</option>)}
-                </select>
-              </div>
-            )}
-            {form.frequency === "monthly" && (
-              <div className={styles.formRow}>
-                <label className={styles.formLabel}>{l.dayOfMonth}</label>
-                <select className={styles.formInput} value={form.dayOfMonth} onChange={(e) => set("dayOfMonth", e.target.value)}>
-                  {Array.from({ length: 28 }, (_, i) => i + 1).map((d) => (
-                    <option key={d} value={d}>{d}</option>
-                  ))}
-                </select>
-              </div>
-            )}
-
-            {/* Dates */}
-            <div className={styles.formRow}>
-              <label className={styles.formLabel}>{l.startDate}</label>
-              <input type="date" className={styles.formInput} value={form.startDate} onChange={(e) => set("startDate", e.target.value)} required />
-            </div>
-            <div className={styles.formRow}>
-              <label className={styles.formLabel}>{l.endDate}</label>
-              <input type="date" className={styles.formInput} value={form.endDate} onChange={(e) => set("endDate", e.target.value)} />
-            </div>
-
-            {/* Time + Duration */}
-            <div className={styles.formRow}>
-              <label className={styles.formLabel}>{l.startTime}</label>
-              <input type="time" className={styles.formInput} value={form.startTime} onChange={(e) => set("startTime", e.target.value)} required />
-            </div>
-            <div className={styles.formRow}>
-              <label className={styles.formLabel}>{l.timeDuration}</label>
-              <input type="number" min="0" step="0.5" className={styles.formInput} value={form.timeDuration} onChange={(e) => set("timeDuration", e.target.value)} />
-            </div>
-
-            {/* Price */}
-            <div className={styles.formRow}>
-              <label className={styles.formLabel}>{l.price}</label>
-              <div style={{ display: "flex", gap: 8 }}>
-                <input type="number" min="0" step="0.01" className={styles.formInput} value={form.price} onChange={(e) => set("price", e.target.value)} style={{ flex: 1 }} />
-                <select className={styles.formInput} value={form.priceUnit} onChange={(e) => set("priceUnit", e.target.value as RecurringForm["priceUnit"])} style={{ width: 100 }}>
-                  {(["per_hour", "per_job", "per_day"] as const).map((u) => (
-                    <option key={u} value={u}>{l.priceUnitLabels[u]}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            {/* Assigned Users */}
-            <div className={styles.formRow}>
-              <label className={styles.formLabel}>{l.assignedUsers}</label>
-              <div className={styles.userCheckList}>
-                {users.map((u) => (
-                  <label key={u._id} className={styles.userCheck}>
-                    <input type="checkbox" checked={form.assignedUsers.includes(u._id)} onChange={() => toggleUser(u._id)} />
-                    {u.firstName} {u.lastName}
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            {/* Address */}
-            <div className={styles.sectionLabel}>{jmT[lang].addressSection}</div>
-            <div className={styles.formRow}>
-              <label className={styles.formLabel}>{l.street}</label>
-              <input className={styles.formInput} value={form.street} onChange={(e) => set("street", e.target.value)} />
-            </div>
-            <div className={styles.formGrid2}>
-              <div className={styles.formRow}>
-                <label className={styles.formLabel}>{l.city}</label>
-                <input className={styles.formInput} value={form.city} onChange={(e) => set("city", e.target.value)} />
-              </div>
-              <div className={styles.formRow}>
-                <label className={styles.formLabel}>{l.stateLabel}</label>
-                <input className={styles.formInput} value={form.state} onChange={(e) => set("state", e.target.value)} />
-              </div>
-              <div className={styles.formRow}>
-                <label className={styles.formLabel}>{l.zipCode}</label>
-                <input className={styles.formInput} value={form.zipCode} onChange={(e) => set("zipCode", e.target.value)} />
-              </div>
-              <div className={styles.formRow}>
-                <label className={styles.formLabel}>{l.country}</label>
-                <input className={styles.formInput} value={form.country} onChange={(e) => set("country", e.target.value)} />
-              </div>
-            </div>
-
-            {error && <p className={styles.formError}>{error}</p>}
-
-            <div className={styles.modalFooter}>
-              <button type="button" className={styles.btnCancel} onClick={onClose}>{l.cancel}</button>
-              <button type="submit" className={styles.btnSave} disabled={saving}>
-                {saving ? l.saving : l.save}
-              </button>
-            </div>
-          </form>
-        )}
-      </div>
-    </div>
-  );
-}
-
 // ─────────────────────────────────────────────────────────────────────────────
 export default function JobsPage() {
   const { lang } = useLang();
@@ -1156,7 +997,6 @@ export default function JobsPage() {
   const canDelete = hasPermission("jobs", "delete");
 
   const [showAddModal, setShowAddModal] = useState(false);
-  const [showRecurringModal, setShowRecurringModal] = useState(false);
   const [editingJob, setEditingJob] = useState<Job | null>(null);
 
   const [searchParams, setSearchParams] = useSearchParams();
@@ -1316,22 +1156,12 @@ export default function JobsPage() {
       <div className={styles.header}>
         <h2 className={styles.title}>{l.title}</h2>
         {canCreate && (
-          <div style={{ display: "flex", gap: 8 }}>
-            <button
-              className={styles.addBtn}
-              onClick={() => setShowAddModal(true)}
-            >
-              {l.addJob}
-            </button>
-            <button
-              className={styles.addBtn}
-              style={{ background: "#7c3aed" }}
-              onClick={() => setShowRecurringModal(true)}
-              title="Create Recurring Job Rule"
-            >
-              🔄 {lang === "es" ? "Recurrente" : "Recurring"}
-            </button>
-          </div>
+          <button
+            className={styles.addBtn}
+            onClick={() => setShowAddModal(true)}
+          >
+            {l.addJob}
+          </button>
         )}
       </div>
 
@@ -1578,16 +1408,6 @@ export default function JobsPage() {
           onClose={() => setShowAddModal(false)}
           onSaved={() => {
             setShowAddModal(false);
-            fetchJobs();
-          }}
-        />
-      )}
-      {showRecurringModal && canCreate && (
-        <RecurringModal
-          lang={lang}
-          onClose={() => setShowRecurringModal(false)}
-          onSaved={() => {
-            setShowRecurringModal(false);
             fetchJobs();
           }}
         />

@@ -699,6 +699,65 @@
   padding: 0.5rem 0;
 }
 
+.dayGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+  padding: 0.5rem 0 0.25rem;
+}
+
+.dayChip {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.875rem;
+  color: #374151;
+  cursor: pointer;
+  user-select: none;
+}
+
+.dayChip input[type="checkbox"] {
+  width: 1rem;
+  height: 1rem;
+  accent-color: #4f6c8a;
+  cursor: pointer;
+}
+
+.dayChip.isEveryday {
+  font-weight: 600;
+  color: #4f6c8a;
+  margin-top: 0.25rem;
+}
+
+.recurringToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #374151;
+  cursor: pointer;
+  margin-bottom: 1rem;
+  padding: 0.4rem 0.75rem;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.recurringToggle:has(input:checked) {
+  background: #eef2ff;
+  border-color: #a5b4fc;
+  color: #4338ca;
+}
+
+.recurringToggle input[type="checkbox"] {
+  width: 1rem;
+  height: 1rem;
+  accent-color: #4338ca;
+  cursor: pointer;
+}
+
 .userCheckboxItem {
   display: flex;
   align-items: center;

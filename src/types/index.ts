@@ -199,7 +199,7 @@ export interface ApiResponse<T> {
   error?: string;
 }
 
-export type RecurringFrequency = "daily" | "weekly" | "biweekly" | "monthly";
+export type RecurringFrequency = "daily" | "weekly" | "monthly";
 
 export interface RecurringRule {
   _id: string;
@@ -207,7 +207,8 @@ export interface RecurringRule {
   customerId: string | Customer;
   serviceId?: string | Service;
   frequency: RecurringFrequency;
-  dayOfWeek?: number; // 0=Sun … 6=Sat (weekly/biweekly)
+  daysOfWeek: number[]; // 0=Sun … 6=Sat, at least one required for weekly
+  monthsOfYear?: number[]; // 1-12, empty/absent = every month
   dayOfMonth?: number; // 1-31 (monthly)
   startDate: string; // YYYY-MM-DD
   endDate?: string; // YYYY-MM-DD

@@ -4,9 +4,9 @@ import type { RecurringRule } from "../types";
 interface RecurringPayload {
   customerId: string;
   serviceId?: string;
-  frequency: "daily" | "weekly" | "biweekly" | "monthly";
-  dayOfWeek?: number;
-  dayOfMonth?: number;
+  frequency: "daily" | "weekly" | "monthly";
+  daysOfWeek?: number[];
+  monthsOfYear?: number[];
   startDate: string;
   endDate?: string;
   startTime: string;
@@ -49,9 +49,15 @@ export const recurringService = {
       .get<{ success: boolean; data: RecurringRule }>(`/recurring/${id}`)
       .then((r) => r.data.data),
 
-  update: (id: string, payload: Partial<RecurringPayload>): Promise<RecurringRule> =>
+  update: (
+    id: string,
+    payload: Partial<RecurringPayload>,
+  ): Promise<RecurringRule> =>
     apiClient
-      .put<{ success: boolean; data: RecurringRule }>(`/recurring/${id}`, payload)
+      .put<{
+        success: boolean;
+        data: RecurringRule;
+      }>(`/recurring/${id}`, payload)
       .then((r) => r.data.data),
 
   remove: (id: string): Promise<void> =>
@@ -59,10 +65,9 @@ export const recurringService = {
 
   generate: (id: string, from: string, to: string): Promise<GenerateResponse> =>
     apiClient
-      .post<{ success: boolean; data: GenerateResponse }>(
-        `/recurring/${id}/generate`,
-        {},
-        { params: { from, to } },
-      )
+      .post<{
+        success: boolean;
+        data: GenerateResponse;
+      }>(`/recurring/${id}/generate`, {}, { params: { from, to } })
       .then((r) => r.data.data),
 };
