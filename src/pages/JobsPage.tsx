@@ -234,7 +234,20 @@ const jmT = {
     monthlySchedule: "Monthly schedule (optional)",
     everyDay: "everyday",
     everyMonth: "every month",
-    months: ["january","february","march","april","may","june","july","august","september","october","november","december"],
+    months: [
+      "january",
+      "february",
+      "march",
+      "april",
+      "may",
+      "june",
+      "july",
+      "august",
+      "september",
+      "october",
+      "november",
+      "december",
+    ],
   },
   es: {
     addTitle: "Agregar Trabajo",
@@ -295,7 +308,20 @@ const jmT = {
     monthlySchedule: "Horario mensual (opcional)",
     everyDay: "todos los días",
     everyMonth: "todos los meses",
-    months: ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"],
+    months: [
+      "enero",
+      "febrero",
+      "marzo",
+      "abril",
+      "mayo",
+      "junio",
+      "julio",
+      "agosto",
+      "septiembre",
+      "octubre",
+      "noviembre",
+      "diciembre",
+    ],
   },
 };
 
@@ -338,17 +364,38 @@ function JobModal({ job, lang, onClose, onSaved }: JobModalProps) {
   const [loadingOptions, setLoadingOptions] = useState(true);
   const [checklistTab, setChecklistTab] = useState<"en" | "es">("en");
   const [isRecurring, setIsRecurring] = useState(false);
-  const [rDaysOfWeek, setRDaysOfWeek] = useState<number[]>([0,1,2,3,4,5,6]);
-  const [rMonthsOfYear, setRMonthsOfYear] = useState<number[]>([1,2,3,4,5,6,7,8,9,10,11,12]);
+  const [rDaysOfWeek, setRDaysOfWeek] = useState<number[]>([
+    0, 1, 2, 3, 4, 5, 6,
+  ]);
+  const [rMonthsOfYear, setRMonthsOfYear] = useState<number[]>([
+    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
+  ]);
   const [rStartDate, setRStartDate] = useState("");
   const [rEndDate, setREndDate] = useState("");
   const [rStartTime, setRStartTime] = useState("08:00");
   // Mon=1..Sun=0, displayed Mon→Sun then "everyday"
-  const WEEKDAYS = lang === "es"
-    ? ["lunes","martes","miércoles","jueves","viernes","sábado","domingo"]
-    : ["monday","tuesday","wednesday","thursday","friday","saturday","sunday"];
+  const WEEKDAYS =
+    lang === "es"
+      ? [
+          "lunes",
+          "martes",
+          "miércoles",
+          "jueves",
+          "viernes",
+          "sábado",
+          "domingo",
+        ]
+      : [
+          "monday",
+          "tuesday",
+          "wednesday",
+          "thursday",
+          "friday",
+          "saturday",
+          "sunday",
+        ];
   // Sun=0 but display order: Mon(1),Tue(2),...Sat(6),Sun(0)
-  const WEEKDAY_ORDER = [1,2,3,4,5,6,0];
+  const WEEKDAY_ORDER = [1, 2, 3, 4, 5, 6, 0];
 
   useEffect(() => {
     Promise.all([
@@ -444,12 +491,17 @@ function JobModal({ job, lang, onClose, onSaved }: JobModalProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.customerId) { setError(l.required); return; }
+    if (!form.customerId) {
+      setError(l.required);
+      return;
+    }
     if (isRecurring && !isEdit && (!rStartDate || !rStartTime)) {
-      setError(l.requiredRecurring); return;
+      setError(l.requiredRecurring);
+      return;
     }
     if (!isRecurring && (isEdit || !isEdit) && !form.scheduledStart) {
-      setError(l.required); return;
+      setError(l.required);
+      return;
     }
     setSaving(true);
     setError("");
@@ -467,7 +519,8 @@ function JobModal({ job, lang, onClose, onSaved }: JobModalProps) {
           startDate: rStartDate,
           endDate: rEndDate || undefined,
           startTime: rStartTime,
-          timeDuration: form.timeDuration !== "" ? Number(form.timeDuration) : undefined,
+          timeDuration:
+            form.timeDuration !== "" ? Number(form.timeDuration) : undefined,
           title: form.title.trim() || undefined,
           price: form.price !== "" ? Number(form.price) : undefined,
           priceUnit: form.priceUnit,
@@ -639,7 +692,11 @@ function JobModal({ job, lang, onClose, onSaved }: JobModalProps) {
                   <label className={styles.label}>
                     {l.scheduledEnd}
                     {form.scheduledEnd &&
-                      calcEnd(form.scheduledStart, form.timeDuration, form.priceUnit) === form.scheduledEnd && (
+                      calcEnd(
+                        form.scheduledStart,
+                        form.timeDuration,
+                        form.priceUnit,
+                      ) === form.scheduledEnd && (
                         <span className={styles.autoCalcBadge}>auto</span>
                       )}
                   </label>
@@ -661,20 +718,34 @@ function JobModal({ job, lang, onClose, onSaved }: JobModalProps) {
                 <div className={styles.formRow}>
                   <div className={styles.formGroup}>
                     <label className={styles.label}>{l.startDate}</label>
-                    <input type="date" className={styles.input} value={rStartDate}
-                      onChange={(e) => setRStartDate(e.target.value)} required />
+                    <input
+                      type="date"
+                      className={styles.input}
+                      value={rStartDate}
+                      onChange={(e) => setRStartDate(e.target.value)}
+                      required
+                    />
                   </div>
                   <div className={styles.formGroup}>
                     <label className={styles.label}>{l.endDate}</label>
-                    <input type="date" className={styles.input} value={rEndDate}
-                      onChange={(e) => setREndDate(e.target.value)} />
+                    <input
+                      type="date"
+                      className={styles.input}
+                      value={rEndDate}
+                      onChange={(e) => setREndDate(e.target.value)}
+                    />
                   </div>
                 </div>
                 <div className={styles.formRow}>
                   <div className={styles.formGroup}>
                     <label className={styles.label}>{l.startTime}</label>
-                    <input type="time" className={styles.input} value={rStartTime}
-                      onChange={(e) => setRStartTime(e.target.value)} required />
+                    <input
+                      type="time"
+                      className={styles.input}
+                      value={rStartTime}
+                      onChange={(e) => setRStartTime(e.target.value)}
+                      required
+                    />
                   </div>
                 </div>
 
@@ -690,7 +761,7 @@ function JobModal({ job, lang, onClose, onSaved }: JobModalProps) {
                           setRDaysOfWeek((prev) =>
                             prev.includes(dayIdx)
                               ? prev.filter((x) => x !== dayIdx)
-                              : [...prev, dayIdx].sort()
+                              : [...prev, dayIdx].sort(),
                           )
                         }
                       />
@@ -702,7 +773,11 @@ function JobModal({ job, lang, onClose, onSaved }: JobModalProps) {
                       type="checkbox"
                       checked={rDaysOfWeek.length === 7}
                       onChange={() =>
-                        setRDaysOfWeek(rDaysOfWeek.length === 7 ? [1] : [0,1,2,3,4,5,6])
+                        setRDaysOfWeek(
+                          rDaysOfWeek.length === 7
+                            ? [1]
+                            : [0, 1, 2, 3, 4, 5, 6],
+                        )
                       }
                     />
                     {l.everyDay}
@@ -721,7 +796,7 @@ function JobModal({ job, lang, onClose, onSaved }: JobModalProps) {
                           setRMonthsOfYear((prev) =>
                             prev.includes(i + 1)
                               ? prev.filter((x) => x !== i + 1)
-                              : [...prev, i + 1].sort()
+                              : [...prev, i + 1].sort(),
                           )
                         }
                       />
@@ -734,7 +809,9 @@ function JobModal({ job, lang, onClose, onSaved }: JobModalProps) {
                       checked={rMonthsOfYear.length === 12}
                       onChange={() =>
                         setRMonthsOfYear(
-                          rMonthsOfYear.length === 12 ? [] : [1,2,3,4,5,6,7,8,9,10,11,12]
+                          rMonthsOfYear.length === 12
+                            ? []
+                            : [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
                         )
                       }
                     />
@@ -916,7 +993,9 @@ function JobModal({ job, lang, onClose, onSaved }: JobModalProps) {
                       placeholder={
                         checklistTab === "en" ? l.checkItemEn : l.checkItemEs
                       }
-                      value={checklistTab === "en" ? item.labelEn : item.labelEs}
+                      value={
+                        checklistTab === "en" ? item.labelEn : item.labelEs
+                      }
                       onChange={(e) =>
                         updateChecklistItem(
                           idx,

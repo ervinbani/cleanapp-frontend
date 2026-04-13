@@ -742,7 +742,9 @@
   border-radius: 6px;
   border: 1px solid #e5e7eb;
   background: #f9fafb;
-  transition: background 0.15s, border-color 0.15s;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
 }
 
 .recurringToggle:has(input:checked) {
