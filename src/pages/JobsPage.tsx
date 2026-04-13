@@ -1039,7 +1039,7 @@ function JobModal({ job, lang, onClose, onSaved }: JobModalProps) {
                 className={styles.btnSave}
                 disabled={saving}
               >
-                {isEdit ? l.update : isRecurring ? l.saveRecurring : l.save}
+                {isEdit ? l.update : l.save}
               </button>
             </div>
           </form>
