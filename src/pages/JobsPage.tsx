@@ -66,7 +66,15 @@ const STATUS_ORDER: JobStatus[] = [
 function getTodayRange(): { dateFrom: string; dateTo: string } {
   const now = new Date();
   const from = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const to = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+  const to = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate(),
+    23,
+    59,
+    59,
+    999,
+  );
   return { dateFrom: from.toISOString(), dateTo: to.toISOString() };
 }
 
@@ -74,8 +82,20 @@ function getWeekRange(): { dateFrom: string; dateTo: string } {
   const now = new Date();
   const day = now.getDay(); // 0=Sun
   const diffToMon = day === 0 ? -6 : 1 - day;
-  const mon = new Date(now.getFullYear(), now.getMonth(), now.getDate() + diffToMon);
-  const sun = new Date(mon.getFullYear(), mon.getMonth(), mon.getDate() + 6, 23, 59, 59, 999);
+  const mon = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate() + diffToMon,
+  );
+  const sun = new Date(
+    mon.getFullYear(),
+    mon.getMonth(),
+    mon.getDate() + 6,
+    23,
+    59,
+    59,
+    999,
+  );
   return { dateFrom: mon.toISOString(), dateTo: sun.toISOString() };
 }
 
@@ -1088,7 +1108,9 @@ export default function JobsPage() {
   const [apiStatus, setApiStatus] = useState<JobStatus | "">("");
   const [filterUserId, setFilterUserId] = useState("");
   const [filterUsers, setFilterUsers] = useState<FilterUser[]>([]);
-  const [dateMode, setDateMode] = useState<"" | "today" | "week" | "custom">("");
+  const [dateMode, setDateMode] = useState<"" | "today" | "week" | "custom">(
+    "",
+  );
   const [customDateFrom, setCustomDateFrom] = useState("");
   const [customDateTo, setCustomDateTo] = useState("");
 
@@ -1134,7 +1156,9 @@ export default function JobsPage() {
     } else if (dateMode === "week") {
       ({ dateFrom, dateTo } = getWeekRange());
     } else if (dateMode === "custom") {
-      dateFrom = customDateFrom ? new Date(customDateFrom).toISOString() : undefined;
+      dateFrom = customDateFrom
+        ? new Date(customDateFrom).toISOString()
+        : undefined;
       dateTo = customDateTo
         ? new Date(customDateTo + "T23:59:59").toISOString()
         : undefined;
@@ -1157,7 +1181,15 @@ export default function JobsPage() {
     } finally {
       setLoading(false);
     }
-  }, [page, search, apiStatus, filterUserId, dateMode, customDateFrom, customDateTo]);
+  }, [
+    page,
+    search,
+    apiStatus,
+    filterUserId,
+    dateMode,
+    customDateFrom,
+    customDateTo,
+  ]);
 
   useEffect(() => {
     fetchJobs();
