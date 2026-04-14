@@ -63,6 +63,22 @@ const STATUS_ORDER: JobStatus[] = [
   "no_show",
 ];
 
+function getTodayRange(): { dateFrom: string; dateTo: string } {
+  const now = new Date();
+  const from = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const to = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+  return { dateFrom: from.toISOString(), dateTo: to.toISOString() };
+}
+
+function getWeekRange(): { dateFrom: string; dateTo: string } {
+  const now = new Date();
+  const day = now.getDay(); // 0=Sun
+  const diffToMon = day === 0 ? -6 : 1 - day;
+  const mon = new Date(now.getFullYear(), now.getMonth(), now.getDate() + diffToMon);
+  const sun = new Date(mon.getFullYear(), mon.getMonth(), mon.getDate() + 6, 23, 59, 59, 999);
+  return { dateFrom: mon.toISOString(), dateTo: sun.toISOString() };
+}
+
 // ── Job Modal ────────────────────────────────────────────────────────────
 interface ChecklistItem {
   labelEn: string;
@@ -337,6 +353,13 @@ interface DropdownService {
   priceUnit?: string;
 }
 interface DropdownUser {
+  _id: string;
+  firstName: string;
+  lastName: string;
+  isActive: boolean;
+}
+
+interface FilterUser {
   _id: string;
   firstName: string;
   lastName: string;
@@ -1063,6 +1086,11 @@ export default function JobsPage() {
   // API-level filters
   const [search, setSearch] = useState("");
   const [apiStatus, setApiStatus] = useState<JobStatus | "">("");
+  const [filterUserId, setFilterUserId] = useState("");
+  const [filterUsers, setFilterUsers] = useState<FilterUser[]>([]);
+  const [dateMode, setDateMode] = useState<"" | "today" | "week" | "custom">("");
+  const [customDateFrom, setCustomDateFrom] = useState("");
+  const [customDateTo, setCustomDateTo] = useState("");
 
   // Column-level client filters
   const [colTitle, setColTitle] = useState("");
@@ -1086,14 +1114,40 @@ export default function JobsPage() {
     }
   }, [searchParams, setSearchParams, canCreate]);
 
+  // Load users for filter dropdown
+  useEffect(() => {
+    apiClient
+      .get("/users", { params: { limit: 200 } })
+      .then((r) => {
+        const data = (r.data as { data: FilterUser[] }).data ?? [];
+        setFilterUsers(data.filter((u) => u.isActive));
+      })
+      .catch(() => {});
+  }, []);
+
   const fetchJobs = useCallback(async () => {
     setLoading(true);
+    let dateFrom: string | undefined;
+    let dateTo: string | undefined;
+    if (dateMode === "today") {
+      ({ dateFrom, dateTo } = getTodayRange());
+    } else if (dateMode === "week") {
+      ({ dateFrom, dateTo } = getWeekRange());
+    } else if (dateMode === "custom") {
+      dateFrom = customDateFrom ? new Date(customDateFrom).toISOString() : undefined;
+      dateTo = customDateTo
+        ? new Date(customDateTo + "T23:59:59").toISOString()
+        : undefined;
+    }
     try {
       const res = await jobService.getAll({
         page,
         limit: PAGE_LIMIT,
         search: search.trim() || undefined,
         status: apiStatus || undefined,
+        assignedUserId: filterUserId || undefined,
+        dateFrom,
+        dateTo,
       });
       setJobs(res.data);
       setTotal(res.pagination.total);
@@ -1103,7 +1157,7 @@ export default function JobsPage() {
     } finally {
       setLoading(false);
     }
-  }, [page, search, apiStatus]);
+  }, [page, search, apiStatus, filterUserId, dateMode, customDateFrom, customDateTo]);
 
   useEffect(() => {
     fetchJobs();
@@ -1111,7 +1165,7 @@ export default function JobsPage() {
 
   useEffect(() => {
     setPage(1);
-  }, [search, apiStatus]);
+  }, [search, apiStatus, filterUserId, dateMode, customDateFrom, customDateTo]);
 
   const handleDelete = async (id: string) => {
     if (!window.confirm("Delete this job?")) return;
@@ -1277,6 +1331,62 @@ export default function JobsPage() {
             </option>
           ))}
         </select>
+        {/* User filter */}
+        <select
+          className={styles.filterSelect}
+          value={filterUserId}
+          onChange={(e) => setFilterUserId(e.target.value)}
+        >
+          <option value="">{l.allUsers}</option>
+          {filterUsers.map((u) => (
+            <option key={u._id} value={u._id}>
+              {u.firstName} {u.lastName}
+            </option>
+          ))}
+        </select>
+        {/* Date filters */}
+        <div className={styles.dateFilterWrap}>
+          <button
+            type="button"
+            className={`${styles.dateModeBtn}${dateMode === "today" ? ` ${styles.dateModeActive}` : ""}`}
+            onClick={() => setDateMode(dateMode === "today" ? "" : "today")}
+          >
+            {l.today}
+          </button>
+          <button
+            type="button"
+            className={`${styles.dateModeBtn}${dateMode === "week" ? ` ${styles.dateModeActive}` : ""}`}
+            onClick={() => setDateMode(dateMode === "week" ? "" : "week")}
+          >
+            {l.thisWeek}
+          </button>
+          <button
+            type="button"
+            className={`${styles.dateModeBtn}${dateMode === "custom" ? ` ${styles.dateModeActive}` : ""}`}
+            onClick={() => setDateMode(dateMode === "custom" ? "" : "custom")}
+          >
+            {l.customRange}
+          </button>
+          {dateMode === "custom" && (
+            <>
+              <input
+                type="date"
+                className={styles.dateInput}
+                title={l.dateFrom}
+                value={customDateFrom}
+                onChange={(e) => setCustomDateFrom(e.target.value)}
+              />
+              <span className={styles.dateSeparator}>→</span>
+              <input
+                type="date"
+                className={styles.dateInput}
+                title={l.dateTo}
+                value={customDateTo}
+                onChange={(e) => setCustomDateTo(e.target.value)}
+              />
+            </>
+          )}
+        </div>
         <div className={styles.exportBtns}>
           <button className={styles.btnExcelExport} onClick={handleExportExcel}>
             <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15">

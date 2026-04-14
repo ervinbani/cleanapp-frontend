@@ -7,6 +7,9 @@ export interface JobsQuery {
   status?: JobStatus;
   search?: string;
   customerId?: string;
+  assignedUserId?: string;
+  dateFrom?: string;
+  dateTo?: string;
 }
 
 export interface JobsResponse {
