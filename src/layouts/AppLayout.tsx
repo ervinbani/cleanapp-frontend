@@ -355,7 +355,15 @@ export default function AppLayout() {
               className={styles.themeToggle}
               onClick={toggleTheme}
               aria-label="Toggle dark mode"
-              title={theme === "dark" ? (lang === "en" ? "Light mode" : "Modo claro") : (lang === "en" ? "Dark mode" : "Modo oscuro")}
+              title={
+                theme === "dark"
+                  ? lang === "en"
+                    ? "Light mode"
+                    : "Modo claro"
+                  : lang === "en"
+                    ? "Dark mode"
+                    : "Modo oscuro"
+              }
             >
               {theme === "dark" ? "☀️" : "🌙"}
             </button>
