@@ -8,8 +8,8 @@
 .subNav {
   width: 180px;
   min-width: 180px;
-  background: #ffffff;
-  border-right: 1px solid #e4eaf4;
+  background: var(--bg-surface);
+  border-right: 1px solid var(--border);
   padding: 1.5rem 0;
   display: flex;
   flex-direction: column;
@@ -20,16 +20,16 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.07em;
-  color: #9ca3af;
+  color: var(--text-placeholder);
   padding: 0 1rem 0.75rem;
-  border-bottom: 1px solid #e4eaf4;
+  border-bottom: 1px solid var(--border);
   margin: 0 0 0.5rem 0;
 }
 
 .subNavItem {
   padding: 0.55rem 1rem;
   font-size: 0.875rem;
-  color: #374151;
+  color: var(--text-secondary);
   text-decoration: none;
   border-left: 3px solid transparent;
   transition:
@@ -38,15 +38,15 @@
 }
 
 .subNavItem:hover {
-  background: #f0f4fb;
-  color: #1d4ed8;
+  background: var(--bg-page);
+  color: var(--accent-hover);
 }
 
 .subNavItemActive {
-  background: #eff6ff;
-  color: #2563eb;
+  background: var(--bg-accent-subtle);
+  color: var(--accent);
   font-weight: 600;
-  border-left-color: #2563eb;
+  border-left-color: var(--accent);
 }
 
 /* ─── Content ─────────────────────────────────────────────────── */

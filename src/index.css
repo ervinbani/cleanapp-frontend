@@ -84,3 +84,12 @@ textarea {
   font-family: inherit;
   font-size: inherit;
 }
+
+input, select, textarea {
+  color: var(--text-primary);
+  background-color: var(--bg-surface);
+}
+
+input::placeholder, textarea::placeholder {
+  color: var(--text-placeholder);
+}

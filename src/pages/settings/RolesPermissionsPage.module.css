@@ -15,20 +15,20 @@
 .title {
   font-size: 1.6rem;
   font-weight: 700;
-  color: #111827;
+  color: var(--text-primary);
   margin: 0 0 0.25rem 0;
 }
 
 .subtitle {
   font-size: 0.875rem;
-  color: #6b7280;
+  color: var(--text-muted);
   margin: 0;
 }
 
 .newRoleBtn {
   padding: 0.55rem 1.1rem;
-  background: #2563eb;
-  color: #fff;
+  background: var(--accent);
+  color: var(--bg-surface);
   border: none;
   border-radius: 8px;
   font-size: 0.875rem;
@@ -40,7 +40,7 @@
 }
 
 .newRoleBtn:hover:not(:disabled) {
-  background: #1d4ed8;
+  background: var(--accent-hover);
 }
 
 .newRoleBtn:disabled {
@@ -52,7 +52,7 @@
 .tabs {
   display: flex;
   gap: 0;
-  border-bottom: 1px solid #e4eaf4;
+  border-bottom: 1px solid var(--border);
   overflow-x: auto;
 }
 
@@ -62,7 +62,7 @@
   border: none;
   border-bottom: 2px solid transparent;
   font-size: 0.875rem;
-  color: #374151;
+  color: var(--text-secondary);
   cursor: pointer;
   white-space: nowrap;
   transition:
@@ -72,19 +72,19 @@
 }
 
 .tab:hover {
-  color: #2563eb;
+  color: var(--accent);
 }
 
 .tabActive {
-  color: #2563eb;
+  color: var(--accent);
   font-weight: 600;
-  border-bottom-color: #2563eb;
+  border-bottom-color: var(--accent);
 }
 
 /* ─── Section ─────────────────────────────────────────────────── */
 .section {
-  background: #ffffff;
-  border: 1px solid #e4eaf4;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
   border-radius: 12px;
   padding: 1.5rem;
 }
@@ -92,15 +92,15 @@
 .roleTitle {
   font-size: 1.25rem;
   font-weight: 700;
-  color: #111827;
+  color: var(--text-primary);
   margin: 0 0 0.25rem 0;
 }
 
 .roleSubtitle {
   font-size: 0.875rem;
-  color: #6b7280;
+  color: var(--text-muted);
   margin: 0 0 1rem 0;
-  border-bottom: 1px solid #e4eaf4;
+  border-bottom: 1px solid var(--border);
   padding-bottom: 1rem;
 }
 
@@ -112,7 +112,7 @@
 
 .hints li {
   font-size: 0.825rem;
-  color: #6b7280;
+  color: var(--text-muted);
 }
 
 /* ─── Table ───────────────────────────────────────────────────── */
@@ -130,8 +130,8 @@
   text-align: left;
   padding: 0.6rem 1rem;
   font-weight: 600;
-  color: #6b7280;
-  border-bottom: 1px solid #e4eaf4;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
   width: 40%;
 }
 
@@ -139,21 +139,21 @@
   text-align: center;
   padding: 0.6rem 1rem;
   font-weight: 600;
-  color: #6b7280;
-  border-bottom: 1px solid #e4eaf4;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
 }
 
 .tdResource {
   padding: 0.7rem 1rem;
   font-weight: 500;
-  color: #374151;
-  border-bottom: 1px solid #f3f4f6;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--bg-surface-subtle);
 }
 
 .tdCheck {
   text-align: center;
   padding: 0.7rem 1rem;
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 1px solid var(--bg-surface-subtle);
 }
 
 .table tr:last-child .tdResource,
@@ -165,7 +165,7 @@
 .checkbox {
   width: 1.1rem;
   height: 1.1rem;
-  accent-color: #2563eb;
+  accent-color: var(--accent);
   cursor: pointer;
 }
 
@@ -184,9 +184,9 @@
 
 .cancelBtn {
   padding: 0.55rem 1.25rem;
-  background: #ffffff;
-  color: #374151;
-  border: 1px solid #d1d5db;
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-input);
   border-radius: 8px;
   font-size: 0.875rem;
   font-weight: 500;
@@ -195,7 +195,7 @@
 }
 
 .cancelBtn:hover:not(:disabled) {
-  background: #f9fafb;
+  background: var(--bg-surface-muted);
 }
 
 .cancelBtn:disabled {
@@ -205,8 +205,8 @@
 
 .saveBtn {
   padding: 0.55rem 1.25rem;
-  background: #2563eb;
-  color: #ffffff;
+  background: var(--accent);
+  color: var(--bg-surface);
   border: none;
   border-radius: 8px;
   font-size: 0.875rem;
@@ -216,7 +216,7 @@
 }
 
 .saveBtn:hover:not(:disabled) {
-  background: #1d4ed8;
+  background: var(--accent-hover);
 }
 
 .saveBtn:disabled {
@@ -226,7 +226,7 @@
 
 /* ─── State messages ──────────────────────────────────────────── */
 .stateMsg {
-  color: #6b7280;
+  color: var(--text-muted);
   font-size: 0.875rem;
 }
 
@@ -252,31 +252,31 @@
 .breadcrumbLink {
   background: none;
   border: none;
-  color: #6b7280;
+  color: var(--text-muted);
   cursor: pointer;
   font-size: 0.875rem;
   padding: 0;
 }
 
 .breadcrumbLink:hover {
-  color: #2563eb;
+  color: var(--accent);
   text-decoration: underline;
 }
 
 .breadcrumbSep {
-  color: #9ca3af;
+  color: var(--text-placeholder);
   font-size: 0.875rem;
 }
 
 .breadcrumbCurrent {
-  color: #111827;
+  color: var(--text-primary);
   font-size: 0.875rem;
   font-weight: 500;
 }
 
 .formCard {
-  background: #ffffff;
-  border: 1px solid #e4eaf4;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
   border-radius: 12px;
   padding: 1.75rem 2rem;
 }
@@ -284,7 +284,7 @@
 .formTitle {
   font-size: 1.4rem;
   font-weight: 700;
-  color: #111827;
+  color: var(--text-primary);
   margin: 0 0 1.5rem 0;
 }
 
@@ -312,15 +312,15 @@
 .label {
   font-size: 0.8125rem;
   font-weight: 600;
-  color: #374151;
+  color: var(--text-secondary);
 }
 
 .input {
   padding: 0.55rem 0.85rem;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border-input);
   border-radius: 8px;
   font-size: 0.875rem;
-  color: #111827;
+  color: var(--text-primary);
   outline: none;
   transition: border-color 0.15s;
   width: 100%;
@@ -328,16 +328,16 @@
 }
 
 .input:focus {
-  border-color: #2563eb;
+  border-color: var(--accent);
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
 .textarea {
   padding: 0.55rem 0.85rem;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border-input);
   border-radius: 8px;
   font-size: 0.875rem;
-  color: #111827;
+  color: var(--text-primary);
   outline: none;
   resize: vertical;
   font-family: inherit;
@@ -347,7 +347,7 @@
 }
 
 .textarea:focus {
-  border-color: #2563eb;
+  border-color: var(--accent);
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
@@ -369,7 +369,7 @@
 .toggleSlider {
   position: absolute;
   inset: 0;
-  background: #d1d5db;
+  background: var(--border-input);
   border-radius: 999px;
   transition: background 0.2s;
 }
@@ -382,13 +382,13 @@
   left: 0.2rem;
   top: 50%;
   transform: translateY(-50%);
-  background: #ffffff;
+  background: var(--bg-surface);
   border-radius: 50%;
   transition: transform 0.2s;
 }
 
 .toggle input:checked + .toggleSlider {
-  background: #2563eb;
+  background: var(--accent);
 }
 
 .toggle input:checked + .toggleSlider::before {
@@ -398,14 +398,14 @@
 .toggleLabel {
   font-size: 0.875rem;
   font-weight: 500;
-  color: #374151;
+  color: var(--text-secondary);
 }
 
 /* Permissions section in form */
 .permissionsHeading {
   font-size: 1rem;
   font-weight: 700;
-  color: #111827;
+  color: var(--text-primary);
   margin: 0 0 0.75rem 0;
 }
 
@@ -424,15 +424,15 @@
   left: 0.75rem;
   font-size: 0.875rem;
   pointer-events: none;
-  color: #9ca3af;
+  color: var(--text-placeholder);
 }
 
 .searchInput {
   padding: 0.5rem 0.85rem 0.5rem 2.25rem;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border-input);
   border-radius: 8px;
   font-size: 0.875rem;
-  color: #111827;
+  color: var(--text-primary);
   outline: none;
   width: 100%;
   box-sizing: border-box;
@@ -440,7 +440,7 @@
 }
 
 .searchInput:focus {
-  border-color: #2563eb;
+  border-color: var(--accent);
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
@@ -448,13 +448,13 @@
   width: 9rem;
   padding: 0.6rem 1rem;
   text-align: right;
-  border-bottom: 1px solid #e4eaf4;
+  border-bottom: 1px solid var(--border);
 }
 
 .tdSelectAll {
   text-align: right;
   padding: 0.7rem 1rem;
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 1px solid var(--bg-surface-subtle);
 }
 
 .table tr:last-child .tdSelectAll {
@@ -464,7 +464,7 @@
 .selectRowBtn {
   background: none;
   border: none;
-  color: #2563eb;
+  color: var(--accent);
   font-size: 0.8125rem;
   font-weight: 500;
   cursor: pointer;
@@ -483,7 +483,7 @@
   align-items: center;
   margin-top: 1.5rem;
   padding-top: 1rem;
-  border-top: 1px solid #e4eaf4;
+  border-top: 1px solid var(--border);
 }
 
 .formFooterRight {
@@ -493,9 +493,9 @@
 
 .saveContinueBtn {
   padding: 0.55rem 1.25rem;
-  background: #ffffff;
-  color: #374151;
-  border: 1px solid #d1d5db;
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-input);
   border-radius: 8px;
   font-size: 0.875rem;
   font-weight: 500;
@@ -504,7 +504,7 @@
 }
 
 .saveContinueBtn:hover:not(:disabled) {
-  background: #f9fafb;
+  background: var(--bg-surface-muted);
 }
 
 .saveContinueBtn:disabled {
@@ -523,9 +523,9 @@
 
 .editRoleBtn {
   padding: 0.4rem 0.85rem;
-  background: #fff;
-  color: #2563eb;
-  border: 1px solid #2563eb;
+  background: var(--bg-surface);
+  color: var(--accent);
+  border: 1px solid var(--accent);
   border-radius: 7px;
   font-size: 0.8125rem;
   font-weight: 600;
@@ -536,13 +536,13 @@
 }
 
 .editRoleBtn:hover {
-  background: #eff6ff;
+  background: var(--bg-accent-subtle);
 }
 
 /* ─── Delete role button (in form footer) ─────────────────────── */
 .deleteRoleBtn {
   padding: 0.55rem 1.1rem;
-  background: #fff;
+  background: var(--bg-surface);
   color: #dc2626;
   border: 1px solid #dc2626;
   border-radius: 8px;
@@ -585,7 +585,7 @@
 .confirmDeleteBtn {
   padding: 0.5rem 1.1rem;
   background: #dc2626;
-  color: #fff;
+  color: var(--bg-surface);
   border: none;
   border-radius: 8px;
   font-size: 0.875rem;
@@ -606,9 +606,9 @@
 /* ─── System role note ────────────────────────────────────────── */
 .systemRoleNote {
   font-size: 0.825rem;
-  color: #6b7280;
-  background: #f9fafb;
-  border: 1px solid #e5e7eb;
+  color: var(--text-muted);
+  background: var(--bg-surface-muted);
+  border: 1px solid var(--border-light);
   border-radius: 6px;
   padding: 0.5rem 0.75rem;
   margin-bottom: 1rem;
