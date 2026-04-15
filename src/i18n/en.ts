@@ -169,6 +169,7 @@ const en = {
     filterByUser: "Filter by user",
     today: "Today",
     thisWeek: "This Week",
+    thisMonth: "This Month",
     customRange: "By Date",
     dateFrom: "From",
     dateTo: "To",

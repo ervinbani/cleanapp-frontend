@@ -171,6 +171,7 @@ const es: Translations = {
     filterByUser: "Filtrar por usuario",
     today: "Hoy",
     thisWeek: "Esta semana",
+    thisMonth: "Este mes",
     customRange: "Por fecha",
     dateFrom: "Desde",
     dateTo: "Hasta",

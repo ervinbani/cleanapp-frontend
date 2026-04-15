@@ -99,6 +99,13 @@ function getWeekRange(): { dateFrom: string; dateTo: string } {
   return { dateFrom: mon.toISOString(), dateTo: sun.toISOString() };
 }
 
+function getMonthRange(): { dateFrom: string; dateTo: string } {
+  const now = new Date();
+  const from = new Date(now.getFullYear(), now.getMonth(), 1);
+  const to = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+  return { dateFrom: from.toISOString(), dateTo: to.toISOString() };
+}
+
 // ── Job Modal ────────────────────────────────────────────────────────────
 interface ChecklistItem {
   labelEn: string;
@@ -1108,7 +1115,7 @@ export default function JobsPage() {
   const [apiStatus, setApiStatus] = useState<JobStatus | "">("");
   const [filterUserId, setFilterUserId] = useState("");
   const [filterUsers, setFilterUsers] = useState<FilterUser[]>([]);
-  const [dateMode, setDateMode] = useState<"" | "today" | "week" | "custom">(
+  const [dateMode, setDateMode] = useState<"" | "today" | "week" | "month" | "custom">(
     "",
   );
   const [customDateFrom, setCustomDateFrom] = useState("");
@@ -1155,6 +1162,8 @@ export default function JobsPage() {
       ({ dateFrom, dateTo } = getTodayRange());
     } else if (dateMode === "week") {
       ({ dateFrom, dateTo } = getWeekRange());
+    } else if (dateMode === "month") {
+      ({ dateFrom, dateTo } = getMonthRange());
     } else if (dateMode === "custom") {
       dateFrom = customDateFrom
         ? new Date(customDateFrom).toISOString()
@@ -1391,6 +1400,13 @@ export default function JobsPage() {
             onClick={() => setDateMode(dateMode === "week" ? "" : "week")}
           >
             {l.thisWeek}
+          </button>
+          <button
+            type="button"
+            className={`${styles.dateModeBtn}${dateMode === "month" ? ` ${styles.dateModeActive}` : ""}`}
+            onClick={() => setDateMode(dateMode === "month" ? "" : "month")}
+          >
+            {l.thisMonth}
           </button>
           <button
             type="button"
