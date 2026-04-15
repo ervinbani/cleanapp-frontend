@@ -85,11 +85,14 @@ textarea {
   font-size: inherit;
 }
 
-input, select, textarea {
+input,
+select,
+textarea {
   color: var(--text-primary);
   background-color: var(--bg-surface);
 }
 
-input::placeholder, textarea::placeholder {
+input::placeholder,
+textarea::placeholder {
   color: var(--text-placeholder);
 }
