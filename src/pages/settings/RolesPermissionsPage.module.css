@@ -321,6 +321,7 @@
   border-radius: 8px;
   font-size: 0.875rem;
   color: var(--text-primary);
+  background-color: var(--bg-surface);
   outline: none;
   transition: border-color 0.15s;
   width: 100%;
@@ -338,6 +339,7 @@
   border-radius: 8px;
   font-size: 0.875rem;
   color: var(--text-primary);
+  background-color: var(--bg-surface);
   outline: none;
   resize: vertical;
   font-family: inherit;
@@ -433,6 +435,7 @@
   border-radius: 8px;
   font-size: 0.875rem;
   color: var(--text-primary);
+  background-color: var(--bg-surface);
   outline: none;
   width: 100%;
   box-sizing: border-box;
@@ -553,7 +556,7 @@
 }
 
 .deleteRoleBtn:hover:not(:disabled) {
-  background: #fef2f2;
+  background: rgba(220, 38, 38, 0.08);
 }
 
 .deleteRoleBtn:disabled {
@@ -563,8 +566,8 @@
 
 /* ─── Danger zone (delete confirm) ───────────────────────────── */
 .dangerZone {
-  background: #fef2f2;
-  border: 1px solid #fca5a5;
+  background: rgba(220, 38, 38, 0.08);
+  border: 1px solid rgba(220, 38, 38, 0.3);
   border-radius: 8px;
   padding: 1rem 1.25rem;
   margin-bottom: 1.25rem;
@@ -572,7 +575,7 @@
 
 .dangerZoneText {
   font-size: 0.875rem;
-  color: #991b1b;
+  color: #ef4444;
   margin: 0 0 0.75rem 0;
 }
 
