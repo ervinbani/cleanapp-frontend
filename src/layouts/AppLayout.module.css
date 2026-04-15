@@ -3,15 +3,15 @@
   display: flex;
   height: 100vh;
   overflow: hidden;
-  background-color: #f0f4fb;
+  background-color: var(--bg-page);
 }
 
 /* ─── Sidebar ─────────────────────────────────────────────────── */
 .sidebar {
   width: 240px;
   min-width: 240px;
-  background-color: #ffffff;
-  border-right: 1px solid #e4eaf4;
+  background-color: var(--bg-surface);
+  border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
   padding: 1.25rem 0;
@@ -24,7 +24,7 @@
   align-items: center;
   gap: 0.6rem;
   padding: 0 1.25rem 1.25rem;
-  border-bottom: 1px solid #e4eaf4;
+  border-bottom: 1px solid var(--border);
   margin-bottom: 0.75rem;
 }
 
@@ -36,7 +36,7 @@
 .sidebarBrandName {
   font-size: 1.35rem;
   font-weight: 700;
-  color: #2563eb;
+  color: var(--accent);
   letter-spacing: -0.5px;
 }
 
@@ -57,7 +57,7 @@
   padding: 0.65rem 0.85rem;
   border-radius: 10px;
   text-decoration: none;
-  color: #4b5563;
+  color: var(--text-soft);
   font-size: 0.9rem;
   font-weight: 500;
   transition:
@@ -66,13 +66,13 @@
 }
 
 .navItem:hover {
-  background-color: #eff6ff;
-  color: #2563eb;
+  background-color: var(--bg-accent-subtle);
+  color: var(--accent);
 }
 
 .navItemActive {
-  background-color: #dbeafe;
-  color: #2563eb;
+  background-color: var(--bg-accent-active);
+  color: var(--accent);
   font-weight: 600;
 }
 
@@ -92,7 +92,7 @@
 .navLabelSub {
   font-size: 0.7rem;
   font-weight: 400;
-  color: #9ca3af;
+  color: var(--text-placeholder);
   margin-top: 1px;
 }
 
@@ -123,7 +123,7 @@
   border-radius: 10px;
   background: none;
   border: none;
-  color: #4b5563;
+  color: var(--text-soft);
   font-size: 0.9rem;
   font-weight: 500;
   cursor: pointer;
@@ -136,8 +136,8 @@
 }
 
 .settingsToggle:hover {
-  background-color: #eff6ff;
-  color: #2563eb;
+  background-color: var(--bg-accent-subtle);
+  color: var(--accent);
 }
 
 .chevron {
@@ -146,7 +146,7 @@
   line-height: 1;
   display: inline-block;
   transition: transform 0.2s ease;
-  color: #9ca3af;
+  color: var(--text-placeholder);
 }
 
 .chevronOpen {
@@ -158,7 +158,7 @@
   flex-direction: column;
   margin: 2px 0 4px 1.6rem;
   padding-left: 0.65rem;
-  border-left: 2px solid #e4eaf4;
+  border-left: 2px solid var(--border);
   gap: 1px;
 }
 
@@ -168,7 +168,7 @@
   padding: 0.45rem 0.75rem;
   border-radius: 8px;
   text-decoration: none;
-  color: #6b7280;
+  color: var(--text-muted);
   font-size: 0.83rem;
   font-weight: 500;
   transition:
@@ -177,13 +177,13 @@
 }
 
 .subMenuItem:hover {
-  background-color: #eff6ff;
-  color: #2563eb;
+  background-color: var(--bg-accent-subtle);
+  color: var(--accent);
 }
 
 .subMenuItemActive {
-  background-color: #dbeafe;
-  color: #2563eb;
+  background-color: var(--bg-accent-active);
+  color: var(--accent);
   font-weight: 600;
 }
 
@@ -199,8 +199,8 @@
 .topbar {
   height: 60px;
   min-height: 60px;
-  background: #ffffff;
-  border-bottom: 1px solid #e4eaf4;
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -213,7 +213,7 @@
   background: none;
   border: none;
   font-size: 1.4rem;
-  color: #4b5563;
+  color: var(--text-soft);
   cursor: pointer;
   margin-right: auto;
 }
@@ -224,9 +224,28 @@
   gap: 1rem;
 }
 
+/* ─── Theme toggle ────────────────────────────────────────────── */
+.themeToggle {
+  background: none;
+  border: 1px solid var(--border-input);
+  border-radius: 8px;
+  padding: 0.3rem 0.5rem;
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
+}
+
+.themeToggle:hover {
+  background: var(--bg-accent-subtle);
+  border-color: var(--accent);
+}
+
 .langToggle {
   display: flex;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border-input);
   border-radius: 8px;
   overflow: hidden;
 }
@@ -237,7 +256,7 @@
   border: none;
   font-size: 0.78rem;
   font-weight: 600;
-  color: #6b7280;
+  color: var(--text-muted);
   cursor: pointer;
   transition:
     background 0.15s,
@@ -245,12 +264,12 @@
 }
 
 .langBtn:hover {
-  background-color: #eff6ff;
-  color: #2563eb;
+  background-color: var(--bg-accent-subtle);
+  color: var(--accent);
 }
 
 .langActive {
-  background-color: #2563eb !important;
+  background-color: var(--accent) !important;
   color: #ffffff !important;
 }
 
@@ -273,22 +292,22 @@
 }
 
 .userMenuTrigger:hover {
-  background: #eff6ff;
+  background: var(--bg-accent-subtle);
 }
 
 .userChevron {
   font-size: 0.7rem;
-  color: #9ca3af;
+  color: var(--text-placeholder);
 }
 
 .userDropdown {
   position: absolute;
   top: calc(100% + 8px);
   right: 0;
-  background: #fff;
-  border: 1px solid #e5e7eb;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-light);
   border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
   min-width: 220px;
   z-index: 300;
   overflow: hidden;
@@ -299,14 +318,14 @@
   align-items: center;
   gap: 0.75rem;
   padding: 0.9rem 1rem;
-  background: #f9fafb;
+  background: var(--bg-surface-muted);
 }
 
 .avatarLarge {
   width: 42px;
   height: 42px;
   border-radius: 50%;
-  background: #2563eb;
+  background: var(--accent);
   color: #fff;
   font-size: 0.9rem;
   font-weight: 700;
@@ -319,20 +338,20 @@
 .dropdownName {
   font-size: 0.88rem;
   font-weight: 600;
-  color: #111827;
+  color: var(--text-primary);
   margin: 0;
 }
 
 .dropdownRole {
   font-size: 0.75rem;
-  color: #6b7280;
+  color: var(--text-muted);
   margin: 0.1rem 0 0;
   text-transform: capitalize;
 }
 
 .dropdownDivider {
   border: none;
-  border-top: 1px solid #f3f4f6;
+  border-top: 1px solid var(--border-light);
   margin: 0;
 }
 
@@ -345,20 +364,20 @@
   text-align: left;
   font-size: 0.88rem;
   font-family: inherit;
-  color: #374151;
+  color: var(--text-secondary);
   cursor: pointer;
   transition: background 0.12s;
 }
 
 .dropdownItem:hover {
-  background: #f3f4f6;
+  background: var(--bg-surface-subtle);
 }
 
 .avatar {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background-color: #2563eb;
+  background-color: var(--accent);
   color: #ffffff;
   font-size: 0.75rem;
   font-weight: 700;
@@ -372,7 +391,7 @@
 .userName {
   font-size: 0.88rem;
   font-weight: 600;
-  color: #374151;
+  color: var(--text-secondary);
 }
 
 .logoutBtn {
@@ -380,7 +399,7 @@
   border: none;
   cursor: pointer;
   font-size: 1.1rem;
-  color: #9ca3af;
+  color: var(--text-placeholder);
   padding: 0.25rem;
   border-radius: 6px;
   transition:
@@ -448,12 +467,12 @@
 }
 
 .modal {
-  background: #fff;
+  background: var(--bg-surface);
   border-radius: 14px;
   padding: 1.75rem;
   width: 100%;
   max-width: 480px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.28);
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -462,7 +481,7 @@
 .modalTitle {
   font-size: 1.15rem;
   font-weight: 700;
-  color: #111827;
+  color: var(--text-primary);
   margin: 0 0 0.5rem;
 }
 
@@ -472,7 +491,7 @@
 
 .dangerBody {
   font-size: 0.875rem;
-  color: #6b7280;
+  color: var(--text-muted);
   line-height: 1.5;
   margin: 0 0 0.5rem;
 }
@@ -492,25 +511,26 @@
   display: block;
   font-size: 0.8rem;
   font-weight: 600;
-  color: #374151;
+  color: var(--text-secondary);
   margin-bottom: 0.25rem;
 }
 
 .formInput {
   width: 100%;
   padding: 0.5rem 0.75rem;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border-input);
   border-radius: 8px;
   font-size: 0.875rem;
   font-family: inherit;
-  color: #111827;
+  color: var(--text-primary);
+  background: var(--bg-surface);
   outline: none;
   box-sizing: border-box;
   transition: border-color 0.15s;
 }
 
 .formInput:focus {
-  border-color: #2563eb;
+  border-color: var(--accent);
 }
 
 .formError {
@@ -553,21 +573,21 @@
 .cancelBtn {
   padding: 0.5rem 1rem;
   background: none;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border-input);
   border-radius: 8px;
   font-size: 0.875rem;
   cursor: pointer;
-  color: #374151;
+  color: var(--text-secondary);
   transition: background 0.12s;
 }
 
 .cancelBtn:hover {
-  background: #f3f4f6;
+  background: var(--bg-surface-subtle);
 }
 
 .saveBtn {
   padding: 0.5rem 1.1rem;
-  background: #2563eb;
+  background: var(--accent);
   color: #fff;
   border: none;
   border-radius: 8px;
@@ -578,7 +598,7 @@
 }
 
 .saveBtn:hover:not(:disabled) {
-  background: #1d4ed8;
+  background: var(--accent-hover);
 }
 
 .saveBtn:disabled {

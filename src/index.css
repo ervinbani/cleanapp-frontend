@@ -1,3 +1,54 @@
+/* ─── Design tokens ───────────────────────────────────────────── */
+:root {
+  --bg-page: #f0f4fb;
+  --bg-surface: #ffffff;
+  --bg-surface-muted: #f9fafb;
+  --bg-surface-subtle: #f3f4f6;
+  --bg-row-hover: #f8faff;
+  --bg-accent-subtle: #eff6ff;
+  --bg-accent-active: #dbeafe;
+
+  --border: #e4eaf4;
+  --border-light: #e5e7eb;
+  --border-input: #d1d5db;
+  --border-faint: #f0f0f0;
+
+  --text-primary: #111827;
+  --text-secondary: #374151;
+  --text-soft: #4b5563;
+  --text-muted: #6b7280;
+  --text-placeholder: #9ca3af;
+
+  --accent: #2563eb;
+  --accent-hover: #1d4ed8;
+  --accent-text: #2563eb;
+}
+
+[data-theme="dark"] {
+  --bg-page: #0f172a;
+  --bg-surface: #1e293b;
+  --bg-surface-muted: #162032;
+  --bg-surface-subtle: #334155;
+  --bg-row-hover: #1e3050;
+  --bg-accent-subtle: #1e3050;
+  --bg-accent-active: #1e3a5f;
+
+  --border: #334155;
+  --border-light: #334155;
+  --border-input: #475569;
+  --border-faint: #2d3f55;
+
+  --text-primary: #f1f5f9;
+  --text-secondary: #cbd5e1;
+  --text-soft: #94a3b8;
+  --text-muted: #94a3b8;
+  --text-placeholder: #64748b;
+
+  --accent: #3b82f6;
+  --accent-hover: #2563eb;
+  --accent-text: #60a5fa;
+}
+
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -13,9 +64,10 @@ body {
     Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   font-size: 16px;
   line-height: 1.5;
-  color: #111827;
-  background-color: #f0f4fb;
+  color: var(--text-primary);
+  background-color: var(--bg-page);
   -webkit-font-smoothing: antialiased;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 button, input, select, textarea {

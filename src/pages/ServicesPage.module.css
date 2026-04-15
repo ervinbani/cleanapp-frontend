@@ -15,14 +15,14 @@
 .title {
   font-size: 1.6rem;
   font-weight: 700;
-  color: #111827;
+  color: var(--text-primary);
   margin: 0;
 }
 
 .addBtn {
   padding: 0.55rem 1.1rem;
-  background: #2563eb;
-  color: #fff;
+  background: var(--accent);
+  color: var(--bg-surface);
   border: none;
   border-radius: 8px;
   font-size: 0.88rem;
@@ -33,7 +33,7 @@
 }
 
 .addBtn:hover {
-  background: #1d4ed8;
+  background: var(--accent-hover);
 }
 
 /* ─── Toolbar ─────────────────────────────────────────────────── */
@@ -59,25 +59,25 @@
   transform: translateY(-50%);
   width: 16px;
   height: 16px;
-  color: #9ca3af;
+  color: var(--text-placeholder);
   pointer-events: none;
 }
 
 .searchInput {
   width: 100%;
   padding: 0.5rem 0.75rem 0.5rem 2.2rem;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border-input);
   border-radius: 8px;
   font-size: 0.875rem;
-  color: #374151;
-  background: #fff;
+  color: var(--text-secondary);
+  background: var(--bg-surface);
   outline: none;
   box-sizing: border-box;
   transition: border-color 0.15s;
 }
 
 .searchInput:focus {
-  border-color: #2563eb;
+  border-color: var(--accent);
 }
 
 .exportBtns {
@@ -137,8 +137,8 @@
 /* ─── Table ───────────────────────────────────────────────────── */
 .tableWrap {
   flex: 1;
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-light);
   border-radius: 12px;
   overflow: auto;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
@@ -155,41 +155,41 @@
   text-align: left;
   font-size: 0.78rem;
   font-weight: 600;
-  color: #6b7280;
+  color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  background: #f9fafb;
-  border-bottom: 1px solid #f0f0f0;
+  background: var(--bg-surface-muted);
+  border-bottom: 1px solid var(--border-faint);
   white-space: nowrap;
 }
 
 .filterRow th {
   padding: 0.35rem 0.6rem 0.55rem;
-  background: #f9fafb;
-  border-bottom: 2px solid #e5e7eb;
+  background: var(--bg-surface-muted);
+  border-bottom: 2px solid var(--border-light);
 }
 
 .colFilter {
   width: 100%;
   padding: 0.3rem 0.5rem;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border-light);
   border-radius: 6px;
   font-size: 0.78rem;
-  color: #374151;
-  background: #fff;
+  color: var(--text-secondary);
+  background: var(--bg-surface);
   outline: none;
   box-sizing: border-box;
   transition: border-color 0.15s;
 }
 
 .colFilter:focus {
-  border-color: #2563eb;
+  border-color: var(--accent);
 }
 
 .bodyRow td {
   padding: 0.85rem 1rem;
-  border-bottom: 1px solid #f3f4f6;
-  color: #374151;
+  border-bottom: 1px solid var(--bg-surface-subtle);
+  color: var(--text-secondary);
   vertical-align: middle;
 }
 
@@ -198,17 +198,17 @@
 }
 
 .bodyRow:hover td {
-  background: #f8faff;
+  background: var(--bg-row-hover);
 }
 
 .nameCell {
   font-weight: 600;
-  color: #111827 !important;
+  color: var(--text-primary) !important;
   white-space: nowrap;
 }
 
 .descCell {
-  color: #6b7280 !important;
+  color: var(--text-muted) !important;
   max-width: 320px;
   white-space: nowrap;
   overflow: hidden;
@@ -218,13 +218,13 @@
 .durationCell,
 .priceCell {
   white-space: nowrap;
-  color: #374151;
+  color: var(--text-secondary);
 }
 
 .empty {
   text-align: center;
   padding: 2.5rem !important;
-  color: #9ca3af;
+  color: var(--text-placeholder);
   font-size: 0.9rem;
 }
 
@@ -244,8 +244,8 @@
 }
 
 .badge_inactive {
-  background: #f3f4f6;
-  color: #6b7280;
+  background: var(--bg-surface-subtle);
+  color: var(--text-muted);
 }
 
 /* ─── Actions ─────────────────────────────────────────────────── */
@@ -282,27 +282,27 @@
 }
 
 .btnView {
-  background: #fff;
-  border-color: #d1d5db;
-  color: #374151;
+  background: var(--bg-surface);
+  border-color: var(--border-input);
+  color: var(--text-secondary);
 }
 
 .btnView:hover {
-  background: #f3f4f6;
+  background: var(--bg-surface-subtle);
 }
 
 .btnUpdate {
-  background: #fff;
-  border-color: #d1d5db;
-  color: #374151;
+  background: var(--bg-surface);
+  border-color: var(--border-input);
+  color: var(--text-secondary);
 }
 
 .btnUpdate:hover {
-  background: #f3f4f6;
+  background: var(--bg-surface-subtle);
 }
 
 .btnDelete {
-  background: #fff;
+  background: var(--bg-surface);
   border-color: #fca5a5;
   color: #ef4444;
   padding: 0.3rem 0.5rem;
@@ -325,10 +325,10 @@
 
 .pageBtn {
   padding: 0.4rem 0.85rem;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border-input);
   border-radius: 7px;
-  background: #fff;
-  color: #374151;
+  background: var(--bg-surface);
+  color: var(--text-secondary);
   font-size: 0.82rem;
   font-weight: 600;
   cursor: pointer;
@@ -338,8 +338,8 @@
 }
 
 .pageBtn:hover:not(:disabled) {
-  background: #eff6ff;
-  color: #2563eb;
+  background: var(--bg-accent-subtle);
+  color: var(--accent);
   border-color: #93c5fd;
 }
 
@@ -358,10 +358,10 @@
   min-width: 32px;
   height: 32px;
   padding: 0 0.35rem;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border-light);
   border-radius: 6px;
-  background: #fff;
-  color: #374151;
+  background: var(--bg-surface);
+  color: var(--text-secondary);
   font-size: 0.82rem;
   font-weight: 500;
   cursor: pointer;
@@ -372,28 +372,28 @@
 }
 
 .pageNum:hover {
-  background: #eff6ff;
-  color: #2563eb;
+  background: var(--bg-accent-subtle);
+  color: var(--accent);
   border-color: #93c5fd;
 }
 
 .pageNumActive {
-  background: #2563eb !important;
-  color: #fff !important;
-  border-color: #2563eb !important;
+  background: var(--accent) !important;
+  color: var(--bg-surface) !important;
+  border-color: var(--accent) !important;
   font-weight: 700;
 }
 
 .ellipsis {
   padding: 0 0.25rem;
-  color: #9ca3af;
+  color: var(--text-placeholder);
   font-size: 0.85rem;
   user-select: none;
 }
 
 .pageInfo {
   font-size: 0.8rem;
-  color: #9ca3af;
+  color: var(--text-placeholder);
   margin-left: 0.5rem;
 }
 
@@ -409,7 +409,7 @@
 }
 
 .modal {
-  background: #fff;
+  background: var(--bg-surface);
   border-radius: 12px;
   padding: 2rem;
   width: 100%;
@@ -430,7 +430,7 @@
 .modalTitle {
   font-size: 1.25rem;
   font-weight: 700;
-  color: #111827;
+  color: var(--text-primary);
   margin: 0;
 }
 
@@ -439,7 +439,7 @@
   border: none;
   font-size: 1.4rem;
   line-height: 1;
-  color: #9ca3af;
+  color: var(--text-placeholder);
   cursor: pointer;
   padding: 0.1rem 0.4rem;
   border-radius: 4px;
@@ -449,14 +449,14 @@
 }
 
 .modalCloseBtn:hover {
-  color: #374151;
-  background: #f3f4f6;
+  color: var(--text-secondary);
+  background: var(--bg-surface-subtle);
 }
 
 .modalLoading {
   padding: 1.5rem;
   text-align: center;
-  color: #6b7280;
+  color: var(--text-muted);
   font-size: 0.9rem;
 }
 
@@ -466,15 +466,15 @@
   gap: 0.35rem;
   margin-bottom: 1.25rem;
   padding-bottom: 0.75rem;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--border-light);
 }
 
 .langTab {
   padding: 0.35rem 1rem;
   border-radius: 6px;
-  border: 1px solid #e5e7eb;
-  background: #f9fafb;
-  color: #6b7280;
+  border: 1px solid var(--border-light);
+  background: var(--bg-surface-muted);
+  color: var(--text-muted);
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
@@ -485,15 +485,15 @@
 }
 
 .langTab:hover {
-  background: #eff6ff;
-  color: #2563eb;
+  background: var(--bg-accent-subtle);
+  color: var(--accent);
   border-color: #93c5fd;
 }
 
 .langTabActive {
-  background: #2563eb !important;
-  color: #fff !important;
-  border-color: #2563eb !important;
+  background: var(--accent) !important;
+  color: var(--bg-surface) !important;
+  border-color: var(--accent) !important;
 }
 
 .langTabContent {
@@ -518,7 +518,7 @@
 
 .durationRow {
   display: flex;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border-input);
   border-radius: 8px;
   overflow: hidden;
   min-width: 0;
@@ -538,7 +538,7 @@
   border-radius: 0;
   padding: 0.55rem 0.75rem;
   font-size: 0.95rem;
-  color: #111827;
+  color: var(--text-primary);
   outline: none;
   background: transparent;
   min-width: 0;
@@ -546,12 +546,12 @@
 
 .durationRow select {
   border: none;
-  border-left: 1px solid #d1d5db;
+  border-left: 1px solid var(--border-input);
   border-radius: 0;
   padding: 0.55rem 0.5rem 0.55rem 0.6rem;
   font-size: 0.95rem;
-  color: #374151;
-  background: #f9fafb;
+  color: var(--text-secondary);
+  background: var(--bg-surface-muted);
   outline: none;
   cursor: pointer;
   min-width: 80px;
@@ -559,7 +559,7 @@
 
 .priceRow {
   display: flex;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border-input);
   border-radius: 8px;
   overflow: hidden;
   min-width: 0;
@@ -579,7 +579,7 @@
   border-radius: 0;
   padding: 0.55rem 0.75rem;
   font-size: 0.95rem;
-  color: #111827;
+  color: var(--text-primary);
   outline: none;
   background: transparent;
   min-width: 0;
@@ -587,12 +587,12 @@
 
 .priceRow select {
   border: none;
-  border-left: 1px solid #d1d5db;
+  border-left: 1px solid var(--border-input);
   border-radius: 0;
   padding: 0.55rem 0.5rem 0.55rem 0.6rem;
   font-size: 0.95rem;
-  color: #374151;
-  background: #f9fafb;
+  color: var(--text-secondary);
+  background: var(--bg-surface-muted);
   outline: none;
   cursor: pointer;
   min-width: 72px;
@@ -601,17 +601,17 @@
 .label {
   font-size: 0.8rem;
   font-weight: 600;
-  color: #374151;
+  color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
 
 .input {
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border-input);
   border-radius: 8px;
   padding: 0.55rem 0.75rem;
   font-size: 0.95rem;
-  color: #111827;
+  color: var(--text-primary);
   outline: none;
   transition: border-color 0.15s;
 }
@@ -622,11 +622,11 @@
 }
 
 .textarea {
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border-input);
   border-radius: 8px;
   padding: 0.55rem 0.75rem;
   font-size: 0.95rem;
-  color: #111827;
+  color: var(--text-primary);
   resize: vertical;
   outline: none;
   transition: border-color 0.15s;
@@ -662,7 +662,7 @@
 .toggleSlider {
   position: absolute;
   inset: 0;
-  background: #d1d5db;
+  background: var(--border-input);
   border-radius: 24px;
   transition: background 0.2s;
 }
@@ -674,7 +674,7 @@
   height: 18px;
   left: 3px;
   bottom: 3px;
-  background: #fff;
+  background: var(--bg-surface);
   border-radius: 50%;
   transition: transform 0.2s;
 }
@@ -689,7 +689,7 @@
 
 .toggleLabel {
   font-size: 0.9rem;
-  color: #374151;
+  color: var(--text-secondary);
 }
 
 .formError {
@@ -704,15 +704,15 @@
   gap: 0.75rem;
   margin-top: 1.5rem;
   padding-top: 1rem;
-  border-top: 1px solid #f3f4f6;
+  border-top: 1px solid var(--bg-surface-subtle);
 }
 
 .btnCancel {
   padding: 0.55rem 1.25rem;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border-input);
   border-radius: 8px;
-  background: #fff;
-  color: #374151;
+  background: var(--bg-surface);
+  color: var(--text-secondary);
   font-size: 0.9rem;
   font-weight: 500;
   cursor: pointer;
@@ -720,7 +720,7 @@
 }
 
 .btnCancel:hover {
-  background: #f9fafb;
+  background: var(--bg-surface-muted);
 }
 
 .btnSave {
@@ -728,7 +728,7 @@
   border: none;
   border-radius: 8px;
   background: #3b82f6;
-  color: #fff;
+  color: var(--bg-surface);
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
@@ -736,7 +736,7 @@
 }
 
 .btnSave:hover {
-  background: #2563eb;
+  background: var(--accent);
 }
 
 .btnSave:disabled,

@@ -16,14 +16,14 @@
 .title {
   font-size: 1.6rem;
   font-weight: 700;
-  color: #111827;
+  color: var(--text-primary);
   margin: 0;
 }
 
 .addBtn {
   padding: 0.55rem 1.1rem;
-  background: #2563eb;
-  color: #fff;
+  background: var(--accent);
+  color: var(--bg-surface);
   border: none;
   border-radius: 8px;
   font-size: 0.88rem;
@@ -34,7 +34,7 @@
 }
 
 .addBtn:hover {
-  background: #1d4ed8;
+  background: var(--accent-hover);
 }
 
 /* ─── Toolbar ─────────────────────────────────────────────────── */
@@ -60,41 +60,41 @@
   transform: translateY(-50%);
   width: 16px;
   height: 16px;
-  color: #9ca3af;
+  color: var(--text-placeholder);
   pointer-events: none;
 }
 
 .searchInput {
   width: 100%;
   padding: 0.5rem 0.75rem 0.5rem 2.2rem;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border-input);
   border-radius: 8px;
   font-size: 0.875rem;
-  color: #374151;
-  background: #fff;
+  color: var(--text-secondary);
+  background: var(--bg-surface);
   outline: none;
   box-sizing: border-box;
   transition: border-color 0.15s;
 }
 
 .searchInput:focus {
-  border-color: #2563eb;
+  border-color: var(--accent);
 }
 
 .filterSelect {
   padding: 0.5rem 0.75rem;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border-input);
   border-radius: 8px;
   font-size: 0.875rem;
-  color: #374151;
-  background: #fff;
+  color: var(--text-secondary);
+  background: var(--bg-surface);
   outline: none;
   cursor: pointer;
   transition: border-color 0.15s;
 }
 
 .filterSelect:focus {
-  border-color: #2563eb;
+  border-color: var(--accent);
 }
 
 /* ─── Export buttons ──────────────────────────────────────────── */
@@ -153,8 +153,8 @@
 /* ─── Table wrapper ───────────────────────────────────────────── */
 .tableWrap {
   flex: 1;
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-light);
   border-radius: 12px;
   overflow: auto;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
@@ -172,41 +172,41 @@
   text-align: left;
   font-size: 0.78rem;
   font-weight: 600;
-  color: #6b7280;
+  color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  background: #f9fafb;
-  border-bottom: 1px solid #f0f0f0;
+  background: var(--bg-surface-muted);
+  border-bottom: 1px solid var(--border-faint);
   white-space: nowrap;
 }
 
 .filterRow th {
   padding: 0.35rem 0.6rem 0.55rem;
-  background: #f9fafb;
-  border-bottom: 2px solid #e5e7eb;
+  background: var(--bg-surface-muted);
+  border-bottom: 2px solid var(--border-light);
 }
 
 .colFilter {
   width: 100%;
   padding: 0.3rem 0.5rem;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border-light);
   border-radius: 6px;
   font-size: 0.78rem;
-  color: #374151;
-  background: #fff;
+  color: var(--text-secondary);
+  background: var(--bg-surface);
   outline: none;
   box-sizing: border-box;
   transition: border-color 0.15s;
 }
 
 .colFilter:focus {
-  border-color: #2563eb;
+  border-color: var(--accent);
 }
 
 .bodyRow td {
   padding: 0.85rem 1rem;
-  border-bottom: 1px solid #f3f4f6;
-  color: #374151;
+  border-bottom: 1px solid var(--bg-surface-subtle);
+  color: var(--text-secondary);
   vertical-align: middle;
 }
 
@@ -214,33 +214,33 @@
   border-bottom: none;
 }
 .bodyRow:hover td {
-  background: #f8faff;
+  background: var(--bg-row-hover);
 }
 
 .invoiceNumCell {
   font-weight: 600;
-  color: #111827 !important;
+  color: var(--text-primary) !important;
   white-space: nowrap;
 }
 .customerCell {
-  color: #374151;
+  color: var(--text-secondary);
   white-space: nowrap;
 }
 .dateCell {
   white-space: nowrap;
-  color: #374151;
+  color: var(--text-secondary);
   font-size: 0.82rem;
 }
 .amountCell {
   white-space: nowrap;
   font-weight: 500;
-  color: #374151;
+  color: var(--text-secondary);
 }
 
 .empty {
   text-align: center;
   padding: 2.5rem !important;
-  color: #9ca3af;
+  color: var(--text-placeholder);
   font-size: 0.9rem;
 }
 
@@ -255,12 +255,12 @@
 }
 
 .badge_draft {
-  background: #f3f4f6;
-  color: #6b7280;
+  background: var(--bg-surface-subtle);
+  color: var(--text-muted);
 }
 .badge_sent {
-  background: #dbeafe;
-  color: #1d4ed8;
+  background: var(--bg-accent-active);
+  color: var(--accent-hover);
 }
 .badge_paid {
   background: #d1fae5;
@@ -275,8 +275,8 @@
   color: #991b1b;
 }
 .badge_void {
-  background: #f3f4f6;
-  color: #9ca3af;
+  background: var(--bg-surface-subtle);
+  color: var(--text-placeholder);
 }
 
 /* ─── Action buttons ──────────────────────────────────────────── */
@@ -313,25 +313,25 @@
 }
 
 .btnView {
-  background: #fff;
-  border-color: #d1d5db;
-  color: #374151;
+  background: var(--bg-surface);
+  border-color: var(--border-input);
+  color: var(--text-secondary);
 }
 .btnView:hover {
-  background: #f3f4f6;
+  background: var(--bg-surface-subtle);
 }
 
 .btnUpdate {
-  background: #fff;
-  border-color: #d1d5db;
-  color: #374151;
+  background: var(--bg-surface);
+  border-color: var(--border-input);
+  color: var(--text-secondary);
 }
 .btnUpdate:hover {
-  background: #f3f4f6;
+  background: var(--bg-surface-subtle);
 }
 
 .btnDelete {
-  background: #fff;
+  background: var(--bg-surface);
   border-color: #fca5a5;
   color: #ef4444;
   padding: 0.3rem 0.5rem;
@@ -353,10 +353,10 @@
 
 .pageBtn {
   padding: 0.4rem 0.85rem;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border-input);
   border-radius: 7px;
-  background: #fff;
-  color: #374151;
+  background: var(--bg-surface);
+  color: var(--text-secondary);
   font-size: 0.82rem;
   font-weight: 600;
   cursor: pointer;
@@ -366,8 +366,8 @@
 }
 
 .pageBtn:hover:not(:disabled) {
-  background: #eff6ff;
-  color: #2563eb;
+  background: var(--bg-accent-subtle);
+  color: var(--accent);
   border-color: #93c5fd;
 }
 .pageBtn:disabled {
@@ -385,10 +385,10 @@
   min-width: 32px;
   height: 32px;
   padding: 0 0.35rem;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border-light);
   border-radius: 6px;
-  background: #fff;
-  color: #374151;
+  background: var(--bg-surface);
+  color: var(--text-secondary);
   font-size: 0.82rem;
   font-weight: 500;
   cursor: pointer;
@@ -399,34 +399,34 @@
 }
 
 .pageNum:hover {
-  background: #eff6ff;
-  color: #2563eb;
+  background: var(--bg-accent-subtle);
+  color: var(--accent);
   border-color: #93c5fd;
 }
 
 .pageNumActive {
-  background: #2563eb !important;
-  color: #fff !important;
-  border-color: #2563eb !important;
+  background: var(--accent) !important;
+  color: var(--bg-surface) !important;
+  border-color: var(--accent) !important;
   font-weight: 700;
 }
 
 .ellipsis {
   padding: 0 0.25rem;
-  color: #9ca3af;
+  color: var(--text-placeholder);
   font-size: 0.85rem;
   user-select: none;
 }
 .pageInfo {
   font-size: 0.8rem;
-  color: #9ca3af;
+  color: var(--text-placeholder);
   margin-left: 0.5rem;
 }
 
 /* ─── Inline Form ──────────────────────────────────────────────── */
 .formSection {
-  background: #fff;
-  border: 1px solid #e5e7eb;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-light);
   border-radius: 12px;
   padding: 1.5rem 2rem;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
@@ -442,7 +442,7 @@
 .formTitle {
   font-size: 1.25rem;
   font-weight: 700;
-  color: #111827;
+  color: var(--text-primary);
   margin: 0;
 }
 
@@ -451,7 +451,7 @@
   border: none;
   font-size: 1.4rem;
   line-height: 1;
-  color: #9ca3af;
+  color: var(--text-placeholder);
   cursor: pointer;
   padding: 0.1rem 0.4rem;
   border-radius: 4px;
@@ -461,8 +461,8 @@
 }
 
 .formCloseBtn:hover {
-  color: #374151;
-  background: #f3f4f6;
+  color: var(--text-secondary);
+  background: var(--bg-surface-subtle);
 }
 
 .formRow {
@@ -502,8 +502,8 @@
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;
-  background: #dbeafe;
-  color: #1d4ed8;
+  background: var(--bg-accent-active);
+  color: var(--accent-hover);
   border-radius: 6px;
   padding: 0.2rem 0.5rem;
   font-size: 0.82rem;
@@ -514,7 +514,7 @@
   background: none;
   border: none;
   cursor: pointer;
-  color: #1d4ed8;
+  color: var(--accent-hover);
   font-size: 1rem;
   line-height: 1;
   padding: 0 0.1rem;
@@ -529,18 +529,18 @@
 .label {
   font-size: 0.8rem;
   font-weight: 600;
-  color: #374151;
+  color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
 
 .input {
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border-input);
   border-radius: 8px;
   padding: 0.55rem 0.75rem;
   font-size: 0.95rem;
-  color: #111827;
-  background: #fff;
+  color: var(--text-primary);
+  background: var(--bg-surface);
   outline: none;
   transition: border-color 0.15s;
   width: 100%;
@@ -553,11 +553,11 @@
 }
 
 .textarea {
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border-input);
   border-radius: 8px;
   padding: 0.55rem 0.75rem;
   font-size: 0.95rem;
-  color: #111827;
+  color: var(--text-primary);
   resize: vertical;
   outline: none;
   transition: border-color 0.15s;
@@ -576,10 +576,10 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: #9ca3af;
+  color: var(--text-placeholder);
   margin: 0.5rem 0 1rem;
   padding-top: 0.75rem;
-  border-top: 1px solid #f3f4f6;
+  border-top: 1px solid var(--bg-surface-subtle);
 }
 
 /* ─── Items rows ──────────────────────────────────────────────── */
@@ -610,9 +610,9 @@
 
 .btnAddItem {
   background: none;
-  border: 1px dashed #d1d5db;
+  border: 1px dashed var(--border-input);
   border-radius: 8px;
-  color: #6b7280;
+  color: var(--text-muted);
   font-size: 0.875rem;
   padding: 0.4rem 0.9rem;
   cursor: pointer;
@@ -636,7 +636,7 @@
 
 .totalsTable {
   font-size: 0.9rem;
-  color: #374151;
+  color: var(--text-secondary);
 }
 
 .totalsTable td {
@@ -646,7 +646,7 @@
 .totalsTable td:first-child {
   text-align: right;
   font-weight: 600;
-  color: #6b7280;
+  color: var(--text-muted);
 }
 
 .totalsTable td:last-child {
@@ -656,9 +656,9 @@
 
 .totalRow td {
   font-weight: 700;
-  color: #111827 !important;
+  color: var(--text-primary) !important;
   font-size: 1rem;
-  border-top: 2px solid #e5e7eb;
+  border-top: 2px solid var(--border-light);
   padding-top: 0.5rem;
 }
 
@@ -674,15 +674,15 @@
   gap: 0.75rem;
   margin-top: 1.5rem;
   padding-top: 1rem;
-  border-top: 1px solid #f3f4f6;
+  border-top: 1px solid var(--bg-surface-subtle);
 }
 
 .btnCancel {
   padding: 0.55rem 1.25rem;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border-input);
   border-radius: 8px;
-  background: #fff;
-  color: #374151;
+  background: var(--bg-surface);
+  color: var(--text-secondary);
   font-size: 0.9rem;
   font-weight: 500;
   cursor: pointer;
@@ -690,7 +690,7 @@
 }
 
 .btnCancel:hover {
-  background: #f9fafb;
+  background: var(--bg-surface-muted);
 }
 
 .btnSave {
@@ -698,7 +698,7 @@
   border: none;
   border-radius: 8px;
   background: #3b82f6;
-  color: #fff;
+  color: var(--bg-surface);
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
@@ -706,7 +706,7 @@
 }
 
 .btnSave:hover {
-  background: #2563eb;
+  background: var(--accent);
 }
 .btnSave:disabled,
 .btnCancel:disabled {

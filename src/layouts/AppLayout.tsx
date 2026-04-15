@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { useLang } from "../contexts/LangContext";
+import { useTheme } from "../contexts/ThemeContext";
 import { messageService } from "../services/messageService";
 import { deleteTenant } from "../services/authService";
 import styles from "./AppLayout.module.css";
@@ -110,6 +111,7 @@ export default function AppLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const { lang, setLang } = useLang();
+  const { theme, toggleTheme } = useTheme();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(() =>
     location.pathname.startsWith("/settings"),
@@ -349,6 +351,15 @@ export default function AppLayout() {
           </button>
 
           <div className={styles.topbarRight}>
+            <button
+              className={styles.themeToggle}
+              onClick={toggleTheme}
+              aria-label="Toggle dark mode"
+              title={theme === "dark" ? (lang === "en" ? "Light mode" : "Modo claro") : (lang === "en" ? "Dark mode" : "Modo oscuro")}
+            >
+              {theme === "dark" ? "☀️" : "🌙"}
+            </button>
+
             <div className={styles.langToggle}>
               <button
                 className={`${styles.langBtn} ${lang === "en" ? styles.langActive : ""}`}
