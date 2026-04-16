@@ -113,6 +113,7 @@ export default function AppLayout() {
   const { lang, setLang } = useLang();
   const { theme, toggleTheme } = useTheme();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(() =>
     location.pathname.startsWith("/settings"),
   );
@@ -255,11 +256,20 @@ export default function AppLayout() {
     <div className={styles.shell}>
       {/* Sidebar */}
       <aside
-        className={`${styles.sidebar} ${sidebarOpen ? styles.sidebarOpen : ""}`}
+        className={`${styles.sidebar} ${sidebarOpen ? styles.sidebarOpen : ""} ${sidebarCollapsed ? styles.sidebarCollapsed : ""}`}
       >
         <div className={styles.sidebarBrand}>
           <span className={styles.sidebarLogo}>🪣</span>
-          <span className={styles.sidebarBrandName}>Brillo</span>
+          {!sidebarCollapsed && (
+            <span className={styles.sidebarBrandName}>Brillo</span>
+          )}
+          <button
+            className={styles.collapseBtn}
+            onClick={() => setSidebarCollapsed((v) => !v)}
+            title={sidebarCollapsed ? "Espandi sidebar" : "Comprimi sidebar"}
+          >
+            {sidebarCollapsed ? "›" : "‹"}
+          </button>
         </div>
 
         <nav className={styles.nav}>
@@ -273,21 +283,48 @@ export default function AppLayout() {
               item.path === "/settings" ? (
                 <div key="settings" className={styles.settingsGroup}>
                   <button
-                    className={`${styles.settingsToggle} ${isSettingsArea ? styles.navItemActive : ""}`}
-                    onClick={() => setSettingsOpen((o) => !o)}
+                    className={`${styles.settingsToggle} ${isSettingsArea ? styles.navItemActive : ""} ${sidebarCollapsed ? styles.navItemIconOnly : ""}`}
+                    onClick={() => !sidebarCollapsed && setSettingsOpen((o) => !o)}
+                    title={sidebarCollapsed ? (lang === "en" ? "Settings" : "Configuración") : undefined}
                   >
                     <span className={styles.navIcon}>{item.icon}</span>
-                    <span className={styles.navLabel}>
-                      {lang === "en" ? item.label : item.labelEs}
-                    </span>
-                    <span
-                      className={`${styles.chevron} ${settingsOpen ? styles.chevronOpen : ""}`}
-                    >
-                      ›
-                    </span>
+                    {!sidebarCollapsed && (
+                      <>
+                        <span className={styles.navLabel}>
+                          {lang === "en" ? item.label : item.labelEs}
+                        </span>
+                        <span
+                          className={`${styles.chevron} ${settingsOpen ? styles.chevronOpen : ""}`}
+                        >
+                          ›
+                        </span>
+                      </>
+                    )}
                   </button>
-                  {settingsOpen && (
+                  {/* expanded: normal accordion */}
+                  {!sidebarCollapsed && settingsOpen && (
                     <div className={styles.subMenu}>
+                      {settingsSubItems
+                        .filter(
+                          (s) => !s.restricted || hasRole("owner", "director"),
+                        )
+                        .map((sub) => (
+                          <NavLink
+                            key={sub.path}
+                            to={sub.path}
+                            className={({ isActive }) =>
+                              `${styles.subMenuItem} ${isActive ? styles.subMenuItemActive : ""}`
+                            }
+                            onClick={() => setSidebarOpen(false)}
+                          >
+                            {lang === "en" ? sub.label : sub.labelEs}
+                          </NavLink>
+                        ))}
+                    </div>
+                  )}
+                  {/* collapsed: hover flyout */}
+                  {sidebarCollapsed && (
+                    <div className={styles.subMenuFlyout}>
                       {settingsSubItems
                         .filter(
                           (s) => !s.restricted || hasRole("owner", "director"),
@@ -313,19 +350,24 @@ export default function AppLayout() {
                   to={item.path}
                   end={item.path === "/"}
                   className={({ isActive }) =>
-                    `${styles.navItem} ${isActive ? styles.navItemActive : ""}`
+                    `${styles.navItem} ${isActive ? styles.navItemActive : ""} ${sidebarCollapsed ? styles.navItemIconOnly : ""}`
                   }
                   onClick={() => setSidebarOpen(false)}
+                  title={sidebarCollapsed ? (lang === "en" ? item.label : item.labelEs) : undefined}
                 >
                   <span className={styles.navIcon}>{item.icon}</span>
-                  <span className={styles.navLabel}>
-                    {lang === "en" ? item.label : item.labelEs}
-                    {lang === "es" && (
-                      <span className={styles.navLabelSub}>{item.label}</span>
-                    )}
-                  </span>
-                  {item.path === "/messages" && unreadCount > 0 && (
-                    <span className={styles.navBadge}>{unreadCount}</span>
+                  {!sidebarCollapsed && (
+                    <>
+                      <span className={styles.navLabel}>
+                        {lang === "en" ? item.label : item.labelEs}
+                        {lang === "es" && (
+                          <span className={styles.navLabelSub}>{item.label}</span>
+                        )}
+                      </span>
+                      {item.path === "/messages" && unreadCount > 0 && (
+                        <span className={styles.navBadge}>{unreadCount}</span>
+                      )}
+                    </>
                   )}
                 </NavLink>
               ),

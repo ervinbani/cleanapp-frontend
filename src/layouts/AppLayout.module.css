@@ -1,3 +1,79 @@
+/* ─── Sidebar collapsed ───────────────────────────────────────── */
+.sidebar.sidebarCollapsed {
+  width: 62px;
+  min-width: 62px;
+  overflow: visible;
+}
+
+.sidebar.sidebarCollapsed .nav {
+  overflow: visible;
+  overflow-y: visible;
+}
+
+.sidebar.sidebarCollapsed .sidebarBrand {
+  padding: 0 0 1.25rem;
+  justify-content: center;
+  gap: 0;
+}
+
+.sidebar.sidebarCollapsed .collapseBtn {
+  margin-left: 0;
+}
+
+/* flyout submenu when sidebar is collapsed */
+.sidebar.sidebarCollapsed .settingsGroup {
+  position: relative;
+}
+
+.subMenuFlyout {
+  position: absolute;
+  left: calc(100% + 8px);
+  top: 0;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.22);
+  padding: 0.4rem 0.5rem;
+  min-width: 180px;
+  z-index: 400;
+  display: none;
+  flex-direction: column;
+  gap: 1px;
+  margin: 0;
+  pointer-events: none;
+}
+
+.sidebar.sidebarCollapsed .settingsGroup:hover .subMenuFlyout {
+  display: flex;
+  pointer-events: auto;
+}
+
+.collapseBtn {
+  margin-left: auto;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-placeholder);
+  font-size: 1.1rem;
+  font-weight: 700;
+  padding: 0.15rem 0.35rem;
+  border-radius: 6px;
+  line-height: 1;
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+
+.collapseBtn:hover {
+  background: var(--bg-accent-subtle);
+  color: var(--accent);
+}
+
+.navItemIconOnly {
+  justify-content: center;
+  padding: 0.65rem 0;
+}
+
 /* ─── Shell ──────────────────────────────────────────────────── */
 .shell {
   display: flex;
@@ -16,7 +92,10 @@
   flex-direction: column;
   padding: 1.25rem 0;
   z-index: 200;
-  transition: transform 0.25s ease;
+  transition:
+    transform 0.25s ease,
+    width 0.2s ease,
+    min-width 0.2s ease;
 }
 
 .sidebarBrand {
@@ -451,6 +530,10 @@
 
   .content {
     padding: 1rem;
+  }
+
+  .collapseBtn {
+    display: none;
   }
 }
 
