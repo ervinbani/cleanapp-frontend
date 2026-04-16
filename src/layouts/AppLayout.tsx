@@ -284,8 +284,16 @@ export default function AppLayout() {
                 <div key="settings" className={styles.settingsGroup}>
                   <button
                     className={`${styles.settingsToggle} ${isSettingsArea ? styles.navItemActive : ""} ${sidebarCollapsed ? styles.navItemIconOnly : ""}`}
-                    onClick={() => !sidebarCollapsed && setSettingsOpen((o) => !o)}
-                    title={sidebarCollapsed ? (lang === "en" ? "Settings" : "Configuración") : undefined}
+                    onClick={() =>
+                      !sidebarCollapsed && setSettingsOpen((o) => !o)
+                    }
+                    title={
+                      sidebarCollapsed
+                        ? lang === "en"
+                          ? "Settings"
+                          : "Configuración"
+                        : undefined
+                    }
                   >
                     <span className={styles.navIcon}>{item.icon}</span>
                     {!sidebarCollapsed && (
@@ -353,7 +361,13 @@ export default function AppLayout() {
                     `${styles.navItem} ${isActive ? styles.navItemActive : ""} ${sidebarCollapsed ? styles.navItemIconOnly : ""}`
                   }
                   onClick={() => setSidebarOpen(false)}
-                  title={sidebarCollapsed ? (lang === "en" ? item.label : item.labelEs) : undefined}
+                  title={
+                    sidebarCollapsed
+                      ? lang === "en"
+                        ? item.label
+                        : item.labelEs
+                      : undefined
+                  }
                 >
                   <span className={styles.navIcon}>{item.icon}</span>
                   {!sidebarCollapsed && (
@@ -361,7 +375,9 @@ export default function AppLayout() {
                       <span className={styles.navLabel}>
                         {lang === "en" ? item.label : item.labelEs}
                         {lang === "es" && (
-                          <span className={styles.navLabelSub}>{item.label}</span>
+                          <span className={styles.navLabelSub}>
+                            {item.label}
+                          </span>
                         )}
                       </span>
                       {item.path === "/messages" && unreadCount > 0 && (
