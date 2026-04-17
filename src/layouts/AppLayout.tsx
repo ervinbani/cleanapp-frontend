@@ -58,6 +58,13 @@ const navItems = [
     permission: "invoices.read",
   },
   {
+    path: "/documents",
+    label: "Documents",
+    labelEs: "Documentos",
+    icon: "📁",
+    permission: null,
+  },
+  {
     path: "/messages",
     label: "Messages",
     labelEs: "Mensajes",

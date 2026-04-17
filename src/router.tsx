@@ -9,6 +9,7 @@ import ServicesPage from "./pages/ServicesPage";
 import UsersPage from "./pages/UsersPage";
 import JobsPage from "./pages/JobsPage";
 import InvoicesPage from "./pages/InvoicesPage";
+import DocumentsPage from "./pages/DocumentsPage";
 import RolesPermissionsPage from "./pages/settings/RolesPermissionsPage";
 import MessagesPage from "./pages/MessagesPage";
 
@@ -29,6 +30,7 @@ const router = createBrowserRouter([
           { path: "/customers", element: <CustomersPage /> },
           { path: "/jobs", element: <JobsPage /> },
           { path: "/invoices", element: <InvoicesPage /> },
+          { path: "/documents", element: <DocumentsPage /> },
           { path: "/services", element: <ServicesPage /> },
           { path: "/messages", element: <MessagesPage /> },
           {
