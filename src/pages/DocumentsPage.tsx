@@ -9,6 +9,29 @@ const MAX_MB = 20;
 
 const RESOURCES: UploadResource[] = ["invoices", "customers", "jobs", "services", "tenants"];
 
+const IMAGE_EXTS = /\.(jpe?g|png|webp|gif)$/i;
+
+function FileThumbnail({ filename, fileKey }: { filename: string; fileKey: string }) {
+  const [url, setUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!IMAGE_EXTS.test(filename)) return;
+    let cancelled = false;
+    getReadUrl(fileKey)
+      .then((u) => { if (!cancelled) setUrl(u); })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [filename, fileKey]);
+
+  if (IMAGE_EXTS.test(filename)) {
+    return url
+      ? <img src={url} alt={filename} className={styles.thumb} />
+      : <span className={styles.fileIcon}>🖼️</span>;
+  }
+  if (/\.pdf$/i.test(filename)) return <span className={styles.fileIcon}>📕</span>;
+  return <span className={styles.fileIcon}>📄</span>;
+}
+
 export default function DocumentsPage() {
   const { lang } = useLang();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -133,6 +156,15 @@ export default function DocumentsPage() {
     }
   };
 
+  const handleCopyUrl = async (key: string) => {
+    try {
+      const url = await getReadUrl(key);
+      await navigator.clipboard.writeText(url);
+    } catch {
+      setError(t("Could not copy URL.", "No se pudo copiar la URL."));
+    }
+  };
+
   const handleDelete = async (doc: FileListItem) => {
     if (!window.confirm(t(`Delete "${doc.filename}"?`, `¿Eliminar "${doc.filename}"?`))) return;
     try {
@@ -247,6 +279,7 @@ export default function DocumentsPage() {
           <table className={styles.table}>
             <thead>
               <tr>
+                <th>{t("Preview", "Vista previa")}</th>
                 <th>{t("File", "Archivo")}</th>
                 <th>{t("Resource", "Recurso")}</th>
                 <th>{t("Ref ID", "ID Ref")}</th>
@@ -257,13 +290,17 @@ export default function DocumentsPage() {
             <tbody>
               {docs.map((doc) => (
                 <tr key={doc.key}>
-                  <td className={styles.filenameCell}>📄 {doc.filename}</td>
+                  <td className={styles.thumbCell}>
+                    <FileThumbnail filename={doc.filename} fileKey={doc.key} />
+                  </td>
+                  <td className={styles.filenameCell}>{doc.filename}</td>
                   <td><span className={styles.badge}>{doc.resource}</span></td>
                   <td className={styles.refCell}>{doc.refId}</td>
                   <td className={styles.dateCell}>{new Date(doc.uploadedAt).toLocaleString()}</td>
                   <td>
                     <div className={styles.rowActions}>
                       <button className={styles.viewBtn} onClick={() => handleView(doc.key)} title={t("View", "Ver")}>👁</button>
+                      <button className={styles.copyBtn} onClick={() => handleCopyUrl(doc.key)} title={t("Copy URL", "Copiar URL")}>🔗</button>
                       <button className={styles.deleteBtn} onClick={() => handleDelete(doc)} title={t("Delete", "Eliminar")}>🗑</button>
                     </div>
                   </td>

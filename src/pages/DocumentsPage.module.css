@@ -251,13 +251,35 @@
   border-radius: 999px;
 }
 
+/* ─── Thumbnail cell ────────────────────────────────────────────── */
+.thumbCell {
+  width: 52px;
+  padding: 0.4rem 0.5rem !important;
+  text-align: center;
+}
+
+.thumb {
+  width: 44px;
+  height: 44px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  display: block;
+}
+
+.fileIcon {
+  font-size: 1.6rem;
+  line-height: 1;
+}
+
 .rowActions {
   display: flex;
   gap: 0.4rem;
 }
 
 .viewBtn,
-.deleteBtn {
+.deleteBtn,
+.copyBtn {
   padding: 0.3rem 0.5rem;
   border-radius: 7px;
   border: 1px solid var(--border);
@@ -269,6 +291,11 @@
 
 .viewBtn:hover {
   background: var(--bg-accent-subtle);
+}
+
+.copyBtn:hover {
+  background: var(--bg-accent-subtle);
+  border-color: var(--accent);
 }
 
 .deleteBtn:hover {
