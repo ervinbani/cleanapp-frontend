@@ -104,7 +104,9 @@
   flex-direction: column;
   align-items: center;
   gap: 0.5rem;
-  transition: border-color 0.15s, background 0.15s;
+  transition:
+    border-color 0.15s,
+    background 0.15s;
 }
 
 .dropzone:hover {
