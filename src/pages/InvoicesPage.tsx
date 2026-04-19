@@ -816,7 +816,7 @@ function InvoiceFormSection({
               >
                 {STATUS_ORDER.map((s) => (
                   <option key={s} value={s}>
-                    {l[`status_${s}` as keyof typeof l] as string ?? s}
+                    {(l[`status_${s}` as keyof typeof l] as string) ?? s}
                   </option>
                 ))}
               </select>
