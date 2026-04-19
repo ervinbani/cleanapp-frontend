@@ -206,6 +206,12 @@ const formT = {
     pm_stripe: "Stripe",
     pm_paypal: "PayPal",
     pm_other: "Other",
+    status_draft: "Draft",
+    status_sent: "Sent",
+    status_paid: "Paid",
+    status_partially_paid: "Partially Paid",
+    status_overdue: "Overdue",
+    status_void: "Void",
   },
   es: {
     addTitle: "Agregar Factura",
@@ -257,6 +263,12 @@ const formT = {
     pm_stripe: "Stripe",
     pm_paypal: "PayPal",
     pm_other: "Otro",
+    status_draft: "Borrador",
+    status_sent: "Enviada",
+    status_paid: "Pagada",
+    status_partially_paid: "Pago parcial",
+    status_overdue: "Vencida",
+    status_void: "Anulada",
   },
 };
 
@@ -804,12 +816,7 @@ function InvoiceFormSection({
               >
                 {STATUS_ORDER.map((s) => (
                   <option key={s} value={s}>
-                    {(formT[lang][`pm_${s}` as keyof typeof l] as
-                      | string
-                      | undefined) ??
-                      (l[`status_${s}` as keyof typeof l] as
-                        | string
-                        | undefined)}
+                    {l[`status_${s}` as keyof typeof l] as string ?? s}
                   </option>
                 ))}
               </select>

@@ -92,6 +92,15 @@ textarea {
   background-color: var(--bg-surface);
 }
 
+select {
+  color-scheme: light;
+}
+
+select option {
+  color: #111827;
+  background-color: #ffffff;
+}
+
 input::placeholder,
 textarea::placeholder {
   color: var(--text-placeholder);

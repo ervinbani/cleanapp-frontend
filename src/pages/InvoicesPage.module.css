@@ -91,6 +91,12 @@
   outline: none;
   cursor: pointer;
   transition: border-color 0.15s;
+  color-scheme: light;
+}
+
+.filterSelect option {
+  color: #111827;
+  background: #ffffff;
 }
 
 .filterSelect:focus {
@@ -545,6 +551,12 @@
   transition: border-color 0.15s;
   width: 100%;
   box-sizing: border-box;
+  color-scheme: light;
+}
+
+.input option {
+  color: #111827;
+  background: #ffffff;
 }
 
 .input:focus {
