@@ -75,7 +75,8 @@ interface InvoiceForm {
   servicePeriodTo: string;
   status: InvoiceStatus;
   currency: string;
-  discount: string;
+  discountType: "percentage" | "fixed";
+  discountValue: string;
   taxRate: string;
   paymentMethod: string;
   notes: string;
@@ -101,7 +102,8 @@ const EMPTY_FORM: InvoiceForm = {
   servicePeriodTo: "",
   status: "draft",
   currency: "USD",
-  discount: "0",
+  discountType: "percentage",
+  discountValue: "0",
   taxRate: "0",
   paymentMethod: "",
   notes: "",
@@ -139,7 +141,8 @@ function invoiceToForm(inv: Invoice): InvoiceForm {
       : "",
     status: inv.status,
     currency: inv.currency ?? "USD",
-    discount: String(inv.discount ?? 0),
+    discountType: inv.discount?.type ?? "percentage",
+    discountValue: String(inv.discount?.value ?? 0),
     taxRate: String(inv.taxRate ?? 0),
     paymentMethod: inv.paymentMethod ?? "",
     notes: inv.notes ?? "",
@@ -167,7 +170,10 @@ const formT = {
     dueDate: "Due Date",
     status: "Status",
     currency: "Currency",
-    discount: "Discount (€)",
+    discountType: "Discount Type",
+    discountTypePct: "Percentage (%)",
+    discountTypeFixed: "Fixed amount",
+    discountValue: "Discount value",
     taxRate: "Tax Rate (%)",
     paymentMethod: "Payment Method",
     selectPayment: "— None —",
@@ -211,7 +217,10 @@ const formT = {
     dueDate: "Fecha de Vencimiento",
     status: "Estado",
     currency: "Moneda",
-    discount: "Descuento (€)",
+    discountType: "Tipo de descuento",
+    discountTypePct: "Porcentaje (%)",
+    discountTypeFixed: "Monto fijo",
+    discountValue: "Valor del descuento",
     taxRate: "Tasa de Impuesto (%)",
     paymentMethod: "Método de Pago",
     selectPayment: "— Ninguno —",
@@ -341,11 +350,15 @@ function InvoiceFormSection({
     return qty * price;
   });
   const subtotal = itemTotals.reduce((s, v) => s + v, 0);
-  const discount = parseFloat(form.discount) || 0;
+  const discountValue = parseFloat(form.discountValue) || 0;
+  const discountAmount =
+    form.discountType === "percentage"
+      ? subtotal * (discountValue / 100)
+      : discountValue;
   const taxRate = parseFloat(form.taxRate) || 0;
-  const afterDiscount = subtotal - discount;
-  const tax = afterDiscount * (taxRate / 100);
-  const total = afterDiscount + tax;
+  const taxBase = subtotal - discountAmount;
+  const tax = taxBase * (taxRate / 100);
+  const total = taxBase + tax;
 
   const handleDownloadPdf = async () => {
     const { default: jsPDF } = await import("jspdf");
@@ -444,8 +457,8 @@ function InvoiceFormSection({
       align: "right",
     });
     tY += 6;
-    doc.text(`${l.discount}:`, rightX - 50, tY, { align: "right" });
-    doc.text(`-${discount.toFixed(2)} ${form.currency}`, rightX, tY, {
+    doc.text(`${l.discountValue}:`, rightX - 50, tY, { align: "right" });
+    doc.text(`-${discountAmount.toFixed(2)} ${form.currency}`, rightX, tY, {
       align: "right",
     });
     tY += 6;
@@ -571,11 +584,15 @@ function InvoiceFormSection({
             : undefined,
         status: form.status,
         currency: form.currency,
-        discount,
+        discount: {
+          type: form.discountType,
+          value: parseFloat(form.discountValue) || 0,
+          amount: +discountAmount.toFixed(2),
+        },
         taxRate,
-        tax,
-        subtotal,
-        total,
+        tax: +tax.toFixed(2),
+        subtotal: +subtotal.toFixed(2),
+        total: +total.toFixed(2),
         paymentMethod: form.paymentMethod || undefined,
         notes: form.notes.trim() || undefined,
         items: form.items
@@ -939,8 +956,57 @@ function InvoiceFormSection({
             {l.addItem}
           </button>
 
-          {/* Discount, Tax, Currency, Payment */}
+          {/* Discount Type + Value */}
           <div className={styles.formRow}>
+            <div className={styles.formGroup}>
+              <label className={styles.label}>{l.discountType}</label>
+              <select
+                className={styles.input}
+                value={form.discountType}
+                onChange={(e) =>
+                  setForm((prev) => ({
+                    ...prev,
+                    discountType: e.target.value as "percentage" | "fixed",
+                  }))
+                }
+              >
+                <option value="percentage">{l.discountTypePct}</option>
+                <option value="fixed">{l.discountTypeFixed}</option>
+              </select>
+            </div>
+            <div className={styles.formGroup}>
+              <label className={styles.label}>
+                {l.discountValue}{" "}
+                {form.discountType === "percentage"
+                  ? "(%)"
+                  : `(${form.currency})`}
+              </label>
+              <input
+                className={styles.input}
+                type="number"
+                min="0"
+                step="0.01"
+                value={form.discountValue}
+                onChange={(e) =>
+                  setForm((prev) => ({ ...prev, discountValue: e.target.value }))
+                }
+              />
+            </div>
+          </div>
+
+          {/* Tax Rate + Currency + Payment */}
+          <div className={styles.formRow3}>
+            <div className={styles.formGroup}>
+              <label className={styles.label}>{l.taxRate}</label>
+              <input
+                className={styles.input}
+                type="number"
+                min="0"
+                step="0.01"
+                value={form.taxRate}
+                onChange={(e) => set("taxRate", e.target.value)}
+              />
+            </div>
             <div className={styles.formGroup}>
               <label className={styles.label}>{l.currency}</label>
               <select
@@ -954,30 +1020,6 @@ function InvoiceFormSection({
                   </option>
                 ))}
               </select>
-            </div>
-            <div className={styles.formGroup}>
-              <label className={styles.label}>{l.discount}</label>
-              <input
-                className={styles.input}
-                type="number"
-                min="0"
-                step="0.01"
-                value={form.discount}
-                onChange={(e) => set("discount", e.target.value)}
-              />
-            </div>
-          </div>
-          <div className={styles.formRow}>
-            <div className={styles.formGroup}>
-              <label className={styles.label}>{l.taxRate}</label>
-              <input
-                className={styles.input}
-                type="number"
-                min="0"
-                step="0.01"
-                value={form.taxRate}
-                onChange={(e) => set("taxRate", e.target.value)}
-              />
             </div>
             <div className={styles.formGroup}>
               <label className={styles.label}>{l.paymentMethod}</label>
@@ -1006,11 +1048,16 @@ function InvoiceFormSection({
                     {subtotal.toFixed(2)} {form.currency}
                   </td>
                 </tr>
-                {discount > 0 && (
+                {discountAmount > 0 && (
                   <tr>
-                    <td>{l.discount}</td>
                     <td>
-                      -{discount.toFixed(2)} {form.currency}
+                      {l.discountValue}{" "}
+                      {form.discountType === "percentage"
+                        ? `(${discountValue}%)`
+                        : `(${form.currency})`}
+                    </td>
+                    <td>
+                      -{discountAmount.toFixed(2)} {form.currency}
                     </td>
                   </tr>
                 )}

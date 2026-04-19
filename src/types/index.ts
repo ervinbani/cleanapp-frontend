@@ -164,7 +164,7 @@ export interface Invoice {
   };
   items: InvoiceItem[];
   subtotal?: number;
-  discount?: number;
+  discount?: { type: "percentage" | "fixed"; value: number; amount?: number };
   taxRate?: number;
   tax?: number;
   total?: number;
