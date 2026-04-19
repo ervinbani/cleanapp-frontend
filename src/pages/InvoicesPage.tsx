@@ -988,7 +988,10 @@ function InvoiceFormSection({
                 step="0.01"
                 value={form.discountValue}
                 onChange={(e) =>
-                  setForm((prev) => ({ ...prev, discountValue: e.target.value }))
+                  setForm((prev) => ({
+                    ...prev,
+                    discountValue: e.target.value,
+                  }))
                 }
               />
             </div>
