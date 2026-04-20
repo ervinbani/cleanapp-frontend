@@ -4,6 +4,7 @@ import type {
   AuthData,
   LoginCredentials,
   RegisterPayload,
+  Tenant,
   User,
 } from "../types";
 
@@ -43,4 +44,27 @@ export const updateMe = async (data: {
 
 export const deleteTenant = async (password: string): Promise<void> => {
   await apiClient.delete("/tenant", { data: { password } });
+};
+
+export const getTenant = async (): Promise<Tenant> => {
+  const res = await apiClient.get<ApiResponse<Tenant>>("/tenant");
+  return res.data.data;
+};
+
+export const updateTenant = async (
+  data: Partial<
+    Pick<
+      Tenant,
+      | "name"
+      | "contactEmail"
+      | "contactPhone"
+      | "timezone"
+      | "defaultLanguage"
+      | "address"
+      | "branding"
+    >
+  >,
+): Promise<Tenant> => {
+  const res = await apiClient.put<ApiResponse<Tenant>>("/tenant", data);
+  return res.data.data;
 };

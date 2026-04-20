@@ -9,30 +9,35 @@ const subNavItems = [
     label: "General",
     labelEs: "General",
     restricted: false,
+    ownerOnly: true,
   },
   {
     path: "/settings/team",
     label: "Team",
     labelEs: "Equipo",
     restricted: false,
+    ownerOnly: false,
   },
   {
     path: "/settings/roles",
     label: "Roles & Permissions",
     labelEs: "Roles y Permisos",
     restricted: true,
+    ownerOnly: false,
   },
   {
     path: "/settings/billing",
     label: "Billing",
     labelEs: "Facturación",
     restricted: false,
+    ownerOnly: false,
   },
   {
     path: "/settings/languages",
     label: "Languages",
     labelEs: "Idiomas",
     restricted: false,
+    ownerOnly: false,
   },
 ];
 
@@ -40,11 +45,14 @@ export default function SettingsLayout() {
   const { hasRole } = useAuth();
   const { lang } = useLang();
 
+  const isOwner = hasRole("owner");
   const canAccessRoles = hasRole("owner", "director");
 
-  const visibleItems = subNavItems.filter(
-    (item) => !item.restricted || canAccessRoles,
-  );
+  const visibleItems = subNavItems.filter((item) => {
+    if (item.ownerOnly) return isOwner;
+    if (item.restricted) return canAccessRoles;
+    return true;
+  });
 
   return (
     <div className={styles.layout}>

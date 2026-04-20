@@ -1,0 +1,14 @@
+Based on the work done in this session:
+
+1. **Documents** — Added thumbnail preview column and Copy URL button to the files table
+2. **Invoices — Discount** — Added discount type selector (percentage / fixed amount) with calculated discount value
+3. **Invoices — Item price type** — Replaced free-text service type with a price type selector (Hourly / Fixed / Daily / No price); "No price" hides qty and price columns
+4. **Invoices — Service period job filter** — Job picker now filters by the selected service period dates
+5. **Invoices — Period quick filters** — Added Last week / 2 weeks / This month / Custom buttons for service period selection
+6. **Invoices — Layout** — Linked Jobs and Service Period moved side by side (50/50 on desktop, stacked on mobile)
+7. **Invoices — Add all jobs** — Added "Add all (N)" button to link all unlinked jobs from the selected period at once
+8. **Invoices — Job filter** — Job picker now only shows jobs with status "confirmed"
+9. **Invoices — PDF download** — Added a download PDF icon button directly in each table row
+10. **Invoices — Table actions** — View and Edit buttons now show icons only (label moved to tooltip)
+11. **Invoices — Date filters** — Added Today / This Week / This Month / By Date filter buttons to the invoices toolbar, matching the Jobs page
+12. **Settings — General Page** — Added owner-only General settings page (`/settings/general`) with company info (name, contact email/phone, timezone, default language), address, and branding (logo URL, primary color); Settings now defaults to this page

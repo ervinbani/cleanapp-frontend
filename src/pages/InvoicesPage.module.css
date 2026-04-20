@@ -46,6 +46,62 @@
   flex-shrink: 0;
 }
 
+/* ─── Date filter buttons ─────────────────────────────────────── */
+.dateFilterWrap {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.dateModeBtn {
+  padding: 0.45rem 0.75rem;
+  border: 1px solid var(--border-input);
+  border-radius: 8px;
+  background: var(--bg-surface);
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.dateModeBtn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.dateModeActive {
+  background: var(--bg-accent-subtle);
+  border-color: var(--accent);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.dateInput {
+  padding: 0.42rem 0.55rem;
+  border: 1px solid var(--border-input);
+  border-radius: 8px;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  background: var(--bg-surface);
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.15s;
+  color-scheme: light;
+}
+
+.dateInput:focus {
+  border-color: var(--accent);
+}
+
+.dateSeparator {
+  color: var(--text-placeholder);
+  font-size: 0.8rem;
+  user-select: none;
+}
+
 .searchWrap {
   position: relative;
   flex: 1;

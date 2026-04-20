@@ -7,6 +7,8 @@ export interface InvoicesQuery {
   status?: InvoiceStatus;
   search?: string;
   customerId?: string;
+  dateFrom?: string;
+  dateTo?: string;
 }
 
 export interface InvoicesResponse {

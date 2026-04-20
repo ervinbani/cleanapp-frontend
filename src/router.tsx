@@ -10,6 +10,7 @@ import UsersPage from "./pages/UsersPage";
 import JobsPage from "./pages/JobsPage";
 import InvoicesPage from "./pages/InvoicesPage";
 import DocumentsPage from "./pages/DocumentsPage";
+import GeneralPage from "./pages/settings/GeneralPage";
 import RolesPermissionsPage from "./pages/settings/RolesPermissionsPage";
 import MessagesPage from "./pages/MessagesPage";
 
@@ -35,8 +36,9 @@ const router = createBrowserRouter([
           { path: "/messages", element: <MessagesPage /> },
           {
             path: "/settings",
-            element: <Navigate to="/settings/roles" replace />,
+            element: <Navigate to="/settings/general" replace />,
           },
+          { path: "/settings/general", element: <GeneralPage /> },
           { path: "/settings/roles", element: <RolesPermissionsPage /> },
         ],
       },

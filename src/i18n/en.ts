@@ -219,6 +219,10 @@ const en = {
     status_void: "Void",
     exportExcel: "Export Excel",
     exportPdf: "Export PDF",
+    today: "Today",
+    thisWeek: "This Week",
+    thisMonth: "This Month",
+    customRange: "By Date",
   },
   users: {
     title: "Users",

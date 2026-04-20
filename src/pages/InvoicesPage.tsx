@@ -29,6 +29,27 @@ function formatDate(iso: string | undefined, lang: "en" | "es"): string {
   });
 }
 
+function getInvoiceTodayRange() {
+  const now = new Date();
+  const from = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const to = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+  return { dateFrom: from.toISOString(), dateTo: to.toISOString() };
+}
+function getInvoiceWeekRange() {
+  const now = new Date();
+  const day = now.getDay();
+  const diffToMon = day === 0 ? -6 : 1 - day;
+  const mon = new Date(now.getFullYear(), now.getMonth(), now.getDate() + diffToMon);
+  const sun = new Date(mon.getFullYear(), mon.getMonth(), mon.getDate() + 6, 23, 59, 59, 999);
+  return { dateFrom: mon.toISOString(), dateTo: sun.toISOString() };
+}
+function getInvoiceMonthRange() {
+  const now = new Date();
+  const from = new Date(now.getFullYear(), now.getMonth(), 1);
+  const to = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+  return { dateFrom: from.toISOString(), dateTo: to.toISOString() };
+}
+
 function getCustomer(inv: Invoice): Customer | null {
   if (typeof inv.customerId === "object" && inv.customerId !== null)
     return inv.customerId as Customer;
@@ -1524,6 +1545,9 @@ export default function InvoicesPage() {
 
   const [search, setSearch] = useState("");
   const [apiStatus, setApiStatus] = useState<InvoiceStatus | "">("");
+  const [dateMode, setDateMode] = useState<"" | "today" | "week" | "month" | "custom">("" );
+  const [customDateFrom, setCustomDateFrom] = useState("");
+  const [customDateTo, setCustomDateTo] = useState("");
 
   const [colNumber, setColNumber] = useState("");
   const [colCustomer, setColCustomer] = useState("");
@@ -1552,12 +1576,23 @@ export default function InvoicesPage() {
 
   const fetchInvoices = useCallback(async () => {
     setLoading(true);
+    let dateFrom: string | undefined;
+    let dateTo: string | undefined;
+    if (dateMode === "today") ({ dateFrom, dateTo } = getInvoiceTodayRange());
+    else if (dateMode === "week") ({ dateFrom, dateTo } = getInvoiceWeekRange());
+    else if (dateMode === "month") ({ dateFrom, dateTo } = getInvoiceMonthRange());
+    else if (dateMode === "custom") {
+      dateFrom = customDateFrom ? new Date(customDateFrom).toISOString() : undefined;
+      dateTo = customDateTo ? new Date(customDateTo + "T23:59:59").toISOString() : undefined;
+    }
     try {
       const res = await invoiceService.getAll({
         page,
         limit: PAGE_LIMIT,
         search: search.trim() || undefined,
         status: apiStatus || undefined,
+        dateFrom,
+        dateTo,
       });
       setInvoices(res.data);
       setTotal(res.pagination.total);
@@ -1567,14 +1602,14 @@ export default function InvoicesPage() {
     } finally {
       setLoading(false);
     }
-  }, [page, search, apiStatus]);
+  }, [page, search, apiStatus, dateMode, customDateFrom, customDateTo]);
 
   useEffect(() => {
     fetchInvoices();
   }, [fetchInvoices]);
   useEffect(() => {
     setPage(1);
-  }, [search, apiStatus]);
+  }, [search, apiStatus, dateMode, customDateFrom, customDateTo]);
 
   const handleDelete = async (id: string) => {
     if (!window.confirm("Delete this invoice?")) return;
@@ -1760,6 +1795,43 @@ export default function InvoicesPage() {
                 </option>
               ))}
             </select>
+            {/* Date filters */}
+            <div className={styles.dateFilterWrap}>
+              {(
+                [
+                  { key: "today", label: l.today },
+                  { key: "week", label: l.thisWeek },
+                  { key: "month", label: l.thisMonth },
+                  { key: "custom", label: l.customRange },
+                ] as { key: typeof dateMode; label: string }[]
+              ).map(({ key, label }) => (
+                <button
+                  key={key}
+                  type="button"
+                  className={`${styles.dateModeBtn}${dateMode === key ? ` ${styles.dateModeActive}` : ""}`}
+                  onClick={() => setDateMode(dateMode === key ? "" : key)}
+                >
+                  {label}
+                </button>
+              ))}
+              {dateMode === "custom" && (
+                <>
+                  <input
+                    type="date"
+                    className={styles.dateInput}
+                    value={customDateFrom}
+                    onChange={(e) => setCustomDateFrom(e.target.value)}
+                  />
+                  <span className={styles.dateSeparator}>→</span>
+                  <input
+                    type="date"
+                    className={styles.dateInput}
+                    value={customDateTo}
+                    onChange={(e) => setCustomDateTo(e.target.value)}
+                  />
+                </>
+              )}
+            </div>
             <div className={styles.exportBtns}>
               <button
                 className={styles.btnExcelExport}

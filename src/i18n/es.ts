@@ -221,6 +221,10 @@ const es: Translations = {
     status_void: "Anulada",
     exportExcel: "Exportar Excel",
     exportPdf: "Exportar PDF",
+    today: "Hoy",
+    thisWeek: "Esta semana",
+    thisMonth: "Este mes",
+    customRange: "Por fecha",
   },
   users: {
     title: "Usuarios",
