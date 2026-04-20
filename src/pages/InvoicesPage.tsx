@@ -107,8 +107,7 @@ async function downloadInvoicePdf(inv: Invoice, lang: "en" | "es") {
     body: inv.items
       .filter(
         (it) =>
-          it.description?.trim() ||
-          (it.unitPrice != null && it.unitPrice > 0),
+          it.description?.trim() || (it.unitPrice != null && it.unitPrice > 0),
       )
       .map((it) => [
         it.description ?? "",
@@ -169,7 +168,8 @@ async function downloadInvoicePdf(inv: Invoice, lang: "en" | "es") {
       const m = color.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
       if (m) return [+m[1], +m[2], +m[3]];
       const h = color.match(/^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i);
-      if (h) return [parseInt(h[1], 16), parseInt(h[2], 16), parseInt(h[3], 16)];
+      if (h)
+        return [parseInt(h[1], 16), parseInt(h[2], 16), parseInt(h[3], 16)];
       return DEFAULT_COLOR;
     };
     type Run = { text: string; color: [number, number, number] };
@@ -177,11 +177,16 @@ async function downloadInvoicePdf(inv: Invoice, lang: "en" | "es") {
       const runs: Run[] = [];
       if (node.nodeType === Node.TEXT_NODE) {
         const text = node.textContent ?? "";
-        if (text) runs.push({ text, color: inheritColor ? parseRgb(inheritColor) : DEFAULT_COLOR });
+        if (text)
+          runs.push({
+            text,
+            color: inheritColor ? parseRgb(inheritColor) : DEFAULT_COLOR,
+          });
       } else if (node.nodeType === Node.ELEMENT_NODE) {
         const el = node as HTMLElement;
         const color = el.style?.color || inheritColor;
-        for (const child of el.childNodes) getRuns(child, color).forEach((r) => runs.push(r));
+        for (const child of el.childNodes)
+          getRuns(child, color).forEach((r) => runs.push(r));
       }
       return runs;
     };
@@ -203,7 +208,10 @@ async function downloadInvoicePdf(inv: Invoice, lang: "en" | "es") {
         words.forEach((word) => {
           if (!word) return;
           const w = doc.getTextWidth(word);
-          if (cx + w > 194 && cx > 14) { cy += lh; cx = 14; }
+          if (cx + w > 194 && cx > 14) {
+            cy += lh;
+            cx = 14;
+          }
           doc.text(word, cx, cy);
           cx += w;
         });
@@ -215,7 +223,6 @@ async function downloadInvoicePdf(inv: Invoice, lang: "en" | "es") {
 
   doc.save(`invoice-${inv.invoiceNumber || "draft"}.pdf`);
 }
-
 
 const STATUS_ORDER: InvoiceStatus[] = [
   "draft",
@@ -1897,8 +1904,17 @@ export default function InvoicesPage() {
                               title="PDF"
                               onClick={() => downloadInvoicePdf(inv, lang)}
                             >
-                              <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14">
-                                <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
+                              <svg
+                                viewBox="0 0 20 20"
+                                fill="currentColor"
+                                width="14"
+                                height="14"
+                              >
+                                <path
+                                  fillRule="evenodd"
+                                  d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
+                                  clipRule="evenodd"
+                                />
                               </svg>
                             </button>
                             {canWrite && (

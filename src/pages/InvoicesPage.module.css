@@ -820,7 +820,8 @@
 }
 
 /* ─── Download PDF button ─────────────────────────────────────── */
-.btnDownloadPdf {  display: inline-flex;
+.btnDownloadPdf {
+  display: inline-flex;
   align-items: center;
   gap: 0.4rem;
   padding: 0.55rem 1.25rem;
@@ -865,7 +866,9 @@
   background: #fef2f2;
   color: #b91c1c;
   cursor: pointer;
-  transition: background 0.15s, border-color 0.15s;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
   flex-shrink: 0;
 }
 
