@@ -32,21 +32,49 @@ function formatDate(iso: string | undefined, lang: "en" | "es"): string {
 function getInvoiceTodayRange() {
   const now = new Date();
   const from = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const to = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+  const to = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate(),
+    23,
+    59,
+    59,
+    999,
+  );
   return { dateFrom: from.toISOString(), dateTo: to.toISOString() };
 }
 function getInvoiceWeekRange() {
   const now = new Date();
   const day = now.getDay();
   const diffToMon = day === 0 ? -6 : 1 - day;
-  const mon = new Date(now.getFullYear(), now.getMonth(), now.getDate() + diffToMon);
-  const sun = new Date(mon.getFullYear(), mon.getMonth(), mon.getDate() + 6, 23, 59, 59, 999);
+  const mon = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate() + diffToMon,
+  );
+  const sun = new Date(
+    mon.getFullYear(),
+    mon.getMonth(),
+    mon.getDate() + 6,
+    23,
+    59,
+    59,
+    999,
+  );
   return { dateFrom: mon.toISOString(), dateTo: sun.toISOString() };
 }
 function getInvoiceMonthRange() {
   const now = new Date();
   const from = new Date(now.getFullYear(), now.getMonth(), 1);
-  const to = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+  const to = new Date(
+    now.getFullYear(),
+    now.getMonth() + 1,
+    0,
+    23,
+    59,
+    59,
+    999,
+  );
   return { dateFrom: from.toISOString(), dateTo: to.toISOString() };
 }
 
@@ -1545,7 +1573,9 @@ export default function InvoicesPage() {
 
   const [search, setSearch] = useState("");
   const [apiStatus, setApiStatus] = useState<InvoiceStatus | "">("");
-  const [dateMode, setDateMode] = useState<"" | "today" | "week" | "month" | "custom">("" );
+  const [dateMode, setDateMode] = useState<
+    "" | "today" | "week" | "month" | "custom"
+  >("");
   const [customDateFrom, setCustomDateFrom] = useState("");
   const [customDateTo, setCustomDateTo] = useState("");
 
@@ -1579,11 +1609,17 @@ export default function InvoicesPage() {
     let dateFrom: string | undefined;
     let dateTo: string | undefined;
     if (dateMode === "today") ({ dateFrom, dateTo } = getInvoiceTodayRange());
-    else if (dateMode === "week") ({ dateFrom, dateTo } = getInvoiceWeekRange());
-    else if (dateMode === "month") ({ dateFrom, dateTo } = getInvoiceMonthRange());
+    else if (dateMode === "week")
+      ({ dateFrom, dateTo } = getInvoiceWeekRange());
+    else if (dateMode === "month")
+      ({ dateFrom, dateTo } = getInvoiceMonthRange());
     else if (dateMode === "custom") {
-      dateFrom = customDateFrom ? new Date(customDateFrom).toISOString() : undefined;
-      dateTo = customDateTo ? new Date(customDateTo + "T23:59:59").toISOString() : undefined;
+      dateFrom = customDateFrom
+        ? new Date(customDateFrom).toISOString()
+        : undefined;
+      dateTo = customDateTo
+        ? new Date(customDateTo + "T23:59:59").toISOString()
+        : undefined;
     }
     try {
       const res = await invoiceService.getAll({

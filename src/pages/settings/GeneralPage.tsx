@@ -120,7 +120,13 @@ export default function GeneralPage() {
   useEffect(() => {
     getTenant()
       .then((tenant) => setForm(tenantToForm(tenant)))
-      .catch(() => setError(lang === "en" ? "Failed to load company data." : "Error al cargar los datos."))
+      .catch(() =>
+        setError(
+          lang === "en"
+            ? "Failed to load company data."
+            : "Error al cargar los datos.",
+        ),
+      )
       .finally(() => setLoading(false));
   }, [lang]);
 
@@ -178,7 +184,9 @@ export default function GeneralPage() {
           <h2 className={styles.sectionTitle}>{t.sectionCompany}</h2>
           <div className={styles.grid}>
             <div className={styles.field}>
-              <label className={styles.label}>{t.labelName} <span className={styles.required}>*</span></label>
+              <label className={styles.label}>
+                {t.labelName} <span className={styles.required}>*</span>
+              </label>
               <input
                 className={styles.input}
                 value={form.name}
@@ -218,7 +226,9 @@ export default function GeneralPage() {
               <select
                 className={styles.input}
                 value={form.defaultLanguage}
-                onChange={(e) => set("defaultLanguage", e.target.value as "en" | "es")}
+                onChange={(e) =>
+                  set("defaultLanguage", e.target.value as "en" | "es")
+                }
               >
                 <option value="en">English</option>
                 <option value="es">Español</option>
