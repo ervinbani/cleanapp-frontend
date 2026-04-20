@@ -297,8 +297,9 @@
 .btnDelete {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.3rem;
-  padding: 0.3rem 0.65rem;
+  padding: 0.3rem 0.5rem;
   border-radius: 6px;
   border: 1px solid;
   font-size: 0.78rem;
@@ -313,8 +314,8 @@
 .btnView svg,
 .btnUpdate svg,
 .btnDelete svg {
-  width: 13px;
-  height: 13px;
+  width: 14px;
+  height: 14px;
   flex-shrink: 0;
 }
 
