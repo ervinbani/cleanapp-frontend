@@ -153,7 +153,7 @@ function invoiceToForm(inv: Invoice): InvoiceForm {
           quantity: String(it.quantity ?? 1),
           unit: it.unit ?? "hours",
           unitPrice: String(it.unitPrice ?? ""),
-          priceUnit: "per_job",
+          priceUnit: it.priceUnit ?? "per_job",
         }))
       : [{ ...EMPTY_ITEM }],
   };
@@ -181,11 +181,15 @@ const formT = {
     servicePeriod: "Service Period",
     from: "From",
     to: "To",
+    periodLastWeek: "Last week",
+    periodTwoWeeks: "2 weeks",
+    periodThisMonth: "This month",
+    periodCustom: "Custom",
     itemsSection: "Items",
     description: "Description",
     serviceType: "Type",
     priceUnit: "Price Type",
-    priceUnitLabels: { per_hour: "Hourly", per_job: "Fixed", per_day: "Daily" },
+    priceUnitLabels: { per_hour: "Hourly", per_job: "Fixed", per_day: "Daily", no_price: "No price" },
     quantity: "Qty",
     unit: "Unit",
     unitPrice: "Unit Price",
@@ -200,6 +204,7 @@ const formT = {
     linkedJob: "Linked Jobs",
     selectJob: "— Add a job —",
     noJobs: "No jobs for this customer",
+    addAllJobs: "Add all",
     pm_cash: "Cash",
     pm_card: "Card",
     pm_bank_transfer: "Bank Transfer",
@@ -234,6 +239,10 @@ const formT = {
     servicePeriod: "Período del Servicio",
     from: "Desde",
     to: "Hasta",
+    periodLastWeek: "Última semana",
+    periodTwoWeeks: "2 semanas",
+    periodThisMonth: "Este mes",
+    periodCustom: "Personalizado",
     itemsSection: "Artículos",
     description: "Descripción",
     serviceType: "Tipo",
@@ -242,6 +251,7 @@ const formT = {
       per_hour: "Por hora",
       per_job: "Fijo",
       per_day: "Por día",
+      no_price: "Sin precio",
     },
     quantity: "Cant.",
     unit: "Unidad",
@@ -257,6 +267,7 @@ const formT = {
     linkedJob: "Trabajos vinculados",
     selectJob: "— Agregar trabajo —",
     noJobs: "Sin trabajos para este cliente",
+    addAllJobs: "Agregar todos",
     pm_cash: "Efectivo",
     pm_card: "Tarjeta",
     pm_bank_transfer: "Transferencia",
@@ -309,6 +320,9 @@ function InvoiceFormSection({
   const [saving, setSaving] = useState(false);
   const [customers, setCustomers] = useState<DropdownCustomer[]>([]);
   const [loadingOptions, setLoadingOptions] = useState(true);
+  const [showPeriodDates, setShowPeriodDates] = useState(
+    !!(invoice?.servicePeriod?.from || invoice?.servicePeriod?.to),
+  );
   const [jobs, setJobs] = useState<DropdownJob[]>([]);
   const [loadingJobs, setLoadingJobs] = useState(false);
 
@@ -329,11 +343,16 @@ function InvoiceFormSection({
     }
     setLoadingJobs(true);
     jobService
-      .getAll({ customerId: form.customerId, limit: 200 })
+      .getAll({
+        customerId: form.customerId,
+        limit: 200,
+        dateFrom: form.servicePeriodFrom || undefined,
+        dateTo: form.servicePeriodTo || undefined,
+      })
       .then((res) => setJobs(res.data as unknown as DropdownJob[]))
       .catch(() => setJobs([]))
       .finally(() => setLoadingJobs(false));
-  }, [form.customerId]);
+  }, [form.customerId, form.servicePeriodFrom, form.servicePeriodTo]);
 
   const set = <K extends keyof InvoiceForm>(field: K, value: InvoiceForm[K]) =>
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -357,6 +376,7 @@ function InvoiceFormSection({
 
   // Compute totals
   const itemTotals = form.items.map((it) => {
+    if (it.priceUnit === "no_price") return 0;
     const qty = parseFloat(it.quantity) || 0;
     const price = parseFloat(it.unitPrice) || 0;
     return qty * price;
@@ -612,9 +632,10 @@ function InvoiceFormSection({
           .map((it, i) => ({
             description: it.description.trim(),
             serviceType: it.serviceType.trim() || undefined,
-            quantity: parseFloat(it.quantity) || 1,
-            unit: it.unit,
+            quantity: it.priceUnit === "no_price" ? 0 : parseFloat(it.quantity) || 1,
+            unit: it.priceUnit === "no_price" ? "no_price" : it.unit,
             unitPrice: parseFloat(it.unitPrice) || 0,
+            priceUnit: it.priceUnit || undefined,
             total: itemTotals[i],
           })),
       };
@@ -689,102 +710,237 @@ function InvoiceFormSection({
             </div>
           </div>
 
-          {/* Linked Jobs picker */}
-          <div className={styles.formGroup}>
-            <label className={styles.label}>{l.linkedJob}</label>
-            <div className={styles.jobPickerRow}>
-              <select
-                className={styles.input}
-                defaultValue=""
-                disabled={loadingJobs || !form.customerId}
-                onChange={(e) => {
-                  const id = e.target.value;
-                  if (!id || form.jobIds.includes(id)) return;
-                  const job = jobs.find((j) => j._id === id);
-                  setForm((prev) => {
-                    // per_job = fixed price, qty always 1; otherwise use timeDuration (fallback 1 if 0/unset)
-                    const qty =
-                      job?.priceUnit === "per_job" ? 1 : job?.timeDuration || 1;
-                    const unitPrice = job?.price ?? 0;
-                    const newItem: ItemForm = {
-                      description: job?.title || id.slice(-6),
-                      serviceType: `job:${id}`,
-                      quantity: String(qty),
-                      unit:
-                        job?.priceUnit === "per_day"
-                          ? "days"
-                          : job?.priceUnit === "per_hour"
-                            ? "hours"
-                            : "job",
-                      unitPrice: String(unitPrice),
-                      priceUnit: job?.priceUnit || "per_job",
-                    };
-                    const items =
-                      prev.items.length === 1 &&
-                      !prev.items[0].description &&
-                      !prev.items[0].unitPrice
-                        ? [newItem]
-                        : [...prev.items, newItem];
-                    return { ...prev, jobIds: [...prev.jobIds, id], items };
-                  });
-                  e.target.value = "";
-                }}
-              >
-                <option value="">
-                  {!form.customerId
-                    ? l.selectCustomer
-                    : loadingJobs
-                      ? l.loadingOpts
-                      : jobs.filter((j) => !form.jobIds.includes(j._id))
-                            .length === 0
-                        ? l.noJobs
-                        : l.selectJob}
-                </option>
-                {jobs
-                  .filter((j) => !form.jobIds.includes(j._id))
-                  .map((j) => (
-                    <option key={j._id} value={j._id}>
-                      {j.title || j._id.slice(-6)} —{" "}
-                      {new Date(j.scheduledStart).toLocaleDateString()}
+          {/* Linked Jobs + Service Period side by side */}
+          <div className={styles.jobPeriodRow}>
+
+            {/* Left: Linked Jobs picker */}
+            <div className={styles.jobPeriodCol}>
+              <div className={styles.formGroup}>
+                <label className={styles.label}>{l.linkedJob}</label>
+                <div className={styles.jobPickerRow}>
+                  <select
+                    className={styles.input}
+                    defaultValue=""
+                    disabled={loadingJobs || !form.customerId}
+                    onChange={(e) => {
+                      const id = e.target.value;
+                      if (!id || form.jobIds.includes(id)) return;
+                      const job = jobs.find((j) => j._id === id);
+                      setForm((prev) => {
+                        // per_job = fixed price, qty always 1; otherwise use timeDuration (fallback 1 if 0/unset)
+                        const qty =
+                          job?.priceUnit === "per_job" ? 1 : job?.timeDuration || 1;
+                        const unitPrice = job?.price ?? 0;
+                        const newItem: ItemForm = {
+                          description: job?.title || id.slice(-6),
+                          serviceType: `job:${id}`,
+                          quantity: String(qty),
+                          unit:
+                            job?.priceUnit === "per_day"
+                              ? "days"
+                              : job?.priceUnit === "per_hour"
+                                ? "hours"
+                                : "job",
+                          unitPrice: String(unitPrice),
+                          priceUnit: job?.priceUnit || "per_job",
+                        };
+                        const items =
+                          prev.items.length === 1 &&
+                          !prev.items[0].description &&
+                          !prev.items[0].unitPrice
+                            ? [newItem]
+                            : [...prev.items, newItem];
+                        return { ...prev, jobIds: [...prev.jobIds, id], items };
+                      });
+                      e.target.value = "";
+                    }}
+                  >
+                    <option value="">
+                      {!form.customerId
+                        ? l.selectCustomer
+                        : loadingJobs
+                          ? l.loadingOpts
+                          : jobs.filter((j) => !form.jobIds.includes(j._id))
+                                .length === 0
+                            ? l.noJobs
+                            : l.selectJob}
                     </option>
-                  ))}
-              </select>
-            </div>
-            {form.jobIds.length > 0 && (
-              <div className={styles.jobTagList}>
-                {form.jobIds.map((id) => {
-                  const job = jobs.find((j) => j._id === id);
-                  return (
-                    <span key={id} className={styles.jobTag}>
-                      {job
-                        ? `${job.title || id.slice(-6)} — ${new Date(job.scheduledStart).toLocaleDateString()}`
-                        : id.slice(-6)}
-                      <button
-                        type="button"
-                        className={styles.jobTagRemove}
-                        onClick={() =>
-                          setForm((prev) => {
-                            const remaining = prev.jobIds.filter(
-                              (j) => j !== id,
-                            );
-                            const items = prev.items.filter(
-                              (it) => it.serviceType !== `job:${id}`,
-                            );
-                            return {
-                              ...prev,
-                              jobIds: remaining,
-                              items: items.length ? items : [{ ...EMPTY_ITEM }],
-                            };
-                          })
-                        }
-                      >
-                        ×
-                      </button>
-                    </span>
-                  );
-                })}
+                    {jobs
+                      .filter((j) => !form.jobIds.includes(j._id))
+                      .map((j) => (
+                        <option key={j._id} value={j._id}>
+                          {j.title || j._id.slice(-6)} —{" "}
+                          {new Date(j.scheduledStart).toLocaleDateString()}
+                        </option>
+                      ))}
+                  </select>
+                </div>
+                {jobs.filter((j) => !form.jobIds.includes(j._id)).length > 0 && (
+                  <button
+                    type="button"
+                    className={styles.addAllJobsBtn}
+                    disabled={loadingJobs}
+                    onClick={() => {
+                      const unlinked = jobs.filter((j) => !form.jobIds.includes(j._id));
+                      setForm((prev) => {
+                        const newItems: ItemForm[] = unlinked.map((job) => ({
+                          description: job.title || job._id.slice(-6),
+                          serviceType: `job:${job._id}`,
+                          quantity: String(job.priceUnit === "per_job" ? 1 : job.timeDuration || 1),
+                          unit:
+                            job.priceUnit === "per_day"
+                              ? "days"
+                              : job.priceUnit === "per_hour"
+                                ? "hours"
+                                : "job",
+                          unitPrice: String(job.price ?? 0),
+                          priceUnit: job.priceUnit || "per_job",
+                        }));
+                        const existingItems =
+                          prev.items.length === 1 &&
+                          !prev.items[0].description &&
+                          !prev.items[0].unitPrice
+                            ? []
+                            : prev.items;
+                        return {
+                          ...prev,
+                          jobIds: [...prev.jobIds, ...unlinked.map((j) => j._id)],
+                          items: [...existingItems, ...newItems],
+                        };
+                      });
+                    }}
+                  >
+                    {l.addAllJobs} ({jobs.filter((j) => !form.jobIds.includes(j._id)).length})
+                  </button>
+                )}
+                {form.jobIds.length > 0 && (
+                  <div className={styles.jobTagList}>
+                    {form.jobIds.map((id) => {
+                      const job = jobs.find((j) => j._id === id);
+                      return (
+                        <span key={id} className={styles.jobTag}>
+                          {job
+                            ? `${job.title || id.slice(-6)} — ${new Date(job.scheduledStart).toLocaleDateString()}`
+                            : id.slice(-6)}
+                          <button
+                            type="button"
+                            className={styles.jobTagRemove}
+                            onClick={() =>
+                              setForm((prev) => {
+                                const remaining = prev.jobIds.filter(
+                                  (j) => j !== id,
+                                );
+                                const items = prev.items.filter(
+                                  (it) => it.serviceType !== `job:${id}`,
+                                );
+                                return {
+                                  ...prev,
+                                  jobIds: remaining,
+                                  items: items.length ? items : [{ ...EMPTY_ITEM }],
+                                };
+                              })
+                            }
+                          >
+                            ×
+                          </button>
+                        </span>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
-            )}
+            </div>
+
+            {/* Right: Service Period */}
+            <div className={styles.jobPeriodCol}>
+              <label className={styles.label}>{l.servicePeriod}</label>
+              <div className={styles.periodBar}>
+                {(
+                  [
+                    {
+                      key: "lastWeek",
+                      label: l.periodLastWeek,
+                      fn: () => {
+                        const now = new Date();
+                        const to = new Date(now);
+                        to.setDate(to.getDate() - 1);
+                        const from = new Date(now);
+                        from.setDate(from.getDate() - 7);
+                        return { from: from.toISOString().slice(0, 10), to: to.toISOString().slice(0, 10) };
+                      },
+                    },
+                    {
+                      key: "twoWeeks",
+                      label: l.periodTwoWeeks,
+                      fn: () => {
+                        const now = new Date();
+                        const to = new Date(now);
+                        to.setDate(to.getDate() - 1);
+                        const from = new Date(now);
+                        from.setDate(from.getDate() - 14);
+                        return { from: from.toISOString().slice(0, 10), to: to.toISOString().slice(0, 10) };
+                      },
+                    },
+                    {
+                      key: "thisMonth",
+                      label: l.periodThisMonth,
+                      fn: () => {
+                        const now = new Date();
+                        const from = new Date(now.getFullYear(), now.getMonth(), 1);
+                        return { from: from.toISOString().slice(0, 10), to: now.toISOString().slice(0, 10) };
+                      },
+                    },
+                  ] as { key: string; label: string; fn: () => { from: string; to: string } }[]
+                ).map(({ key, label, fn }) => (
+                  <button
+                    key={key}
+                    type="button"
+                    className={styles.periodBtn}
+                    onClick={() => {
+                      const { from, to } = fn();
+                      setForm((prev) => ({ ...prev, servicePeriodFrom: from, servicePeriodTo: to }));
+                      setShowPeriodDates(true);
+                    }}
+                  >
+                    {label}
+                  </button>
+                ))}
+                <button
+                  type="button"
+                  className={`${styles.periodBtn} ${showPeriodDates ? styles.periodBtnActive : ""}`}
+                  onClick={() => setShowPeriodDates((v) => !v)}
+                >
+                  {l.periodCustom}
+                </button>
+                {(form.servicePeriodFrom || form.servicePeriodTo) && (
+                  <span className={styles.periodSummary}>
+                    {form.servicePeriodFrom || "…"} → {form.servicePeriodTo || "…"}
+                  </span>
+                )}
+              </div>
+              {showPeriodDates && (
+                <div className={styles.formRow}>
+                  <div className={styles.formGroup}>
+                    <label className={styles.label}>{l.from}</label>
+                    <input
+                      className={styles.input}
+                      type="date"
+                      value={form.servicePeriodFrom}
+                      onChange={(e) => set("servicePeriodFrom", e.target.value)}
+                    />
+                  </div>
+                  <div className={styles.formGroup}>
+                    <label className={styles.label}>{l.to}</label>
+                    <input
+                      className={styles.input}
+                      type="date"
+                      value={form.servicePeriodTo}
+                      onChange={(e) => set("servicePeriodTo", e.target.value)}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Dates */}
@@ -823,29 +979,6 @@ function InvoiceFormSection({
             </div>
           </div>
 
-          {/* Service Period */}
-          <p className={styles.sectionDivider}>{l.servicePeriod}</p>
-          <div className={styles.formRow}>
-            <div className={styles.formGroup}>
-              <label className={styles.label}>{l.from}</label>
-              <input
-                className={styles.input}
-                type="date"
-                value={form.servicePeriodFrom}
-                onChange={(e) => set("servicePeriodFrom", e.target.value)}
-              />
-            </div>
-            <div className={styles.formGroup}>
-              <label className={styles.label}>{l.to}</label>
-              <input
-                className={styles.input}
-                type="date"
-                value={form.servicePeriodTo}
-                onChange={(e) => set("servicePeriodTo", e.target.value)}
-              />
-            </div>
-          </div>
-
           {/* Items */}
           <p className={styles.sectionDivider}>{l.itemsSection}</p>
           {form.items.map((item, idx) => (
@@ -865,55 +998,47 @@ function InvoiceFormSection({
               </div>
               <div className={styles.formGroup}>
                 {idx === 0 && (
-                  <label className={styles.label}>
-                    {item.serviceType.startsWith("job:")
-                      ? l.priceUnit
-                      : l.serviceType}
-                  </label>
+                  <label className={styles.label}>{l.priceUnit}</label>
                 )}
-                {item.serviceType.startsWith("job:") ? (
-                  <select
-                    className={styles.input}
-                    value={item.priceUnit}
-                    onChange={(e) => {
-                      const pu = e.target.value;
-                      updateItem(idx, "priceUnit", pu);
-                      updateItem(
-                        idx,
-                        "unit",
-                        pu === "per_day"
-                          ? "days"
-                          : pu === "per_hour"
-                            ? "hours"
+                <select
+                  className={styles.input}
+                  value={item.priceUnit}
+                  onChange={(e) => {
+                    const pu = e.target.value;
+                    updateItem(idx, "priceUnit", pu);
+                    updateItem(
+                      idx,
+                      "unit",
+                      pu === "per_day"
+                        ? "days"
+                        : pu === "per_hour"
+                          ? "hours"
+                          : pu === "no_price"
+                            ? ""
                             : "job",
-                      );
-                    }}
-                  >
-                    {(
-                      Object.entries(
-                        (
-                          l as unknown as {
-                            priceUnitLabels: Record<string, string>;
-                          }
-                        ).priceUnitLabels,
-                      ) as [string, string][]
-                    ).map(([val, label]) => (
-                      <option key={val} value={val}>
-                        {label}
-                      </option>
-                    ))}
-                  </select>
-                ) : (
-                  <input
-                    className={styles.input}
-                    value={item.serviceType}
-                    onChange={(e) =>
-                      updateItem(idx, "serviceType", e.target.value)
+                    );
+                    if (pu === "no_price") {
+                      updateItem(idx, "quantity", "0");
+                      updateItem(idx, "unitPrice", "0");
                     }
-                    placeholder={l.serviceType}
-                  />
-                )}
+                  }}
+                >
+                  {(
+                    Object.entries(
+                      (
+                        l as unknown as {
+                          priceUnitLabels: Record<string, string>;
+                        }
+                      ).priceUnitLabels,
+                    ) as [string, string][]
+                  ).map(([val, label]) => (
+                    <option key={val} value={val}>
+                      {label}
+                    </option>
+                  ))}
+                </select>
               </div>
+              {item.priceUnit !== "no_price" && (
               <div className={styles.formGroup}>
                 {idx === 0 && (
                   <label className={styles.label}>{l.quantity}</label>
@@ -927,6 +1052,8 @@ function InvoiceFormSection({
                   onChange={(e) => updateItem(idx, "quantity", e.target.value)}
                 />
               </div>
+              )}
+              {item.priceUnit !== "no_price" && (
               <div className={styles.formGroup}>
                 {idx === 0 && (
                   <label className={styles.label}>{l.unitPrice}</label>
@@ -940,6 +1067,8 @@ function InvoiceFormSection({
                   onChange={(e) => updateItem(idx, "unitPrice", e.target.value)}
                 />
               </div>
+              )}
+              {item.priceUnit !== "no_price" && (
               <div className={styles.formGroup}>
                 {idx === 0 && (
                   <label className={styles.label}>{l.lineTotal}</label>
@@ -950,6 +1079,7 @@ function InvoiceFormSection({
                   value={itemTotals[idx]?.toFixed(2) ?? "0.00"}
                 />
               </div>
+              )}
               <button
                 type="button"
                 className={styles.btnRemoveItem}

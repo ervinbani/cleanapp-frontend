@@ -497,6 +497,29 @@
   gap: 0.5rem;
 }
 
+.addAllJobsBtn {
+  margin-top: 0.4rem;
+  width: 100%;
+  padding: 0.3rem 0.75rem;
+  font-size: 0.82rem;
+  font-weight: 500;
+  background: none;
+  border: 1px dashed var(--accent);
+  border-radius: 6px;
+  color: var(--accent);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.addAllJobsBtn:hover:not(:disabled) {
+  background: var(--bg-accent-active);
+}
+
+.addAllJobsBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
 .jobTagList {
   display: flex;
   flex-wrap: wrap;
@@ -592,6 +615,71 @@
   margin: 0.5rem 0 1rem;
   padding-top: 0.75rem;
   border-top: 1px solid var(--bg-surface-subtle);
+}
+
+/* ─── Job + Period side-by-side row ───────────────────────────── */
+.jobPeriodRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  align-items: start;
+}
+
+.jobPeriodCol {
+  min-width: 0;
+}
+
+@media (max-width: 640px) {
+  .jobPeriodRow {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ─── Period quick-filter bar ─────────────────────────────────── */
+.periodBar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.periodBtn {
+  padding: 0.3rem 0.85rem;
+  border: 1px solid var(--border-input);
+  border-radius: 999px;
+  background: none;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
+  white-space: nowrap;
+}
+
+.periodBtn:hover {
+  background: var(--bg-accent-subtle);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.periodBtnActive {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.periodBtnActive:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+  color: #fff;
+}
+
+.periodSummary {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-family: monospace;
+  margin-left: 0.25rem;
 }
 
 /* ─── Items rows ──────────────────────────────────────────────── */

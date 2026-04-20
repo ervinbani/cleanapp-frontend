@@ -140,6 +140,7 @@ export interface InvoiceItem {
   quantity?: number;
   unit?: string;
   unitPrice?: number;
+  priceUnit?: string;
   total?: number;
 }
 
