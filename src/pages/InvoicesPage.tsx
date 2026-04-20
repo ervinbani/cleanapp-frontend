@@ -189,7 +189,12 @@ const formT = {
     description: "Description",
     serviceType: "Type",
     priceUnit: "Price Type",
-    priceUnitLabels: { per_hour: "Hourly", per_job: "Fixed", per_day: "Daily", no_price: "No price" },
+    priceUnitLabels: {
+      per_hour: "Hourly",
+      per_job: "Fixed",
+      per_day: "Daily",
+      no_price: "No price",
+    },
     quantity: "Qty",
     unit: "Unit",
     unitPrice: "Unit Price",
@@ -632,7 +637,8 @@ function InvoiceFormSection({
           .map((it, i) => ({
             description: it.description.trim(),
             serviceType: it.serviceType.trim() || undefined,
-            quantity: it.priceUnit === "no_price" ? 0 : parseFloat(it.quantity) || 1,
+            quantity:
+              it.priceUnit === "no_price" ? 0 : parseFloat(it.quantity) || 1,
             unit: it.priceUnit === "no_price" ? "no_price" : it.unit,
             unitPrice: parseFloat(it.unitPrice) || 0,
             priceUnit: it.priceUnit || undefined,
@@ -712,7 +718,6 @@ function InvoiceFormSection({
 
           {/* Linked Jobs + Service Period side by side */}
           <div className={styles.jobPeriodRow}>
-
             {/* Left: Linked Jobs picker */}
             <div className={styles.jobPeriodCol}>
               <div className={styles.formGroup}>
@@ -729,7 +734,9 @@ function InvoiceFormSection({
                       setForm((prev) => {
                         // per_job = fixed price, qty always 1; otherwise use timeDuration (fallback 1 if 0/unset)
                         const qty =
-                          job?.priceUnit === "per_job" ? 1 : job?.timeDuration || 1;
+                          job?.priceUnit === "per_job"
+                            ? 1
+                            : job?.timeDuration || 1;
                         const unitPrice = job?.price ?? 0;
                         const newItem: ItemForm = {
                           description: job?.title || id.slice(-6),
@@ -775,18 +782,25 @@ function InvoiceFormSection({
                       ))}
                   </select>
                 </div>
-                {jobs.filter((j) => !form.jobIds.includes(j._id)).length > 0 && (
+                {jobs.filter((j) => !form.jobIds.includes(j._id)).length >
+                  0 && (
                   <button
                     type="button"
                     className={styles.addAllJobsBtn}
                     disabled={loadingJobs}
                     onClick={() => {
-                      const unlinked = jobs.filter((j) => !form.jobIds.includes(j._id));
+                      const unlinked = jobs.filter(
+                        (j) => !form.jobIds.includes(j._id),
+                      );
                       setForm((prev) => {
                         const newItems: ItemForm[] = unlinked.map((job) => ({
                           description: job.title || job._id.slice(-6),
                           serviceType: `job:${job._id}`,
-                          quantity: String(job.priceUnit === "per_job" ? 1 : job.timeDuration || 1),
+                          quantity: String(
+                            job.priceUnit === "per_job"
+                              ? 1
+                              : job.timeDuration || 1,
+                          ),
                           unit:
                             job.priceUnit === "per_day"
                               ? "days"
@@ -804,13 +818,17 @@ function InvoiceFormSection({
                             : prev.items;
                         return {
                           ...prev,
-                          jobIds: [...prev.jobIds, ...unlinked.map((j) => j._id)],
+                          jobIds: [
+                            ...prev.jobIds,
+                            ...unlinked.map((j) => j._id),
+                          ],
                           items: [...existingItems, ...newItems],
                         };
                       });
                     }}
                   >
-                    {l.addAllJobs} ({jobs.filter((j) => !form.jobIds.includes(j._id)).length})
+                    {l.addAllJobs} (
+                    {jobs.filter((j) => !form.jobIds.includes(j._id)).length})
                   </button>
                 )}
                 {form.jobIds.length > 0 && (
@@ -836,7 +854,9 @@ function InvoiceFormSection({
                                 return {
                                   ...prev,
                                   jobIds: remaining,
-                                  items: items.length ? items : [{ ...EMPTY_ITEM }],
+                                  items: items.length
+                                    ? items
+                                    : [{ ...EMPTY_ITEM }],
                                 };
                               })
                             }
@@ -866,7 +886,10 @@ function InvoiceFormSection({
                         to.setDate(to.getDate() - 1);
                         const from = new Date(now);
                         from.setDate(from.getDate() - 7);
-                        return { from: from.toISOString().slice(0, 10), to: to.toISOString().slice(0, 10) };
+                        return {
+                          from: from.toISOString().slice(0, 10),
+                          to: to.toISOString().slice(0, 10),
+                        };
                       },
                     },
                     {
@@ -878,7 +901,10 @@ function InvoiceFormSection({
                         to.setDate(to.getDate() - 1);
                         const from = new Date(now);
                         from.setDate(from.getDate() - 14);
-                        return { from: from.toISOString().slice(0, 10), to: to.toISOString().slice(0, 10) };
+                        return {
+                          from: from.toISOString().slice(0, 10),
+                          to: to.toISOString().slice(0, 10),
+                        };
                       },
                     },
                     {
@@ -886,11 +912,22 @@ function InvoiceFormSection({
                       label: l.periodThisMonth,
                       fn: () => {
                         const now = new Date();
-                        const from = new Date(now.getFullYear(), now.getMonth(), 1);
-                        return { from: from.toISOString().slice(0, 10), to: now.toISOString().slice(0, 10) };
+                        const from = new Date(
+                          now.getFullYear(),
+                          now.getMonth(),
+                          1,
+                        );
+                        return {
+                          from: from.toISOString().slice(0, 10),
+                          to: now.toISOString().slice(0, 10),
+                        };
                       },
                     },
-                  ] as { key: string; label: string; fn: () => { from: string; to: string } }[]
+                  ] as {
+                    key: string;
+                    label: string;
+                    fn: () => { from: string; to: string };
+                  }[]
                 ).map(({ key, label, fn }) => (
                   <button
                     key={key}
@@ -898,7 +935,11 @@ function InvoiceFormSection({
                     className={styles.periodBtn}
                     onClick={() => {
                       const { from, to } = fn();
-                      setForm((prev) => ({ ...prev, servicePeriodFrom: from, servicePeriodTo: to }));
+                      setForm((prev) => ({
+                        ...prev,
+                        servicePeriodFrom: from,
+                        servicePeriodTo: to,
+                      }));
                       setShowPeriodDates(true);
                     }}
                   >
@@ -914,7 +955,8 @@ function InvoiceFormSection({
                 </button>
                 {(form.servicePeriodFrom || form.servicePeriodTo) && (
                   <span className={styles.periodSummary}>
-                    {form.servicePeriodFrom || "…"} → {form.servicePeriodTo || "…"}
+                    {form.servicePeriodFrom || "…"} →{" "}
+                    {form.servicePeriodTo || "…"}
                   </span>
                 )}
               </div>
@@ -1039,46 +1081,50 @@ function InvoiceFormSection({
                 </select>
               </div>
               {item.priceUnit !== "no_price" && (
-              <div className={styles.formGroup}>
-                {idx === 0 && (
-                  <label className={styles.label}>{l.quantity}</label>
-                )}
-                <input
-                  className={styles.input}
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  value={item.quantity}
-                  onChange={(e) => updateItem(idx, "quantity", e.target.value)}
-                />
-              </div>
+                <div className={styles.formGroup}>
+                  {idx === 0 && (
+                    <label className={styles.label}>{l.quantity}</label>
+                  )}
+                  <input
+                    className={styles.input}
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={item.quantity}
+                    onChange={(e) =>
+                      updateItem(idx, "quantity", e.target.value)
+                    }
+                  />
+                </div>
               )}
               {item.priceUnit !== "no_price" && (
-              <div className={styles.formGroup}>
-                {idx === 0 && (
-                  <label className={styles.label}>{l.unitPrice}</label>
-                )}
-                <input
-                  className={styles.input}
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  value={item.unitPrice}
-                  onChange={(e) => updateItem(idx, "unitPrice", e.target.value)}
-                />
-              </div>
+                <div className={styles.formGroup}>
+                  {idx === 0 && (
+                    <label className={styles.label}>{l.unitPrice}</label>
+                  )}
+                  <input
+                    className={styles.input}
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={item.unitPrice}
+                    onChange={(e) =>
+                      updateItem(idx, "unitPrice", e.target.value)
+                    }
+                  />
+                </div>
               )}
               {item.priceUnit !== "no_price" && (
-              <div className={styles.formGroup}>
-                {idx === 0 && (
-                  <label className={styles.label}>{l.lineTotal}</label>
-                )}
-                <input
-                  className={styles.input}
-                  readOnly
-                  value={itemTotals[idx]?.toFixed(2) ?? "0.00"}
-                />
-              </div>
+                <div className={styles.formGroup}>
+                  {idx === 0 && (
+                    <label className={styles.label}>{l.lineTotal}</label>
+                  )}
+                  <input
+                    className={styles.input}
+                    readOnly
+                    value={itemTotals[idx]?.toFixed(2) ?? "0.00"}
+                  />
+                </div>
               )}
               <button
                 type="button"

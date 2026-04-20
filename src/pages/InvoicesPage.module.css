@@ -508,7 +508,9 @@
   border-radius: 6px;
   color: var(--accent);
   cursor: pointer;
-  transition: background 0.15s, color 0.15s;
+  transition:
+    background 0.15s,
+    color 0.15s;
 }
 
 .addAllJobsBtn:hover:not(:disabled) {
@@ -653,7 +655,10 @@
   font-weight: 600;
   color: var(--text-secondary);
   cursor: pointer;
-  transition: background 0.12s, border-color 0.12s, color 0.12s;
+  transition:
+    background 0.12s,
+    border-color 0.12s,
+    color 0.12s;
   white-space: nowrap;
 }
 
