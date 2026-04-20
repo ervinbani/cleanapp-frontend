@@ -498,6 +498,98 @@
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
 }
 
+/* ─── Invoice Header Preview ──────────────────────────────────── */
+.invoiceHeaderPreview {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  background: var(--bg-base);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+@media (max-width: 580px) {
+  .invoiceHeaderPreview {
+    grid-template-columns: 1fr;
+  }
+}
+
+.invoiceHeaderLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.invoiceLogo {
+  max-width: 100px;
+  max-height: 44px;
+  object-fit: contain;
+  margin-bottom: 0.5rem;
+}
+
+.invoiceCompanyName {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.invoiceCompanyDetail {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.invoiceHeaderRight {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.15rem;
+}
+
+.invoiceTitle {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--accent);
+  letter-spacing: 0.04em;
+  line-height: 1;
+}
+
+.invoiceNumber {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 0.25rem;
+}
+
+.invoiceMeta {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.invoiceBillTo {
+  margin-top: 0.75rem;
+  text-align: right;
+}
+
+.invoiceBillToLabel {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-placeholder);
+  margin-bottom: 0.15rem;
+}
+
+.invoiceBillToName {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+
+
 .formHeader {
   display: flex;
   align-items: center;

@@ -12,3 +12,4 @@ Based on the work done in this session:
 10. **Invoices — Table actions** — View and Edit buttons now show icons only (label moved to tooltip)
 11. **Invoices — Date filters** — Added Today / This Week / This Month / By Date filter buttons to the invoices toolbar, matching the Jobs page
 12. **Settings — General Page** — Added owner-only General settings page (`/settings/general`) with company info (name, contact email/phone, timezone, default language), address, and branding (logo URL, primary color); Settings now defaults to this page
+13. **Invoices — Branded header** — Invoice form now shows a live preview header (logo + company info on the left, INVOICE title + number + dates + Bill To on the right); same layout applied to all PDF downloads (table row and form button)

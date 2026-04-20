@@ -5,7 +5,8 @@ import { useTrans } from "../i18n";
 import { useAuth } from "../contexts/AuthContext";
 import { invoiceService } from "../services/invoiceService";
 import apiClient from "../services/apiClient";
-import type { Invoice, InvoiceStatus, Customer } from "../types";
+import type { Invoice, InvoiceStatus, Customer, Tenant } from "../types";
+import { getTenant } from "../services/authService";
 import { jobService } from "../services/jobService";
 import RichTextEditor from "../components/RichTextEditor";
 import styles from "./InvoicesPage.module.css";
@@ -84,68 +85,195 @@ function getCustomer(inv: Invoice): Customer | null {
   return null;
 }
 
-async function downloadInvoicePdf(inv: Invoice, lang: "en" | "es") {
+async function loadImageAsDataUrl(url: string): Promise<string | null> {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = img.naturalWidth;
+      canvas.height = img.naturalHeight;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) { resolve(null); return; }
+      ctx.drawImage(img, 0, 0);
+      resolve(canvas.toDataURL("image/png"));
+    };
+    img.onerror = () => resolve(null);
+    img.src = url;
+  });
+}
+
+async function buildInvoicePdfHeader(
+  doc: import("jspdf").jsPDF,
+  tenant: Tenant | null | undefined,
+  customer: Customer | null,
+  invoiceNumber: string,
+  issuedDate: string | undefined,
+  dueDate: string | undefined,
+  lang: "en" | "es",
+): Promise<number> {
+  const l = formT[lang];
+  const PAGE_W = 210; // A4 mm
+  const LEFT = 14;
+  const RIGHT = PAGE_W - 14;
+  const COL_MID = 110; // right column starts here
+
+  const y = 14;
+
+  // ── Left: Logo + Company info ──────────────────────────────────
+  let logoH = 0;
+  if (tenant?.branding?.logoUrl) {
+    const dataUrl = await loadImageAsDataUrl(tenant.branding.logoUrl);
+    if (dataUrl) {
+      const maxW = 36;
+      const maxH = 14;
+      doc.addImage(dataUrl, "PNG", LEFT, y, maxW, maxH);
+      logoH = maxH + 2;
+    }
+  }
+
+  const companyY = y + logoH;
+  doc.setFontSize(13);
+  doc.setFont("helvetica", "bold");
+  doc.setTextColor(17, 24, 39);
+  doc.text(tenant?.name ?? "—", LEFT, companyY);
+  doc.setFont("helvetica", "normal");
+
+  let cy = companyY + 5;
+  doc.setFontSize(8);
+  doc.setTextColor(107, 114, 128);
+  if (tenant?.address?.street) {
+    doc.text(tenant.address.street, LEFT, cy);
+    cy += 4;
+  }
+  const cityLine = [
+    tenant?.address?.city,
+    tenant?.address?.state,
+    tenant?.address?.zipCode,
+  ]
+    .filter(Boolean)
+    .join(", ");
+  if (cityLine) { doc.text(cityLine, LEFT, cy); cy += 4; }
+  if (tenant?.address?.country) { doc.text(tenant.address.country, LEFT, cy); cy += 4; }
+  if (tenant?.contactPhone) { doc.text(tenant.contactPhone, LEFT, cy); cy += 4; }
+  if (tenant?.contactEmail) { doc.text(tenant.contactEmail, LEFT, cy); cy += 4; }
+
+  // ── Right: INVOICE title + number + dates ─────────────────────
+  doc.setFontSize(22);
+  doc.setFont("helvetica", "bold");
+  doc.setTextColor(37, 99, 235);
+  doc.text("INVOICE", RIGHT, y + 8, { align: "right" });
+
+  doc.setFontSize(9);
+  doc.setFont("helvetica", "normal");
+  doc.setTextColor(107, 114, 128);
+  let ry = y + 16;
+  doc.text(`# ${invoiceNumber}`, RIGHT, ry, { align: "right" });
+  ry += 5;
+  if (issuedDate) {
+    doc.text(`${l.issuedDate}: ${issuedDate}`, RIGHT, ry, { align: "right" });
+    ry += 4;
+  }
+  if (dueDate) {
+    doc.text(`${l.dueDate}: ${dueDate}`, RIGHT, ry, { align: "right" });
+    ry += 4;
+  }
+
+  // ── Divider ───────────────────────────────────────────────────
+  const divY = Math.max(cy, ry) + 4;
+  doc.setDrawColor(229, 231, 235);
+  doc.setLineWidth(0.5);
+  doc.line(LEFT, divY, RIGHT, divY);
+
+  // ── Bill To ───────────────────────────────────────────────────
+  let by = divY + 6;
+  doc.setFontSize(7);
+  doc.setFont("helvetica", "bold");
+  doc.setTextColor(156, 163, 175);
+  doc.text(lang === "en" ? "BILL TO" : "FACTURAR A", LEFT, by);
+  by += 4;
+  if (customer) {
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(17, 24, 39);
+    doc.text(`${customer.firstName} ${customer.lastName}`, LEFT, by);
+    by += 4;
+    doc.setFontSize(8);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(107, 114, 128);
+    if (customer.email) { doc.text(customer.email, LEFT, by); by += 4; }
+    if (customer.phone) { doc.text(customer.phone, LEFT, by); by += 4; }
+    const cAddr = customer.address;
+    if (cAddr?.street) { doc.text(cAddr.street, LEFT, by); by += 4; }
+    const cCity = [cAddr?.city, cAddr?.state, cAddr?.zipCode].filter(Boolean).join(", ");
+    if (cCity) { doc.text(cCity, LEFT, by); by += 4; }
+  }
+
+  // Reset to col mid for right-side use
+  doc.setFontSize(7);
+  doc.setFont("helvetica", "bold");
+  doc.setTextColor(156, 163, 175);
+  doc.text(lang === "en" ? "INVOICE DATE" : "FECHA", COL_MID, divY + 6);
+  doc.setFontSize(8);
+  doc.setFont("helvetica", "normal");
+  doc.setTextColor(17, 24, 39);
+  if (issuedDate) { doc.text(issuedDate, COL_MID, divY + 10); }
+
+  // Final Y after header block
+  const finalHeaderY = by + 6;
+  // Separator below header block
+  doc.setDrawColor(229, 231, 235);
+  doc.line(LEFT, finalHeaderY, RIGHT, finalHeaderY);
+
+  doc.setFont("helvetica", "normal");
+  return finalHeaderY + 6;
+}
+
+async function downloadInvoicePdf(
+  inv: Invoice,
+  lang: "en" | "es",
+  tenant?: Tenant | null,
+) {
   const { default: jsPDF } = await import("jspdf");
   const { default: autoTable } = await import("jspdf-autotable");
   const l = formT[lang];
   const doc = new jsPDF();
-
-  // Header
-  doc.setFontSize(20);
-  doc.setTextColor(37, 99, 235);
-  doc.text("INVOICE", 14, 22);
-
-  doc.setFontSize(10);
-  doc.setTextColor(107, 114, 128);
-  doc.text(`# ${inv.invoiceNumber}`, 14, 30);
-
-  // Customer name
   const customer = getCustomer(inv);
-  if (customer) {
-    doc.setFontSize(11);
-    doc.setTextColor(17, 24, 39);
-    doc.text(
-      `${l.customer.replace(" *", "")}: ${customer.firstName} ${customer.lastName}`,
-      14,
-      40,
-    );
-  }
 
-  // Dates
-  let yPos = 48;
+  let yPos = await buildInvoicePdfHeader(
+    doc,
+    tenant,
+    customer,
+    inv.invoiceNumber,
+    inv.issuedDate,
+    inv.dueDate,
+    lang,
+  );
+
+  // Service period + status + payment
   doc.setFontSize(9);
+  doc.setFont("helvetica", "normal");
   doc.setTextColor(107, 114, 128);
-  if (inv.issuedDate) {
-    doc.text(`${l.issuedDate}: ${inv.issuedDate}`, 14, yPos);
-    yPos += 6;
-  }
-  if (inv.dueDate) {
-    doc.text(`${l.dueDate}: ${inv.dueDate}`, 14, yPos);
-    yPos += 6;
-  }
   if (inv.servicePeriod?.from || inv.servicePeriod?.to) {
     doc.text(
       `${l.servicePeriod}: ${inv.servicePeriod?.from || "—"} → ${inv.servicePeriod?.to || "—"}`,
       14,
       yPos,
     );
-    yPos += 6;
+    yPos += 5;
   }
-
-  // Status + Payment
   const statusLabel =
     (l[`status_${inv.status}` as keyof typeof l] as string) ?? inv.status;
   doc.text(`${l.status}: ${statusLabel}`, 14, yPos);
-  yPos += 6;
+  yPos += 5;
   if (inv.paymentMethod) {
     const pmLabel =
       (l[`pm_${inv.paymentMethod}` as keyof typeof l] as string | undefined) ??
       inv.paymentMethod;
     doc.text(`${l.paymentMethod}: ${pmLabel}`, 14, yPos);
-    yPos += 6;
+    yPos += 5;
   }
-
-  yPos += 4;
+  yPos += 3;
 
   // Items table
   autoTable(doc, {
@@ -174,40 +302,31 @@ async function downloadInvoicePdf(inv: Invoice, lang: "en" | "es") {
   const finalY =
     (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable
       .finalY + 10;
-  doc.setFontSize(10);
-  doc.setTextColor(107, 114, 128);
-
   const rightX = 196;
   let tY = finalY;
+  doc.setFontSize(10);
+  doc.setFont("helvetica", "normal");
+  doc.setTextColor(107, 114, 128);
   doc.text("Subtotal:", rightX - 50, tY, { align: "right" });
-  doc.text(`${(inv.subtotal ?? 0).toFixed(2)} ${inv.currency}`, rightX, tY, {
-    align: "right",
-  });
+  doc.text(`${(inv.subtotal ?? 0).toFixed(2)} ${inv.currency}`, rightX, tY, { align: "right" });
   tY += 6;
   doc.text(`${l.discountValue}:`, rightX - 50, tY, { align: "right" });
-  doc.text(
-    `-${(inv.discount?.amount ?? 0).toFixed(2)} ${inv.currency}`,
-    rightX,
-    tY,
-    { align: "right" },
-  );
+  doc.text(`-${(inv.discount?.amount ?? 0).toFixed(2)} ${inv.currency}`, rightX, tY, { align: "right" });
   tY += 6;
   doc.text(`${l.taxRate}:`, rightX - 50, tY, { align: "right" });
-  doc.text(`${(inv.tax ?? 0).toFixed(2)} ${inv.currency}`, rightX, tY, {
-    align: "right",
-  });
+  doc.text(`${(inv.tax ?? 0).toFixed(2)} ${inv.currency}`, rightX, tY, { align: "right" });
   tY += 8;
   doc.setFontSize(12);
+  doc.setFont("helvetica", "bold");
   doc.setTextColor(17, 24, 39);
   doc.text("Total:", rightX - 50, tY, { align: "right" });
-  doc.text(`${(inv.total ?? 0).toFixed(2)} ${inv.currency}`, rightX, tY, {
-    align: "right",
-  });
+  doc.text(`${(inv.total ?? 0).toFixed(2)} ${inv.currency}`, rightX, tY, { align: "right" });
 
   // Notes
   if (inv.notes && inv.notes.replace(/<[^>]*>/g, "").trim()) {
     tY += 14;
     doc.setFontSize(9);
+    doc.setFont("helvetica", "normal");
     doc.setTextColor(107, 114, 128);
     doc.text(`${l.notes}:`, 14, tY);
     tY += 5;
@@ -217,8 +336,7 @@ async function downloadInvoicePdf(inv: Invoice, lang: "en" | "es") {
       const m = color.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
       if (m) return [+m[1], +m[2], +m[3]];
       const h = color.match(/^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i);
-      if (h)
-        return [parseInt(h[1], 16), parseInt(h[2], 16), parseInt(h[3], 16)];
+      if (h) return [parseInt(h[1], 16), parseInt(h[2], 16), parseInt(h[3], 16)];
       return DEFAULT_COLOR;
     };
     type Run = { text: string; color: [number, number, number] };
@@ -226,16 +344,11 @@ async function downloadInvoicePdf(inv: Invoice, lang: "en" | "es") {
       const runs: Run[] = [];
       if (node.nodeType === Node.TEXT_NODE) {
         const text = node.textContent ?? "";
-        if (text)
-          runs.push({
-            text,
-            color: inheritColor ? parseRgb(inheritColor) : DEFAULT_COLOR,
-          });
+        if (text) runs.push({ text, color: inheritColor ? parseRgb(inheritColor) : DEFAULT_COLOR });
       } else if (node.nodeType === Node.ELEMENT_NODE) {
         const el = node as HTMLElement;
         const color = el.style?.color || inheritColor;
-        for (const child of el.childNodes)
-          getRuns(child, color).forEach((r) => runs.push(r));
+        for (const child of el.childNodes) getRuns(child, color).forEach((r) => runs.push(r));
       }
       return runs;
     };
@@ -257,10 +370,7 @@ async function downloadInvoicePdf(inv: Invoice, lang: "en" | "es") {
         words.forEach((word) => {
           if (!word) return;
           const w = doc.getTextWidth(word);
-          if (cx + w > 194 && cx > 14) {
-            cy += lh;
-            cx = 14;
-          }
+          if (cx + w > 194 && cx > 14) { cy += lh; cx = 14; }
           doc.text(word, cx, cy);
           cx += w;
         });
@@ -544,6 +654,7 @@ interface DropdownJob {
 interface InvoiceFormProps {
   invoice?: Invoice;
   lang: "en" | "es";
+  tenant?: Tenant | null;
   onClose: () => void;
   onSaved: () => void;
 }
@@ -551,6 +662,7 @@ interface InvoiceFormProps {
 function InvoiceFormSection({
   invoice,
   lang,
+  tenant,
   onClose,
   onSaved,
 }: InvoiceFormProps) {
@@ -641,63 +753,43 @@ function InvoiceFormSection({
     const { default: autoTable } = await import("jspdf-autotable");
     const doc = new jsPDF();
 
-    // Header
-    doc.setFontSize(20);
-    doc.setTextColor(37, 99, 235);
-    doc.text("INVOICE", 14, 22);
+    const customerObj = customers.find((c) => c._id === form.customerId);
+    const customerForHeader = customerObj
+      ? ({ firstName: customerObj.firstName, lastName: customerObj.lastName } as Customer)
+      : null;
 
-    doc.setFontSize(10);
-    doc.setTextColor(107, 114, 128);
-    doc.text(`# ${form.invoiceNumber}`, 14, 30);
+    let yPos = await buildInvoicePdfHeader(
+      doc,
+      tenant,
+      customerForHeader,
+      form.invoiceNumber,
+      form.issuedDate,
+      form.dueDate,
+      lang,
+    );
 
-    // Customer name
-    const customerName = customers.find((c) => c._id === form.customerId);
-    if (customerName) {
-      doc.setFontSize(11);
-      doc.setTextColor(17, 24, 39);
-      doc.text(
-        `${l.customer.replace(" *", "")}: ${customerName.firstName} ${customerName.lastName}`,
-        14,
-        40,
-      );
-    }
-
-    // Dates
-    let yPos = 48;
+    // Service period + status + payment
     doc.setFontSize(9);
+    doc.setFont("helvetica", "normal");
     doc.setTextColor(107, 114, 128);
-    if (form.issuedDate) {
-      doc.text(`${l.issuedDate}: ${form.issuedDate}`, 14, yPos);
-      yPos += 6;
-    }
-    if (form.dueDate) {
-      doc.text(`${l.dueDate}: ${form.dueDate}`, 14, yPos);
-      yPos += 6;
-    }
     if (form.servicePeriodFrom || form.servicePeriodTo) {
       doc.text(
         `${l.servicePeriod}: ${form.servicePeriodFrom || "—"} → ${form.servicePeriodTo || "—"}`,
         14,
         yPos,
       );
-      yPos += 6;
+      yPos += 5;
     }
-
-    // Status + Payment
-    const statusLabel =
-      l[`status_${form.status}` as keyof typeof l] ?? form.status;
+    const statusLabel = l[`status_${form.status}` as keyof typeof l] ?? form.status;
     doc.text(`${l.status}: ${statusLabel}`, 14, yPos);
-    yPos += 6;
+    yPos += 5;
     if (form.paymentMethod) {
       const pmLabel =
-        (l[`pm_${form.paymentMethod}` as keyof typeof l] as
-          | string
-          | undefined) ?? form.paymentMethod;
+        (l[`pm_${form.paymentMethod}` as keyof typeof l] as string | undefined) ?? form.paymentMethod;
       doc.text(`${l.paymentMethod}: ${pmLabel}`, 14, yPos);
-      yPos += 6;
+      yPos += 5;
     }
-
-    yPos += 4;
+    yPos += 3;
 
     // Items table
     autoTable(doc, {
@@ -721,111 +813,82 @@ function InvoiceFormSection({
 
     // Totals
     const finalY =
-      (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable
-        .finalY + 10;
-    doc.setFontSize(10);
-    doc.setTextColor(107, 114, 128);
-
+      (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 10;
     const rightX = 196;
     let tY = finalY;
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(107, 114, 128);
     doc.text("Subtotal:", rightX - 50, tY, { align: "right" });
-    doc.text(`${subtotal.toFixed(2)} ${form.currency}`, rightX, tY, {
-      align: "right",
-    });
+    doc.text(`${subtotal.toFixed(2)} ${form.currency}`, rightX, tY, { align: "right" });
     tY += 6;
     doc.text(`${l.discountValue}:`, rightX - 50, tY, { align: "right" });
-    doc.text(`-${discountAmount.toFixed(2)} ${form.currency}`, rightX, tY, {
-      align: "right",
-    });
+    doc.text(`-${discountAmount.toFixed(2)} ${form.currency}`, rightX, tY, { align: "right" });
     tY += 6;
     doc.text(`${l.taxRate}:`, rightX - 50, tY, { align: "right" });
-    doc.text(`${tax.toFixed(2)} ${form.currency}`, rightX, tY, {
-      align: "right",
-    });
+    doc.text(`${tax.toFixed(2)} ${form.currency}`, rightX, tY, { align: "right" });
     tY += 8;
     doc.setFontSize(12);
+    doc.setFont("helvetica", "bold");
     doc.setTextColor(17, 24, 39);
     doc.text("Total:", rightX - 50, tY, { align: "right" });
-    doc.text(`${total.toFixed(2)} ${form.currency}`, rightX, tY, {
-      align: "right",
-    });
+    doc.text(`${total.toFixed(2)} ${form.currency}`, rightX, tY, { align: "right" });
 
-    // Notes — render rich HTML with colors to PDF
-    const renderRichHtml = (
-      html: string,
-      startY: number,
-      leftX: number,
-      maxW: number,
-    ): number => {
+    // Notes
+    const renderRichHtml = (html: string, startY: number, leftX: number, maxW: number): number => {
       const DEFAULT_COLOR: [number, number, number] = [55, 65, 81];
-
       const parseRgb = (color: string): [number, number, number] => {
         const m = color.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
         if (m) return [+m[1], +m[2], +m[3]];
         const h = color.match(/^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i);
-        if (h)
-          return [parseInt(h[1], 16), parseInt(h[2], 16), parseInt(h[3], 16)];
+        if (h) return [parseInt(h[1], 16), parseInt(h[2], 16), parseInt(h[3], 16)];
         return DEFAULT_COLOR;
       };
-
       type Run = { text: string; color: [number, number, number] };
       const getRuns = (node: Node, inheritColor?: string): Run[] => {
         const runs: Run[] = [];
         if (node.nodeType === Node.TEXT_NODE) {
           const text = node.textContent ?? "";
-          if (text)
-            runs.push({
-              text,
-              color: inheritColor ? parseRgb(inheritColor) : DEFAULT_COLOR,
-            });
+          if (text) runs.push({ text, color: inheritColor ? parseRgb(inheritColor) : DEFAULT_COLOR });
         } else if (node.nodeType === Node.ELEMENT_NODE) {
           const el = node as HTMLElement;
           const color = el.style?.color || inheritColor;
-          for (const child of el.childNodes)
-            getRuns(child, color).forEach((r) => runs.push(r));
+          for (const child of el.childNodes) getRuns(child, color).forEach((r) => runs.push(r));
         }
         return runs;
       };
-
       const container = document.createElement("div");
       container.innerHTML = html;
       const blocks = container.querySelectorAll("p, h1, h2, h3, li");
-
       let cy = startY;
       blocks.forEach((block) => {
         const tag = block.tagName;
         const fs = tag === "H1" ? 13 : tag === "H2" ? 11 : 9;
         const lh = tag === "H1" ? 7 : tag === "H2" ? 6 : 5;
         doc.setFontSize(fs);
-
         const runs = getRuns(block);
         let cx = leftX;
-
         runs.forEach(({ text, color }) => {
           doc.setTextColor(...color);
           const words = text.split(/(\s+)/);
           words.forEach((word) => {
             if (!word) return;
             const w = doc.getTextWidth(word);
-            if (cx + w > leftX + maxW && cx > leftX) {
-              cy += lh;
-              cx = leftX;
-            }
+            if (cx + w > leftX + maxW && cx > leftX) { cy += lh; cx = leftX; }
             doc.text(word, cx, cy);
             cx += w;
           });
         });
-
         cy += lh;
         doc.setFontSize(9);
       });
-
       return cy;
     };
 
     if (form.notes && form.notes.replace(/<[^>]*>/g, "").trim()) {
       tY += 14;
       doc.setFontSize(9);
+      doc.setFont("helvetica", "normal");
       doc.setTextColor(107, 114, 128);
       doc.text(`${l.notes}:`, 14, tY);
       tY += 5;
@@ -919,6 +982,64 @@ function InvoiceFormSection({
         <p>{l.loadingOpts}</p>
       ) : (
         <form onSubmit={handleSubmit}>
+          {/* ── Invoice Header Preview ────────────────────── */}
+          <div className={styles.invoiceHeaderPreview}>
+            {/* Left: company */}
+            <div className={styles.invoiceHeaderLeft}>
+              {tenant?.branding?.logoUrl && (
+                <img
+                  src={tenant.branding.logoUrl}
+                  alt="logo"
+                  className={styles.invoiceLogo}
+                />
+              )}
+              <div className={styles.invoiceCompanyName}>{tenant?.name ?? "—"}</div>
+              {tenant?.address?.street && (
+                <div className={styles.invoiceCompanyDetail}>{tenant.address.street}</div>
+              )}
+              {(tenant?.address?.city || tenant?.address?.state || tenant?.address?.zipCode) && (
+                <div className={styles.invoiceCompanyDetail}>
+                  {[tenant?.address?.city, tenant?.address?.state, tenant?.address?.zipCode]
+                    .filter(Boolean)
+                    .join(", ")}
+                </div>
+              )}
+              {tenant?.address?.country && (
+                <div className={styles.invoiceCompanyDetail}>{tenant.address.country}</div>
+              )}
+              {tenant?.contactPhone && (
+                <div className={styles.invoiceCompanyDetail}>{tenant.contactPhone}</div>
+              )}
+              {tenant?.contactEmail && (
+                <div className={styles.invoiceCompanyDetail}>{tenant.contactEmail}</div>
+              )}
+            </div>
+            {/* Right: invoice meta + bill to */}
+            <div className={styles.invoiceHeaderRight}>
+              <div className={styles.invoiceTitle}>INVOICE</div>
+              {form.invoiceNumber && (
+                <div className={styles.invoiceNumber}>#{form.invoiceNumber}</div>
+              )}
+              {form.issuedDate && (
+                <div className={styles.invoiceMeta}>{l.issuedDate}: {form.issuedDate}</div>
+              )}
+              {form.dueDate && (
+                <div className={styles.invoiceMeta}>{l.dueDate}: {form.dueDate}</div>
+              )}
+              {form.customerId && customers.find((cx) => cx._id === form.customerId) && (
+                <div className={styles.invoiceBillTo}>
+                  <div className={styles.invoiceBillToLabel}>
+                    {lang === "en" ? "Bill To" : "Facturar a"}
+                  </div>
+                  <div className={styles.invoiceBillToName}>
+                    {customers.find((cx) => cx._id === form.customerId)!.firstName}{" "}
+                    {customers.find((cx) => cx._id === form.customerId)!.lastName}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
           {/* Customer row */}
           <div className={styles.formRow}>
             <div className={styles.formGroup}>
@@ -1570,6 +1691,11 @@ export default function InvoicesPage() {
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [tenant, setTenant] = useState<Tenant | null>(null);
+
+  useEffect(() => {
+    getTenant().then(setTenant).catch(() => {});
+  }, []);
 
   const [search, setSearch] = useState("");
   const [apiStatus, setApiStatus] = useState<InvoiceStatus | "">("");
@@ -1774,6 +1900,7 @@ export default function InvoicesPage() {
       {showForm && canWrite && (
         <InvoiceFormSection
           lang={lang}
+          tenant={tenant}
           onClose={closeForm}
           onSaved={() => {
             closeForm();
@@ -1785,6 +1912,7 @@ export default function InvoicesPage() {
         <InvoiceFormSection
           invoice={editingInvoice}
           lang={lang}
+          tenant={tenant}
           onClose={closeForm}
           onSaved={() => {
             closeForm();
@@ -2012,7 +2140,7 @@ export default function InvoicesPage() {
                             <button
                               className={styles.btnDownloadRow}
                               title="PDF"
-                              onClick={() => downloadInvoicePdf(inv, lang)}
+                              onClick={() => downloadInvoicePdf(inv, lang, tenant)}
                             >
                               <svg
                                 viewBox="0 0 20 20"
