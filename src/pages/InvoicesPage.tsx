@@ -94,7 +94,10 @@ async function loadImageAsDataUrl(url: string): Promise<string | null> {
       canvas.width = img.naturalWidth;
       canvas.height = img.naturalHeight;
       const ctx = canvas.getContext("2d");
-      if (!ctx) { resolve(null); return; }
+      if (!ctx) {
+        resolve(null);
+        return;
+      }
       ctx.drawImage(img, 0, 0);
       resolve(canvas.toDataURL("image/png"));
     };
@@ -153,10 +156,22 @@ async function buildInvoicePdfHeader(
   ]
     .filter(Boolean)
     .join(", ");
-  if (cityLine) { doc.text(cityLine, LEFT, cy); cy += 4; }
-  if (tenant?.address?.country) { doc.text(tenant.address.country, LEFT, cy); cy += 4; }
-  if (tenant?.contactPhone) { doc.text(tenant.contactPhone, LEFT, cy); cy += 4; }
-  if (tenant?.contactEmail) { doc.text(tenant.contactEmail, LEFT, cy); cy += 4; }
+  if (cityLine) {
+    doc.text(cityLine, LEFT, cy);
+    cy += 4;
+  }
+  if (tenant?.address?.country) {
+    doc.text(tenant.address.country, LEFT, cy);
+    cy += 4;
+  }
+  if (tenant?.contactPhone) {
+    doc.text(tenant.contactPhone, LEFT, cy);
+    cy += 4;
+  }
+  if (tenant?.contactEmail) {
+    doc.text(tenant.contactEmail, LEFT, cy);
+    cy += 4;
+  }
 
   // ── Right: INVOICE title + number + dates ─────────────────────
   doc.setFontSize(22);
@@ -201,12 +216,26 @@ async function buildInvoicePdfHeader(
     doc.setFontSize(8);
     doc.setFont("helvetica", "normal");
     doc.setTextColor(107, 114, 128);
-    if (customer.email) { doc.text(customer.email, LEFT, by); by += 4; }
-    if (customer.phone) { doc.text(customer.phone, LEFT, by); by += 4; }
+    if (customer.email) {
+      doc.text(customer.email, LEFT, by);
+      by += 4;
+    }
+    if (customer.phone) {
+      doc.text(customer.phone, LEFT, by);
+      by += 4;
+    }
     const cAddr = customer.address;
-    if (cAddr?.street) { doc.text(cAddr.street, LEFT, by); by += 4; }
-    const cCity = [cAddr?.city, cAddr?.state, cAddr?.zipCode].filter(Boolean).join(", ");
-    if (cCity) { doc.text(cCity, LEFT, by); by += 4; }
+    if (cAddr?.street) {
+      doc.text(cAddr.street, LEFT, by);
+      by += 4;
+    }
+    const cCity = [cAddr?.city, cAddr?.state, cAddr?.zipCode]
+      .filter(Boolean)
+      .join(", ");
+    if (cCity) {
+      doc.text(cCity, LEFT, by);
+      by += 4;
+    }
   }
 
   // Reset to col mid for right-side use
@@ -217,7 +246,9 @@ async function buildInvoicePdfHeader(
   doc.setFontSize(8);
   doc.setFont("helvetica", "normal");
   doc.setTextColor(17, 24, 39);
-  if (issuedDate) { doc.text(issuedDate, COL_MID, divY + 10); }
+  if (issuedDate) {
+    doc.text(issuedDate, COL_MID, divY + 10);
+  }
 
   // Final Y after header block
   const finalHeaderY = by + 6;
@@ -308,19 +339,30 @@ async function downloadInvoicePdf(
   doc.setFont("helvetica", "normal");
   doc.setTextColor(107, 114, 128);
   doc.text("Subtotal:", rightX - 50, tY, { align: "right" });
-  doc.text(`${(inv.subtotal ?? 0).toFixed(2)} ${inv.currency}`, rightX, tY, { align: "right" });
+  doc.text(`${(inv.subtotal ?? 0).toFixed(2)} ${inv.currency}`, rightX, tY, {
+    align: "right",
+  });
   tY += 6;
   doc.text(`${l.discountValue}:`, rightX - 50, tY, { align: "right" });
-  doc.text(`-${(inv.discount?.amount ?? 0).toFixed(2)} ${inv.currency}`, rightX, tY, { align: "right" });
+  doc.text(
+    `-${(inv.discount?.amount ?? 0).toFixed(2)} ${inv.currency}`,
+    rightX,
+    tY,
+    { align: "right" },
+  );
   tY += 6;
   doc.text(`${l.taxRate}:`, rightX - 50, tY, { align: "right" });
-  doc.text(`${(inv.tax ?? 0).toFixed(2)} ${inv.currency}`, rightX, tY, { align: "right" });
+  doc.text(`${(inv.tax ?? 0).toFixed(2)} ${inv.currency}`, rightX, tY, {
+    align: "right",
+  });
   tY += 8;
   doc.setFontSize(12);
   doc.setFont("helvetica", "bold");
   doc.setTextColor(17, 24, 39);
   doc.text("Total:", rightX - 50, tY, { align: "right" });
-  doc.text(`${(inv.total ?? 0).toFixed(2)} ${inv.currency}`, rightX, tY, { align: "right" });
+  doc.text(`${(inv.total ?? 0).toFixed(2)} ${inv.currency}`, rightX, tY, {
+    align: "right",
+  });
 
   // Notes
   if (inv.notes && inv.notes.replace(/<[^>]*>/g, "").trim()) {
@@ -336,7 +378,8 @@ async function downloadInvoicePdf(
       const m = color.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
       if (m) return [+m[1], +m[2], +m[3]];
       const h = color.match(/^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i);
-      if (h) return [parseInt(h[1], 16), parseInt(h[2], 16), parseInt(h[3], 16)];
+      if (h)
+        return [parseInt(h[1], 16), parseInt(h[2], 16), parseInt(h[3], 16)];
       return DEFAULT_COLOR;
     };
     type Run = { text: string; color: [number, number, number] };
@@ -344,11 +387,16 @@ async function downloadInvoicePdf(
       const runs: Run[] = [];
       if (node.nodeType === Node.TEXT_NODE) {
         const text = node.textContent ?? "";
-        if (text) runs.push({ text, color: inheritColor ? parseRgb(inheritColor) : DEFAULT_COLOR });
+        if (text)
+          runs.push({
+            text,
+            color: inheritColor ? parseRgb(inheritColor) : DEFAULT_COLOR,
+          });
       } else if (node.nodeType === Node.ELEMENT_NODE) {
         const el = node as HTMLElement;
         const color = el.style?.color || inheritColor;
-        for (const child of el.childNodes) getRuns(child, color).forEach((r) => runs.push(r));
+        for (const child of el.childNodes)
+          getRuns(child, color).forEach((r) => runs.push(r));
       }
       return runs;
     };
@@ -370,7 +418,10 @@ async function downloadInvoicePdf(
         words.forEach((word) => {
           if (!word) return;
           const w = doc.getTextWidth(word);
-          if (cx + w > 194 && cx > 14) { cy += lh; cx = 14; }
+          if (cx + w > 194 && cx > 14) {
+            cy += lh;
+            cx = 14;
+          }
           doc.text(word, cx, cy);
           cx += w;
         });
@@ -755,7 +806,10 @@ function InvoiceFormSection({
 
     const customerObj = customers.find((c) => c._id === form.customerId);
     const customerForHeader = customerObj
-      ? ({ firstName: customerObj.firstName, lastName: customerObj.lastName } as Customer)
+      ? ({
+          firstName: customerObj.firstName,
+          lastName: customerObj.lastName,
+        } as Customer)
       : null;
 
     let yPos = await buildInvoicePdfHeader(
@@ -780,12 +834,15 @@ function InvoiceFormSection({
       );
       yPos += 5;
     }
-    const statusLabel = l[`status_${form.status}` as keyof typeof l] ?? form.status;
+    const statusLabel =
+      l[`status_${form.status}` as keyof typeof l] ?? form.status;
     doc.text(`${l.status}: ${statusLabel}`, 14, yPos);
     yPos += 5;
     if (form.paymentMethod) {
       const pmLabel =
-        (l[`pm_${form.paymentMethod}` as keyof typeof l] as string | undefined) ?? form.paymentMethod;
+        (l[`pm_${form.paymentMethod}` as keyof typeof l] as
+          | string
+          | undefined) ?? form.paymentMethod;
       doc.text(`${l.paymentMethod}: ${pmLabel}`, 14, yPos);
       yPos += 5;
     }
@@ -813,35 +870,50 @@ function InvoiceFormSection({
 
     // Totals
     const finalY =
-      (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 10;
+      (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable
+        .finalY + 10;
     const rightX = 196;
     let tY = finalY;
     doc.setFontSize(10);
     doc.setFont("helvetica", "normal");
     doc.setTextColor(107, 114, 128);
     doc.text("Subtotal:", rightX - 50, tY, { align: "right" });
-    doc.text(`${subtotal.toFixed(2)} ${form.currency}`, rightX, tY, { align: "right" });
+    doc.text(`${subtotal.toFixed(2)} ${form.currency}`, rightX, tY, {
+      align: "right",
+    });
     tY += 6;
     doc.text(`${l.discountValue}:`, rightX - 50, tY, { align: "right" });
-    doc.text(`-${discountAmount.toFixed(2)} ${form.currency}`, rightX, tY, { align: "right" });
+    doc.text(`-${discountAmount.toFixed(2)} ${form.currency}`, rightX, tY, {
+      align: "right",
+    });
     tY += 6;
     doc.text(`${l.taxRate}:`, rightX - 50, tY, { align: "right" });
-    doc.text(`${tax.toFixed(2)} ${form.currency}`, rightX, tY, { align: "right" });
+    doc.text(`${tax.toFixed(2)} ${form.currency}`, rightX, tY, {
+      align: "right",
+    });
     tY += 8;
     doc.setFontSize(12);
     doc.setFont("helvetica", "bold");
     doc.setTextColor(17, 24, 39);
     doc.text("Total:", rightX - 50, tY, { align: "right" });
-    doc.text(`${total.toFixed(2)} ${form.currency}`, rightX, tY, { align: "right" });
+    doc.text(`${total.toFixed(2)} ${form.currency}`, rightX, tY, {
+      align: "right",
+    });
 
     // Notes
-    const renderRichHtml = (html: string, startY: number, leftX: number, maxW: number): number => {
+    const renderRichHtml = (
+      html: string,
+      startY: number,
+      leftX: number,
+      maxW: number,
+    ): number => {
       const DEFAULT_COLOR: [number, number, number] = [55, 65, 81];
       const parseRgb = (color: string): [number, number, number] => {
         const m = color.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
         if (m) return [+m[1], +m[2], +m[3]];
         const h = color.match(/^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i);
-        if (h) return [parseInt(h[1], 16), parseInt(h[2], 16), parseInt(h[3], 16)];
+        if (h)
+          return [parseInt(h[1], 16), parseInt(h[2], 16), parseInt(h[3], 16)];
         return DEFAULT_COLOR;
       };
       type Run = { text: string; color: [number, number, number] };
@@ -849,11 +921,16 @@ function InvoiceFormSection({
         const runs: Run[] = [];
         if (node.nodeType === Node.TEXT_NODE) {
           const text = node.textContent ?? "";
-          if (text) runs.push({ text, color: inheritColor ? parseRgb(inheritColor) : DEFAULT_COLOR });
+          if (text)
+            runs.push({
+              text,
+              color: inheritColor ? parseRgb(inheritColor) : DEFAULT_COLOR,
+            });
         } else if (node.nodeType === Node.ELEMENT_NODE) {
           const el = node as HTMLElement;
           const color = el.style?.color || inheritColor;
-          for (const child of el.childNodes) getRuns(child, color).forEach((r) => runs.push(r));
+          for (const child of el.childNodes)
+            getRuns(child, color).forEach((r) => runs.push(r));
         }
         return runs;
       };
@@ -874,7 +951,10 @@ function InvoiceFormSection({
           words.forEach((word) => {
             if (!word) return;
             const w = doc.getTextWidth(word);
-            if (cx + w > leftX + maxW && cx > leftX) { cy += lh; cx = leftX; }
+            if (cx + w > leftX + maxW && cx > leftX) {
+              cy += lh;
+              cx = leftX;
+            }
             doc.text(word, cx, cy);
             cx += w;
           });
@@ -993,50 +1073,79 @@ function InvoiceFormSection({
                   className={styles.invoiceLogo}
                 />
               )}
-              <div className={styles.invoiceCompanyName}>{tenant?.name ?? "—"}</div>
+              <div className={styles.invoiceCompanyName}>
+                {tenant?.name ?? "—"}
+              </div>
               {tenant?.address?.street && (
-                <div className={styles.invoiceCompanyDetail}>{tenant.address.street}</div>
-              )}
-              {(tenant?.address?.city || tenant?.address?.state || tenant?.address?.zipCode) && (
                 <div className={styles.invoiceCompanyDetail}>
-                  {[tenant?.address?.city, tenant?.address?.state, tenant?.address?.zipCode]
+                  {tenant.address.street}
+                </div>
+              )}
+              {(tenant?.address?.city ||
+                tenant?.address?.state ||
+                tenant?.address?.zipCode) && (
+                <div className={styles.invoiceCompanyDetail}>
+                  {[
+                    tenant?.address?.city,
+                    tenant?.address?.state,
+                    tenant?.address?.zipCode,
+                  ]
                     .filter(Boolean)
                     .join(", ")}
                 </div>
               )}
               {tenant?.address?.country && (
-                <div className={styles.invoiceCompanyDetail}>{tenant.address.country}</div>
+                <div className={styles.invoiceCompanyDetail}>
+                  {tenant.address.country}
+                </div>
               )}
               {tenant?.contactPhone && (
-                <div className={styles.invoiceCompanyDetail}>{tenant.contactPhone}</div>
+                <div className={styles.invoiceCompanyDetail}>
+                  {tenant.contactPhone}
+                </div>
               )}
               {tenant?.contactEmail && (
-                <div className={styles.invoiceCompanyDetail}>{tenant.contactEmail}</div>
+                <div className={styles.invoiceCompanyDetail}>
+                  {tenant.contactEmail}
+                </div>
               )}
             </div>
             {/* Right: invoice meta + bill to */}
             <div className={styles.invoiceHeaderRight}>
               <div className={styles.invoiceTitle}>INVOICE</div>
               {form.invoiceNumber && (
-                <div className={styles.invoiceNumber}>#{form.invoiceNumber}</div>
-              )}
-              {form.issuedDate && (
-                <div className={styles.invoiceMeta}>{l.issuedDate}: {form.issuedDate}</div>
-              )}
-              {form.dueDate && (
-                <div className={styles.invoiceMeta}>{l.dueDate}: {form.dueDate}</div>
-              )}
-              {form.customerId && customers.find((cx) => cx._id === form.customerId) && (
-                <div className={styles.invoiceBillTo}>
-                  <div className={styles.invoiceBillToLabel}>
-                    {lang === "en" ? "Bill To" : "Facturar a"}
-                  </div>
-                  <div className={styles.invoiceBillToName}>
-                    {customers.find((cx) => cx._id === form.customerId)!.firstName}{" "}
-                    {customers.find((cx) => cx._id === form.customerId)!.lastName}
-                  </div>
+                <div className={styles.invoiceNumber}>
+                  #{form.invoiceNumber}
                 </div>
               )}
+              {form.issuedDate && (
+                <div className={styles.invoiceMeta}>
+                  {l.issuedDate}: {form.issuedDate}
+                </div>
+              )}
+              {form.dueDate && (
+                <div className={styles.invoiceMeta}>
+                  {l.dueDate}: {form.dueDate}
+                </div>
+              )}
+              {form.customerId &&
+                customers.find((cx) => cx._id === form.customerId) && (
+                  <div className={styles.invoiceBillTo}>
+                    <div className={styles.invoiceBillToLabel}>
+                      {lang === "en" ? "Bill To" : "Facturar a"}
+                    </div>
+                    <div className={styles.invoiceBillToName}>
+                      {
+                        customers.find((cx) => cx._id === form.customerId)!
+                          .firstName
+                      }{" "}
+                      {
+                        customers.find((cx) => cx._id === form.customerId)!
+                          .lastName
+                      }
+                    </div>
+                  </div>
+                )}
             </div>
           </div>
 
@@ -1694,7 +1803,9 @@ export default function InvoicesPage() {
   const [tenant, setTenant] = useState<Tenant | null>(null);
 
   useEffect(() => {
-    getTenant().then(setTenant).catch(() => {});
+    getTenant()
+      .then(setTenant)
+      .catch(() => {});
   }, []);
 
   const [search, setSearch] = useState("");
@@ -2140,7 +2251,9 @@ export default function InvoicesPage() {
                             <button
                               className={styles.btnDownloadRow}
                               title="PDF"
-                              onClick={() => downloadInvoicePdf(inv, lang, tenant)}
+                              onClick={() =>
+                                downloadInvoicePdf(inv, lang, tenant)
+                              }
                             >
                               <svg
                                 viewBox="0 0 20 20"
