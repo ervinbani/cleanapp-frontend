@@ -35,6 +35,188 @@ function getCustomer(inv: Invoice): Customer | null {
   return null;
 }
 
+async function downloadInvoicePdf(inv: Invoice, lang: "en" | "es") {
+  const { default: jsPDF } = await import("jspdf");
+  const { default: autoTable } = await import("jspdf-autotable");
+  const l = formT[lang];
+  const doc = new jsPDF();
+
+  // Header
+  doc.setFontSize(20);
+  doc.setTextColor(37, 99, 235);
+  doc.text("INVOICE", 14, 22);
+
+  doc.setFontSize(10);
+  doc.setTextColor(107, 114, 128);
+  doc.text(`# ${inv.invoiceNumber}`, 14, 30);
+
+  // Customer name
+  const customer = getCustomer(inv);
+  if (customer) {
+    doc.setFontSize(11);
+    doc.setTextColor(17, 24, 39);
+    doc.text(
+      `${l.customer.replace(" *", "")}: ${customer.firstName} ${customer.lastName}`,
+      14,
+      40,
+    );
+  }
+
+  // Dates
+  let yPos = 48;
+  doc.setFontSize(9);
+  doc.setTextColor(107, 114, 128);
+  if (inv.issuedDate) {
+    doc.text(`${l.issuedDate}: ${inv.issuedDate}`, 14, yPos);
+    yPos += 6;
+  }
+  if (inv.dueDate) {
+    doc.text(`${l.dueDate}: ${inv.dueDate}`, 14, yPos);
+    yPos += 6;
+  }
+  if (inv.servicePeriod?.from || inv.servicePeriod?.to) {
+    doc.text(
+      `${l.servicePeriod}: ${inv.servicePeriod?.from || "—"} → ${inv.servicePeriod?.to || "—"}`,
+      14,
+      yPos,
+    );
+    yPos += 6;
+  }
+
+  // Status + Payment
+  const statusLabel =
+    (l[`status_${inv.status}` as keyof typeof l] as string) ?? inv.status;
+  doc.text(`${l.status}: ${statusLabel}`, 14, yPos);
+  yPos += 6;
+  if (inv.paymentMethod) {
+    const pmLabel =
+      (l[`pm_${inv.paymentMethod}` as keyof typeof l] as string | undefined) ??
+      inv.paymentMethod;
+    doc.text(`${l.paymentMethod}: ${pmLabel}`, 14, yPos);
+    yPos += 6;
+  }
+
+  yPos += 4;
+
+  // Items table
+  autoTable(doc, {
+    startY: yPos,
+    head: [
+      [l.description, l.serviceType, l.quantity, l.unitPrice, l.lineTotal],
+    ],
+    body: inv.items
+      .filter(
+        (it) =>
+          it.description?.trim() ||
+          (it.unitPrice != null && it.unitPrice > 0),
+      )
+      .map((it) => [
+        it.description ?? "",
+        it.serviceType ?? "—",
+        String(it.quantity ?? ""),
+        (it.unitPrice ?? 0).toFixed(2),
+        (it.total ?? 0).toFixed(2),
+      ]),
+    headStyles: { fillColor: [37, 99, 235], fontSize: 9 },
+    styles: { fontSize: 9 },
+    alternateRowStyles: { fillColor: [248, 250, 255] },
+  });
+
+  // Totals
+  const finalY =
+    (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable
+      .finalY + 10;
+  doc.setFontSize(10);
+  doc.setTextColor(107, 114, 128);
+
+  const rightX = 196;
+  let tY = finalY;
+  doc.text("Subtotal:", rightX - 50, tY, { align: "right" });
+  doc.text(`${(inv.subtotal ?? 0).toFixed(2)} ${inv.currency}`, rightX, tY, {
+    align: "right",
+  });
+  tY += 6;
+  doc.text(`${l.discountValue}:`, rightX - 50, tY, { align: "right" });
+  doc.text(
+    `-${(inv.discount?.amount ?? 0).toFixed(2)} ${inv.currency}`,
+    rightX,
+    tY,
+    { align: "right" },
+  );
+  tY += 6;
+  doc.text(`${l.taxRate}:`, rightX - 50, tY, { align: "right" });
+  doc.text(`${(inv.tax ?? 0).toFixed(2)} ${inv.currency}`, rightX, tY, {
+    align: "right",
+  });
+  tY += 8;
+  doc.setFontSize(12);
+  doc.setTextColor(17, 24, 39);
+  doc.text("Total:", rightX - 50, tY, { align: "right" });
+  doc.text(`${(inv.total ?? 0).toFixed(2)} ${inv.currency}`, rightX, tY, {
+    align: "right",
+  });
+
+  // Notes
+  if (inv.notes && inv.notes.replace(/<[^>]*>/g, "").trim()) {
+    tY += 14;
+    doc.setFontSize(9);
+    doc.setTextColor(107, 114, 128);
+    doc.text(`${l.notes}:`, 14, tY);
+    tY += 5;
+
+    const DEFAULT_COLOR: [number, number, number] = [55, 65, 81];
+    const parseRgb = (color: string): [number, number, number] => {
+      const m = color.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
+      if (m) return [+m[1], +m[2], +m[3]];
+      const h = color.match(/^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i);
+      if (h) return [parseInt(h[1], 16), parseInt(h[2], 16), parseInt(h[3], 16)];
+      return DEFAULT_COLOR;
+    };
+    type Run = { text: string; color: [number, number, number] };
+    const getRuns = (node: Node, inheritColor?: string): Run[] => {
+      const runs: Run[] = [];
+      if (node.nodeType === Node.TEXT_NODE) {
+        const text = node.textContent ?? "";
+        if (text) runs.push({ text, color: inheritColor ? parseRgb(inheritColor) : DEFAULT_COLOR });
+      } else if (node.nodeType === Node.ELEMENT_NODE) {
+        const el = node as HTMLElement;
+        const color = el.style?.color || inheritColor;
+        for (const child of el.childNodes) getRuns(child, color).forEach((r) => runs.push(r));
+      }
+      return runs;
+    };
+
+    const container = document.createElement("div");
+    container.innerHTML = inv.notes;
+    const blocks = container.querySelectorAll("p, h1, h2, h3, li");
+    let cy = tY;
+    blocks.forEach((block) => {
+      const tag = block.tagName;
+      const fs = tag === "H1" ? 13 : tag === "H2" ? 11 : 9;
+      const lh = tag === "H1" ? 7 : tag === "H2" ? 6 : 5;
+      doc.setFontSize(fs);
+      const runs = getRuns(block);
+      let cx = 14;
+      runs.forEach(({ text, color }) => {
+        doc.setTextColor(...color);
+        const words = text.split(/(\s+)/);
+        words.forEach((word) => {
+          if (!word) return;
+          const w = doc.getTextWidth(word);
+          if (cx + w > 194 && cx > 14) { cy += lh; cx = 14; }
+          doc.text(word, cx, cy);
+          cx += w;
+        });
+      });
+      cy += lh;
+      doc.setFontSize(9);
+    });
+  }
+
+  doc.save(`invoice-${inv.invoiceNumber || "draft"}.pdf`);
+}
+
+
 const STATUS_ORDER: InvoiceStatus[] = [
   "draft",
   "sent",
@@ -350,6 +532,7 @@ function InvoiceFormSection({
     jobService
       .getAll({
         customerId: form.customerId,
+        status: "confirmed",
         limit: 200,
         dateFrom: form.servicePeriodFrom || undefined,
         dateTo: form.servicePeriodTo || undefined,
@@ -1708,6 +1891,15 @@ export default function InvoicesPage() {
                                 <path d="M10 3C5 3 1.73 7.11 1.07 9.69a1 1 0 000 .62C1.73 12.89 5 17 10 17s8.27-4.11 8.93-6.69a1 1 0 000-.62C18.27 7.11 15 3 10 3zm0 11a4 4 0 110-8 4 4 0 010 8zm0-6a2 2 0 100 4 2 2 0 000-4z" />
                               </svg>
                               {l.btnView}
+                            </button>
+                            <button
+                              className={styles.btnDownloadRow}
+                              title="PDF"
+                              onClick={() => downloadInvoicePdf(inv, lang)}
+                            >
+                              <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14">
+                                <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
+                              </svg>
                             </button>
                             {canWrite && (
                               <button

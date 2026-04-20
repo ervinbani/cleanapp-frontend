@@ -820,8 +820,7 @@
 }
 
 /* ─── Download PDF button ─────────────────────────────────────── */
-.btnDownloadPdf {
-  display: inline-flex;
+.btnDownloadPdf {  display: inline-flex;
   align-items: center;
   gap: 0.4rem;
   padding: 0.55rem 1.25rem;
@@ -851,4 +850,26 @@
   width: 15px;
   height: 15px;
   flex-shrink: 0;
+}
+
+/* ─── Table-row download icon button ──────────────────────────── */
+.btnDownloadRow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid #fca5a5;
+  border-radius: 6px;
+  background: #fef2f2;
+  color: #b91c1c;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  flex-shrink: 0;
+}
+
+.btnDownloadRow:hover {
+  background: #fee2e2;
+  border-color: #f87171;
 }
