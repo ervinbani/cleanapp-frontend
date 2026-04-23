@@ -4,11 +4,25 @@ import styles from "./DashboardPage.module.css";
 import { customerService } from "../services/customerService";
 import { jobService } from "../services/jobService";
 import { invoiceService } from "../services/invoiceService";
-import apiClient from "../services/apiClient";
 import { useLang } from "../contexts/LangContext";
 import { useAuth } from "../contexts/AuthContext";
 import { useTrans } from "../i18n";
 import type { Customer, Invoice, Job } from "../types";
+
+function Sparkline({ bars, color }: { bars: number[]; color: string }) {
+  const max = Math.max(...bars, 1);
+  return (
+    <div className={styles.sparkline}>
+      {bars.map((v, i) => (
+        <div
+          key={i}
+          className={`${styles.sparkBar} ${i === bars.length - 1 ? styles.sparkBarHi : ""}`}
+          style={{ height: `${Math.max(15, (v / max) * 100)}%`, background: color }}
+        />
+      ))}
+    </div>
+  );
+}
 
 const WEEKDAYS_EN = ["S", "M", "T", "W", "T", "F", "S"];
 const WEEKDAYS_ES = ["D", "L", "M", "X", "J", "V", "S"];
@@ -91,9 +105,8 @@ export default function DashboardPage() {
 
   const [totalClients, setTotalClients] = useState<number | null>(null);
   const [totalJobs, setTotalJobs] = useState<number | null>(null);
-  const [totalServices, setTotalServices] = useState<number | null>(null);
   const [allJobs, setAllJobs] = useState<Job[]>([]);
-  const [recentInvoices, setRecentInvoices] = useState<Invoice[]>([]);
+  const [allInvoices, setAllInvoices] = useState<Invoice[]>([]);
   const [recentCustomers, setRecentCustomers] = useState<Customer[]>([]);
   const [calendarDate, setCalendarDate] = useState(() => {
     const now = new Date();
@@ -113,25 +126,18 @@ export default function DashboardPage() {
       .then((res) => setTotalJobs(res.pagination.total))
       .catch(() => setTotalJobs(0));
 
-    apiClient
-      .get<{ pagination: { total: number } }>("/services", {
-        params: { page: 1, limit: 1 },
-      })
-      .then((res) => setTotalServices(res.data.pagination.total))
-      .catch(() => setTotalServices(0));
-
     jobService
       .getAll({ page: 1, limit: 200 })
       .then((res) => setAllJobs(res.data))
       .catch(() => setAllJobs([]));
 
     invoiceService
-      .getAll({ page: 1, limit: 8 })
-      .then((res) => setRecentInvoices(res.data))
-      .catch(() => setRecentInvoices([]));
+      .getAll({ page: 1, limit: 200 })
+      .then((res) => setAllInvoices(res.data))
+      .catch(() => setAllInvoices([]));
 
     customerService
-      .getAll({ page: 1, limit: 5 })
+      .getAll({ page: 1, limit: 50 })
       .then((res) => setRecentCustomers(res.data))
       .catch(() => setRecentCustomers([]));
   }, []);
@@ -201,18 +207,24 @@ export default function DashboardPage() {
       });
     });
 
-    // Invoices
-    recentInvoices.forEach((inv) => {
-      const isPaid = inv.status === "paid";
-      items.push({
-        id: `inv-${inv._id}`,
-        icon: isPaid ? "💰" : "📄",
-        color: isPaid ? "#10b981" : "#6b7280",
-        text: `Invoice #${inv.invoiceNumber} — ${inv.status}`,
-        time: new Date(inv.paidAt ?? inv.issuedDate ?? inv._id),
-        onClick: () => navigate("/invoices"),
+    // Invoices — show 8 most recent
+    [...allInvoices]
+      .sort(
+        (a, b) =>
+          new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
+      )
+      .slice(0, 8)
+      .forEach((inv) => {
+        const isPaid = inv.status === "paid";
+        items.push({
+          id: `inv-${inv._id}`,
+          icon: isPaid ? "💰" : "📄",
+          color: isPaid ? "#10b981" : "#6b7280",
+          text: `Invoice #${inv.invoiceNumber} — ${inv.status}`,
+          time: new Date(inv.paidAt ?? inv.issuedDate ?? inv._id),
+          onClick: () => navigate("/invoices"),
+        });
       });
-    });
 
     // Customers
     recentCustomers.forEach((c) => {
@@ -229,7 +241,7 @@ export default function DashboardPage() {
     return items
       .sort((a, b) => b.time.getTime() - a.time.getTime())
       .slice(0, 8);
-  }, [allJobs, recentInvoices, recentCustomers, navigate]);
+  }, [allJobs, allInvoices, recentCustomers, navigate]);
 
   const calendarCells = useMemo(
     () =>
@@ -241,6 +253,117 @@ export default function DashboardPage() {
   const isCurrentMonth =
     today.getFullYear() === calendarDate.getFullYear() &&
     today.getMonth() === calendarDate.getMonth();
+
+  // ── Stat card computations ───────────────────────────────────
+  const statData = useMemo(() => {
+    const now = new Date();
+    const curMonth = now.getMonth();
+    const curYear = now.getFullYear();
+    const prevMonthDate = new Date(curYear, curMonth - 1, 1);
+    const prevMonth = prevMonthDate.getMonth();
+    const prevYear = prevMonthDate.getFullYear();
+    const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+
+    const paidInvoices = allInvoices.filter((i) => i.status === "paid");
+    const unpaidInvoices = allInvoices.filter(
+      (i) => i.status !== "paid" && i.status !== "void",
+    );
+    const completedJobs = allJobs.filter((j) => j.status === "completed");
+
+    const totalRevenue = paidInvoices.reduce(
+      (s, i) => s + (i.total ?? 0),
+      0,
+    );
+    const unpaidAmount = unpaidInvoices.reduce(
+      (s, i) => s + (i.total ?? 0),
+      0,
+    );
+    const overdueCount = allInvoices.filter(
+      (i) =>
+        i.status === "overdue" ||
+        (i.dueDate &&
+          new Date(i.dueDate) < now &&
+          i.status !== "paid" &&
+          i.status !== "void"),
+    ).length;
+
+    const inMonth = (iso: string | undefined, m: number, y: number) => {
+      if (!iso) return false;
+      const d = new Date(iso);
+      return d.getMonth() === m && d.getFullYear() === y;
+    };
+
+    const revThis = paidInvoices
+      .filter((i) => inMonth(i.paidAt ?? i.updatedAt, curMonth, curYear))
+      .reduce((s, i) => s + (i.total ?? 0), 0);
+    const revPrev = paidInvoices
+      .filter((i) => inMonth(i.paidAt ?? i.updatedAt, prevMonth, prevYear))
+      .reduce((s, i) => s + (i.total ?? 0), 0);
+    const revenueChange =
+      revPrev > 0 ? ((revThis - revPrev) / revPrev) * 100 : null;
+
+    const jobsThis = completedJobs.filter((j) =>
+      inMonth(j.updatedAt, curMonth, curYear),
+    ).length;
+    const jobsPrev = completedJobs.filter((j) =>
+      inMonth(j.updatedAt, prevMonth, prevYear),
+    ).length;
+    const jobsChange =
+      jobsPrev > 0 ? ((jobsThis - jobsPrev) / jobsPrev) * 100 : null;
+
+    const newCustomersThisWeek = recentCustomers.filter(
+      (c) => new Date(c.createdAt) >= weekAgo,
+    ).length;
+
+    // Sparklines — 10 monthly buckets (oldest → newest)
+    const monthBuckets = (
+      items: { date: string | undefined; value?: number }[],
+    ) => {
+      const b = Array(10).fill(0);
+      items.forEach(({ date, value }) => {
+        if (!date) return;
+        const d = new Date(date);
+        const mAgo =
+          (now.getFullYear() - d.getFullYear()) * 12 +
+          (now.getMonth() - d.getMonth());
+        if (mAgo >= 0 && mAgo < 10) b[9 - mAgo] += value ?? 1;
+      });
+      return b;
+    };
+
+    const revenueSparkline = monthBuckets(
+      paidInvoices.map((i) => ({
+        date: i.paidAt ?? i.updatedAt,
+        value: i.total ?? 0,
+      })),
+    );
+    const jobsSparkline = monthBuckets(
+      completedJobs.map((j) => ({ date: j.updatedAt })),
+    );
+    const customersSparkline = monthBuckets(
+      recentCustomers.map((c) => ({ date: c.createdAt })),
+    );
+    const unpaidSparkline = monthBuckets(
+      unpaidInvoices.map((i) => ({
+        date: i.createdAt,
+        value: i.total ?? 0,
+      })),
+    );
+
+    return {
+      totalRevenue,
+      unpaidAmount,
+      overdueCount,
+      completedJobsCount: completedJobs.length,
+      revenueChange,
+      jobsChange,
+      newCustomersThisWeek,
+      revenueSparkline,
+      jobsSparkline,
+      customersSparkline,
+      unpaidSparkline,
+    };
+  }, [allInvoices, allJobs, recentCustomers]);
 
   const prevMonth = () =>
     setCalendarDate((d) => new Date(d.getFullYear(), d.getMonth() - 1, 1));
@@ -333,19 +456,46 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      <div className={styles.statsRow}>
+      <div className={styles.statGrid}>
+        {/* Total Revenue */}
         <div
           className={styles.statCard}
-          onClick={() => navigate("/customers")}
+          onClick={() => navigate("/invoices")}
           role="button"
           tabIndex={0}
-          onKeyDown={(e) => e.key === "Enter" && navigate("/customers")}
+          onKeyDown={(e) => e.key === "Enter" && navigate("/invoices")}
         >
-          <span className={styles.statLabel}>{labels.totalClients}</span>
-          <span className={styles.statValue}>
-            {totalClients === null ? "—" : totalClients}
-          </span>
+          <div className={styles.statCardHeader}>
+            <span className={styles.statLabel}>
+              {lang === "en" ? "Total Revenue" : "Ingresos Totales"}
+            </span>
+            <span
+              className={styles.statIconWrap}
+              style={{ background: "var(--green-soft)", color: "var(--green)" }}
+            >
+              💰
+            </span>
+          </div>
+          <div className={styles.statValue}>
+            ${statData.totalRevenue.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+          </div>
+          {statData.revenueChange !== null ? (
+            <div
+              className={`${styles.statChange} ${statData.revenueChange >= 0 ? styles.up : styles.down}`}
+            >
+              {statData.revenueChange >= 0 ? "▲" : "▼"}{" "}
+              {Math.abs(statData.revenueChange).toFixed(1)}%{" "}
+              {lang === "en" ? "vs last month" : "vs mes anterior"}
+            </div>
+          ) : (
+            <div className={styles.statChangeFaint}>
+              {lang === "en" ? "No prior month data" : "Sin datos previos"}
+            </div>
+          )}
+          <Sparkline bars={statData.revenueSparkline} color="var(--green)" />
         </div>
+
+        {/* Jobs Completed */}
         <div
           className={styles.statCard}
           onClick={() => navigate("/jobs")}
@@ -353,22 +503,107 @@ export default function DashboardPage() {
           tabIndex={0}
           onKeyDown={(e) => e.key === "Enter" && navigate("/jobs")}
         >
-          <span className={styles.statLabel}>{labels.totalJobs}</span>
-          <span className={styles.statValue}>
-            {totalJobs === null ? "—" : totalJobs}
-          </span>
+          <div className={styles.statCardHeader}>
+            <span className={styles.statLabel}>
+              {lang === "en" ? "Jobs Completed" : "Trabajos Completados"}
+            </span>
+            <span
+              className={styles.statIconWrap}
+              style={{ background: "var(--teal-soft)", color: "var(--teal)" }}
+            >
+              ✅
+            </span>
+          </div>
+          <div className={styles.statValue}>
+            {totalJobs === null ? "—" : statData.completedJobsCount}
+          </div>
+          {statData.jobsChange !== null ? (
+            <div
+              className={`${styles.statChange} ${statData.jobsChange >= 0 ? styles.up : styles.down}`}
+            >
+              {statData.jobsChange >= 0 ? "▲" : "▼"}{" "}
+              {Math.abs(statData.jobsChange).toFixed(0)}%{" "}
+              {lang === "en" ? "this month" : "este mes"}
+            </div>
+          ) : (
+            <div className={styles.statChangeFaint}>
+              {lang === "en" ? "No prior month data" : "Sin datos previos"}
+            </div>
+          )}
+          <Sparkline bars={statData.jobsSparkline} color="var(--teal)" />
         </div>
+
+        {/* Active Customers */}
         <div
           className={styles.statCard}
-          onClick={() => navigate("/services")}
+          onClick={() => navigate("/customers")}
           role="button"
           tabIndex={0}
-          onKeyDown={(e) => e.key === "Enter" && navigate("/services")}
+          onKeyDown={(e) => e.key === "Enter" && navigate("/customers")}
         >
-          <span className={styles.statLabel}>{labels.totalServices}</span>
-          <span className={styles.statValue}>
-            {totalServices === null ? "—" : totalServices}
-          </span>
+          <div className={styles.statCardHeader}>
+            <span className={styles.statLabel}>
+              {lang === "en" ? "Active Customers" : "Clientes Activos"}
+            </span>
+            <span
+              className={styles.statIconWrap}
+              style={{
+                background: "var(--primary-soft)",
+                color: "var(--primary)",
+              }}
+            >
+              👥
+            </span>
+          </div>
+          <div className={styles.statValue}>
+            {totalClients === null ? "—" : totalClients}
+          </div>
+          <div className={`${styles.statChange} ${styles.up}`}>
+            ▲ {statData.newCustomersThisWeek}{" "}
+            {lang === "en" ? "new this week" : "nuevos esta semana"}
+          </div>
+          <Sparkline
+            bars={statData.customersSparkline}
+            color="var(--primary)"
+          />
+        </div>
+
+        {/* Unpaid Invoices */}
+        <div
+          className={styles.statCard}
+          onClick={() => navigate("/invoices")}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => e.key === "Enter" && navigate("/invoices")}
+        >
+          <div className={styles.statCardHeader}>
+            <span className={styles.statLabel}>
+              {lang === "en" ? "Unpaid Invoices" : "Facturas Pendientes"}
+            </span>
+            <span
+              className={styles.statIconWrap}
+              style={{
+                background: "var(--yellow-soft)",
+                color: "var(--yellow)",
+              }}
+            >
+              ⚠️
+            </span>
+          </div>
+          <div className={styles.statValue}>
+            ${statData.unpaidAmount.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+          </div>
+          {statData.overdueCount > 0 ? (
+            <div className={`${styles.statChange} ${styles.down}`}>
+              ▼ {statData.overdueCount}{" "}
+              {lang === "en" ? "overdue" : "vencidas"}
+            </div>
+          ) : (
+            <div className={`${styles.statChange} ${styles.up}`}>
+              {lang === "en" ? "None overdue" : "Sin vencidas"}
+            </div>
+          )}
+          <Sparkline bars={statData.unpaidSparkline} color="var(--terra)" />
         </div>
       </div>
 

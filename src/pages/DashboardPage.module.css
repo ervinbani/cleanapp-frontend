@@ -159,10 +159,10 @@
   margin: 0;
 }
 
-/* ─── Stats row ──────────────────────────────────────────────── */
-.statsRow {
-  display: flex;
-  flex-wrap: wrap;
+/* ─── Stat grid (4 rich cards) ───────────────────────────────── */
+.statGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
   gap: 1rem;
 }
 
@@ -170,14 +170,14 @@
   background: var(--bg-surface);
   border: 1px solid var(--border);
   border-radius: 14px;
-  padding: 1.125rem 1.5rem;
+  padding: 1.125rem 1.25rem 1rem;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  flex: 1 1 180px;
+  gap: 0.35rem;
   box-shadow: var(--shadow);
   cursor: pointer;
   transition: transform 0.15s, box-shadow 0.15s;
+  overflow: hidden;
 }
 
 .statCard:hover {
@@ -189,6 +189,13 @@
   transform: translateY(0);
 }
 
+.statCardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.15rem;
+}
+
 .statLabel {
   font-size: 0.75rem;
   font-weight: 500;
@@ -197,12 +204,60 @@
   letter-spacing: 0.3px;
 }
 
+.statIconWrap {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+  flex-shrink: 0;
+}
+
 .statValue {
-  font-size: 2rem;
+  font-size: 1.875rem;
   font-weight: 700;
   color: var(--text-primary);
   line-height: 1;
   letter-spacing: -0.5px;
+}
+
+.statChange {
+  font-size: 0.75rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.statChange.up  { color: var(--green); }
+.statChange.down { color: var(--red); }
+
+.statChangeFaint {
+  font-size: 0.72rem;
+  color: var(--text-placeholder);
+}
+
+/* ─── Sparkline ──────────────────────────────────────────────── */
+.sparkline {
+  height: 28px;
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  margin-top: 0.25rem;
+}
+
+.sparkBar {
+  flex: 1;
+  border-radius: 2px 2px 0 0;
+  opacity: 0.45;
+  transition: opacity 0.15s;
+  min-height: 3px;
+}
+
+.sparkBarHi {
+  opacity: 1;
 }
 
 /* ─── Bottom row: Calendar + Activity ───────────────────────── */
@@ -530,6 +585,12 @@
 }
 
 /* ─── Responsive ─────────────────────────────────────────────── */
+@media (max-width: 1100px) {
+  .statGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 @media (max-width: 900px) {
   .bottomRow {
     flex-direction: column;
@@ -538,11 +599,14 @@
     flex: unset;
     width: 100%;
   }
-  .statsRow {
-    gap: 0.75rem;
-  }
   .greetingCard {
     flex-direction: column;
     align-items: flex-start;
+  }
+}
+
+@media (max-width: 520px) {
+  .statGrid {
+    grid-template-columns: 1fr;
   }
 }

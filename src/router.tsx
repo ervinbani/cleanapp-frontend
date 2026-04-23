@@ -9,8 +9,10 @@ import ServicesPage from "./pages/ServicesPage";
 import UsersPage from "./pages/UsersPage";
 import JobsPage from "./pages/JobsPage";
 import InvoicesPage from "./pages/InvoicesPage";
-import RolesPermissionsPage from "./pages/settings/RolesPermissionsPage";
 import MessagesPage from "./pages/MessagesPage";
+import SettingsLayout from "./pages/settings/SettingsLayout";
+import ProfilePage from "./pages/settings/ProfilePage";
+import RolesPermissionsPage from "./pages/settings/RolesPermissionsPage";
 
 const router = createBrowserRouter([
   // Public routes
@@ -33,9 +35,13 @@ const router = createBrowserRouter([
           { path: "/messages", element: <MessagesPage /> },
           {
             path: "/settings",
-            element: <Navigate to="/settings/roles" replace />,
+            element: <SettingsLayout />,
+            children: [
+              { index: true, element: <Navigate to="/settings/profile" replace /> },
+              { path: "profile", element: <ProfilePage /> },
+              { path: "roles", element: <RolesPermissionsPage /> },
+            ],
           },
-          { path: "/settings/roles", element: <RolesPermissionsPage /> },
         ],
       },
     ],
