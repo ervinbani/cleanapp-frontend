@@ -264,19 +264,56 @@ export default function DashboardPage() {
   const canCreateClient = hasPermission("users", "create");
   const canCreateInvoice = hasPermission("invoices", "create");
 
+  const todaysJobs = useMemo(() => {
+    const now = new Date();
+    return allJobs.filter((job) => {
+      const d = new Date(job.scheduledStart);
+      return d.toDateString() === now.toDateString();
+    });
+  }, [allJobs]);
+
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return lang === "en" ? "Good morning" : "Buenos días";
+    if (hour < 18) return lang === "en" ? "Good afternoon" : "Buenas tardes";
+    return lang === "en" ? "Good evening" : "Buenas noches";
+  };
+
   return (
     <div className={styles.page}>
+      {/* Greeting banner */}
+      <div className={styles.greetingCard}>
+        <div className={styles.greetingText}>
+          <h2>
+            {getGreeting()}, {user?.firstName}! ☀️
+          </h2>
+          <p>
+            {lang === "en"
+              ? `You have ${todaysJobs.length} job${todaysJobs.length !== 1 ? "s" : ""} scheduled today`
+              : `Tienes ${todaysJobs.length} trabajo${todaysJobs.length !== 1 ? "s" : ""} programado${todaysJobs.length !== 1 ? "s" : ""} hoy`}
+          </p>
+        </div>
+        <div className={styles.greetingStats}>
+          <div className={styles.greetingStat}>
+            <div className={styles.greetingStatNum}>{todaysJobs.length}</div>
+            <div className={styles.greetingStatLbl}>
+              {lang === "en" ? "Today's Jobs" : "Trabajos hoy"}
+            </div>
+          </div>
+          {canCreateJob && (
+            <button
+              className={styles.greetingBtn}
+              onClick={() => navigate("/jobs?new=1")}
+            >
+              + {lang === "en" ? "New Job" : "Nuevo trabajo"}
+            </button>
+          )}
+        </div>
+      </div>
+
       <div className={styles.headingRow}>
         <h2 className={styles.heading}>{labels.heading}</h2>
         <div className={styles.quickActions}>
-          {canCreateJob && (
-            <button
-              className={styles.qaBtn}
-              onClick={() => navigate("/jobs?new=1")}
-            >
-              {labels.newJob}
-            </button>
-          )}
           {canCreateClient && (
             <button
               className={styles.qaBtn}

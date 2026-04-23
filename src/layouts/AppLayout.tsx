@@ -7,71 +7,30 @@ import { messageService } from "../services/messageService";
 import { deleteTenant } from "../services/authService";
 import styles from "./AppLayout.module.css";
 
-const navItems = [
+const navSections = [
   {
-    path: "/",
-    label: "Dashboard",
-    labelEs: "Inicio",
-    icon: "⊞",
-    permission: null,
+    label: "Main",
+    labelEs: "Principal",
+    items: [
+      { path: "/", label: "Dashboard", labelEs: "Inicio", icon: "📊", permission: null },
+      { path: "/jobs", label: "Jobs", labelEs: "Trabajos", icon: "🧹", permission: "jobs.read" },
+      { path: "/customers", label: "Clients", labelEs: "Clientes", icon: "👤", permission: "users.read" },
+      { path: "/invoices", label: "Invoices", labelEs: "Facturas", icon: "💰", permission: "invoices.read" },
+    ],
   },
   {
-    path: "/users",
-    label: "Users",
-    labelEs: "Usuarios",
-    icon: "👥",
-    permission: "users.read",
-  },
-  {
-    path: "/customers",
-    label: "Clients",
-    labelEs: "Clientes",
-    icon: "👤",
-    permission: "users.read",
-  },
-  {
-    path: "/jobs",
-    label: "Jobs",
-    labelEs: "Trabajos",
-    icon: "🧹",
-    permission: "jobs.read",
-  },
-  {
-    path: "/services",
-    label: "Services",
-    labelEs: "Servicios",
-    icon: "✨",
-    permission: "services.read",
-  },
-  {
-    path: "/calendar",
-    label: "Calendar",
-    labelEs: "Calendario",
-    icon: "📅",
-    permission: "jobs.read",
-  },
-  {
-    path: "/invoices",
-    label: "Invoices",
-    labelEs: "Facturas",
-    icon: "✉️",
-    permission: "invoices.read",
-  },
-  {
-    path: "/messages",
-    label: "Messages",
-    labelEs: "Mensajes",
-    icon: "💬",
-    permission: null,
-  },
-  {
-    path: "/settings",
-    label: "Settings",
-    labelEs: "Configuración",
-    icon: "⚙️",
-    permission: "roles.read",
+    label: "Manage",
+    labelEs: "Gestión",
+    items: [
+      { path: "/services", label: "Services", labelEs: "Servicios", icon: "✨", permission: "services.read" },
+      { path: "/calendar", label: "Calendar", labelEs: "Calendario", icon: "📅", permission: "jobs.read" },
+      { path: "/messages", label: "Messages", labelEs: "Mensajes", icon: "💬", permission: null },
+      { path: "/users", label: "Users", labelEs: "Usuarios", icon: "👥", permission: "users.read" },
+      { path: "/settings", label: "Settings", labelEs: "Configuración", icon: "⚙️", permission: "roles.read" },
+    ],
   },
 ];
+
 
 const settingsSubItems = [
   {
@@ -259,27 +218,38 @@ export default function AppLayout() {
         className={`${styles.sidebar} ${sidebarOpen ? styles.sidebarOpen : ""} ${sidebarCollapsed ? styles.sidebarCollapsed : ""}`}
       >
         <div className={styles.sidebarBrand}>
-          <span className={styles.sidebarLogo}>🪣</span>
+          <div className={styles.sidebarLogoIcon}>🧹</div>
           {!sidebarCollapsed && (
-            <span className={styles.sidebarBrandName}>Brillo</span>
+            <div>
+              <div className={styles.sidebarBrandName}>Brillo</div>
+              <div className={styles.sidebarBrandTag}>Pro Plan</div>
+            </div>
           )}
           <button
             className={styles.collapseBtn}
             onClick={() => setSidebarCollapsed((v) => !v)}
-            title={sidebarCollapsed ? "Espandi sidebar" : "Comprimi sidebar"}
+            title={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
           >
             {sidebarCollapsed ? "›" : "‹"}
           </button>
         </div>
 
         <nav className={styles.nav}>
-          {navItems
-            .filter((item) => {
+          {navSections.map((section) => {
+            const visibleItems = section.items.filter((item) => {
               if (!item.permission) return true;
               const [entity, action] = item.permission.split(".");
               return hasPermission(entity, action);
-            })
-            .map((item) =>
+            });
+            if (visibleItems.length === 0) return null;
+            return (
+              <div key={section.label} className={styles.navSection}>
+                {!sidebarCollapsed && (
+                  <span className={styles.navSectionLabel}>
+                    {lang === "en" ? section.label : section.labelEs}
+                  </span>
+                )}
+                {visibleItems.map((item) =>
               item.path === "/settings" ? (
                 <div key="settings" className={styles.settingsGroup}>
                   <button
@@ -387,8 +357,29 @@ export default function AppLayout() {
                   )}
                 </NavLink>
               ),
-            )}
+                )}
+              </div>
+            );
+          })}
         </nav>
+
+        {/* Sidebar footer user card */}
+        {!sidebarCollapsed && (
+          <div className={styles.sidebarFooter}>
+            <div className={styles.sidebarUserCard}>
+              <div className={styles.avatar}>
+                {user?.firstName?.[0]}
+                {user?.lastName?.[0]}
+              </div>
+              <div className={styles.sidebarUserInfo}>
+                <div className={styles.sidebarUserName}>
+                  {user?.firstName} {user?.lastName}
+                </div>
+                <div className={styles.sidebarUserRole}>{user?.role}</div>
+              </div>
+            </div>
+          </div>
+        )}
       </aside>
 
       {/* Overlay for mobile */}
