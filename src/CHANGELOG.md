@@ -5,6 +5,8 @@ Based on the work done in this session:
 ### 2026-04-25
 
 14. **Documents — Download** — Added a download button (⬇️) in the actions column of the files table; clicking it fetches the file as a blob and triggers a native browser download with the original filename
+15. **Services — Overtime** — Added optional overtime support: toggle in create/edit modal to enable overtime, with unit selector (`per_hour` / `per_job` / `per_day`) and extra percentage field (0–1000); when enabled, an **OT +X%** badge is shown next to the price in the services list
+16. **Jobs — Overtime Hours** — When the selected service has `overtime.isEnabled`, an "Overtime Hours" input appears in the job form (with the OT badge showing the extra %); value is sent to the backend as `overtimeHours` and loaded back when editing
 
 ---
 

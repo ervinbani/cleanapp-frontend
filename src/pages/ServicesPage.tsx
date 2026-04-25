@@ -33,6 +33,9 @@ interface ServiceForm {
   basePrice: string;
   priceUnit: PriceUnit;
   isActive: boolean;
+  overtimeEnabled: boolean;
+  overtimeUnit: PriceUnit;
+  overtimePercentage: string;
 }
 
 const EMPTY_SERVICE_FORM: ServiceForm = {
@@ -43,6 +46,9 @@ const EMPTY_SERVICE_FORM: ServiceForm = {
   basePrice: "",
   priceUnit: "per_job",
   isActive: true,
+  overtimeEnabled: false,
+  overtimeUnit: "per_hour",
+  overtimePercentage: "",
 };
 
 function serviceToForm(s: Service): ServiceForm {
@@ -54,6 +60,12 @@ function serviceToForm(s: Service): ServiceForm {
     basePrice: s.basePrice != null ? String(s.basePrice) : "",
     priceUnit: (s.priceUnit as PriceUnit) ?? "per_job",
     isActive: s.isActive,
+    overtimeEnabled: s.overtime?.isEnabled ?? false,
+    overtimeUnit: (s.overtime?.unit as PriceUnit) ?? "per_hour",
+    overtimePercentage:
+      s.overtime?.extraPercentage != null
+        ? String(s.overtime.extraPercentage)
+        : "",
   };
 }
 
@@ -88,6 +100,10 @@ function ServiceModal({
       setActiveTab("en");
       return;
     }
+    if (form.overtimeEnabled && form.overtimePercentage === "") {
+      setError(l.overtimePercentageRequired);
+      return;
+    }
     setSaving(true);
     setError("");
     try {
@@ -103,6 +119,13 @@ function ServiceModal({
         basePrice: form.basePrice !== "" ? Number(form.basePrice) : undefined,
         priceUnit: form.priceUnit,
         isActive: form.isActive,
+        overtime: form.overtimeEnabled
+          ? {
+              isEnabled: true,
+              unit: form.overtimeUnit,
+              extraPercentage: Number(form.overtimePercentage),
+            }
+          : { isEnabled: false },
       };
       if (isEdit) {
         await apiClient.put(`/services/${service!._id}`, payload);
@@ -247,6 +270,54 @@ function ServiceModal({
               </span>
             </div>
           </div>
+
+          <div className={styles.formGroup}>
+            <label className={styles.label}>{l.overtimeLabel}</label>
+            <div className={styles.toggleRow}>
+              <label className={styles.toggleSwitch}>
+                <input
+                  type="checkbox"
+                  checked={form.overtimeEnabled}
+                  onChange={(e) => set("overtimeEnabled", e.target.checked)}
+                />
+                <span className={styles.toggleSlider} />
+              </label>
+              <span className={styles.toggleLabel}>
+                {form.overtimeEnabled ? l.overtimeOn : l.overtimeOff}
+              </span>
+            </div>
+          </div>
+
+          {form.overtimeEnabled && (
+            <div className={styles.formRow}>
+              <div className={styles.formGroup}>
+                <label className={styles.label}>{l.overtimeUnit}</label>
+                <select
+                  className={styles.select}
+                  value={form.overtimeUnit}
+                  onChange={(e) =>
+                    set("overtimeUnit", e.target.value as PriceUnit)
+                  }
+                >
+                  <option value="per_hour">{l.unitPerHour}</option>
+                  <option value="per_job">{l.unitPerJob}</option>
+                  <option value="per_day">{l.unitPerDay}</option>
+                </select>
+              </div>
+              <div className={styles.formGroup}>
+                <label className={styles.label}>{l.overtimePercentage}</label>
+                <input
+                  type="number"
+                  min="0"
+                  max="1000"
+                  step="1"
+                  className={styles.input}
+                  value={form.overtimePercentage}
+                  onChange={(e) => set("overtimePercentage", e.target.value)}
+                />
+              </div>
+            </div>
+          )}
 
           {error && <p className={styles.formError}>{error}</p>}
 
@@ -557,6 +628,11 @@ export default function ServicesPage() {
                   </td>
                   <td className={styles.priceCell}>
                     {s.basePrice != null ? `$${s.basePrice.toFixed(2)}` : "—"}
+                    {s.overtime?.isEnabled && (
+                      <span className={styles.badgeOT}>
+                        OT +{s.overtime.extraPercentage}%
+                      </span>
+                    )}
                   </td>
                   <td className={styles.priceCell}>
                     {s.priceUnit

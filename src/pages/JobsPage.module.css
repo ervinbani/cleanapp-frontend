@@ -662,6 +662,20 @@
   letter-spacing: 0.03em;
 }
 
+.badgeOT {
+  display: inline-block;
+  margin-left: 0.4rem;
+  padding: 0.1rem 0.45rem;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  background: #fef3c7;
+  color: #92400e;
+  vertical-align: middle;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
 .input {
   border: 1px solid var(--border-input);
   border-radius: 8px;

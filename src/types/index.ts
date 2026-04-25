@@ -99,6 +99,11 @@ export interface Service {
   description: { en?: string; es?: string };
   basePrice?: number;
   priceUnit?: "per_hour" | "per_job" | "per_day";
+  overtime?: {
+    isEnabled: boolean;
+    unit?: "per_hour" | "per_job" | "per_day";
+    extraPercentage?: number;
+  };
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
@@ -128,6 +133,7 @@ export interface Job {
   recurringRuleId?: string;
   price?: number;
   priceUnit?: "per_hour" | "per_job" | "per_day";
+  overtimeHours?: number;
   timeDuration?: number;
   invoiceId?: string;
   createdAt: string;
