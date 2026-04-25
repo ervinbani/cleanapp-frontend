@@ -1,6 +1,7 @@
 Based on the work done in this session:
 
 ---
+
 ### 2026-04-25
 
 14. **Documents — Download** — Added a download button (⬇️) in the actions column of the files table; clicking it fetches the file as a blob and triggers a native browser download with the original filename
