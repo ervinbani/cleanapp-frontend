@@ -235,6 +235,27 @@ export default function DocumentsPage() {
     }
   };
 
+  const handleDownload = async (doc: FileListItem) => {
+    try {
+      const url = await getReadUrl(doc.key);
+      const response = await fetch(url);
+      if (!response.ok) throw new Error("fetch failed");
+      const blob = await response.blob();
+      const objectUrl = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = objectUrl;
+      a.download = doc.filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(objectUrl);
+    } catch {
+      setError(
+        t("Could not download file.", "No se pudo descargar el archivo."),
+      );
+    }
+  };
+
   const handleDelete = async (doc: FileListItem) => {
     if (
       !window.confirm(
@@ -424,6 +445,13 @@ export default function DocumentsPage() {
                         title={t("Copy URL", "Copiar URL")}
                       >
                         🔗
+                      </button>
+                      <button
+                        className={styles.downloadBtn}
+                        onClick={() => handleDownload(doc)}
+                        title={t("Download", "Descargar")}
+                      >
+                        ⬇️
                       </button>
                       <button
                         className={styles.deleteBtn}

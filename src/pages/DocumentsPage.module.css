@@ -281,7 +281,8 @@
 
 .viewBtn,
 .deleteBtn,
-.copyBtn {
+.copyBtn,
+.downloadBtn {
   padding: 0.3rem 0.5rem;
   border-radius: 7px;
   border: 1px solid var(--border);
@@ -303,6 +304,11 @@
 .deleteBtn:hover {
   background: #fef2f2;
   border-color: #fca5a5;
+}
+
+.downloadBtn:hover {
+  background: #f0fdf4;
+  border-color: #86efac;
 }
 
 /* ─── Empty state ───────────────────────────────────────────────── */

@@ -1,5 +1,12 @@
 Based on the work done in this session:
 
+---
+### 2026-04-25
+
+14. **Documents — Download** — Added a download button (⬇️) in the actions column of the files table; clicking it fetches the file as a blob and triggers a native browser download with the original filename
+
+---
+
 1. **Documents** — Added thumbnail preview column and Copy URL button to the files table
 2. **Invoices — Discount** — Added discount type selector (percentage / fixed amount) with calculated discount value
 3. **Invoices — Item price type** — Replaced free-text service type with a price type selector (Hourly / Fixed / Daily / No price); "No price" hides qty and price columns
