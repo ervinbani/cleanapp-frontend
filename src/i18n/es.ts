@@ -153,7 +153,8 @@ const es: Translations = {
     overtimeOff: "Sin horas extra",
     overtimeUnit: "Unidad de HE",
     overtimePercentage: "Porcentaje extra %",
-    overtimePercentageRequired: "El porcentaje extra es obligatorio cuando las horas extra están activadas.",
+    overtimePercentageRequired:
+      "El porcentaje extra es obligatorio cuando las horas extra están activadas.",
   },
   jobs: {
     title: "Trabajos",

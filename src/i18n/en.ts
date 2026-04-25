@@ -151,7 +151,8 @@ const en = {
     overtimeOff: "No overtime",
     overtimeUnit: "Overtime Unit",
     overtimePercentage: "Extra %",
-    overtimePercentageRequired: "Extra percentage is required when overtime is enabled.",
+    overtimePercentageRequired:
+      "Extra percentage is required when overtime is enabled.",
   },
   jobs: {
     title: "Jobs",

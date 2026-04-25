@@ -102,7 +102,15 @@ function getWeekRange(): { dateFrom: string; dateTo: string } {
 function getMonthRange(): { dateFrom: string; dateTo: string } {
   const now = new Date();
   const from = new Date(now.getFullYear(), now.getMonth(), 1);
-  const to = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+  const to = new Date(
+    now.getFullYear(),
+    now.getMonth() + 1,
+    0,
+    23,
+    59,
+    59,
+    999,
+  );
   return { dateFrom: from.toISOString(), dateTo: to.toISOString() };
 }
 
@@ -1151,9 +1159,9 @@ export default function JobsPage() {
   const [apiStatus, setApiStatus] = useState<JobStatus | "">("");
   const [filterUserId, setFilterUserId] = useState("");
   const [filterUsers, setFilterUsers] = useState<FilterUser[]>([]);
-  const [dateMode, setDateMode] = useState<"" | "today" | "week" | "month" | "custom">(
-    "",
-  );
+  const [dateMode, setDateMode] = useState<
+    "" | "today" | "week" | "month" | "custom"
+  >("");
   const [customDateFrom, setCustomDateFrom] = useState("");
   const [customDateTo, setCustomDateTo] = useState("");
 
