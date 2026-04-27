@@ -931,41 +931,46 @@ function JobModal({ job, lang, onClose, onSaved }: JobModalProps) {
                   </select>
                 </div>
               </div>
-              <div className={styles.formGroup}>
-                <label className={styles.label}>{l.timeDuration}</label>
-                <input
-                  className={styles.input}
-                  type="number"
-                  min="0"
-                  step="1"
-                  value={form.timeDuration}
-                  onChange={(e) => handleDurationChange(e.target.value)}
-                />
-              </div>
             </div>
 
-            {/* Overtime Hours — only if selected service has overtime enabled */}
+            {/* Duration + Overtime Hours side by side */}
             {(() => {
               const svc = services.find((s) => s._id === form.serviceId);
-              return svc?.overtime?.isEnabled ? (
-                <div className={styles.formGroup}>
-                  <label className={styles.label}>
-                    {l.overtimeHours}
-                    <span className={styles.badgeOT}>
-                      OT +{svc.overtime.extraPercentage}%
-                    </span>
-                  </label>
-                  <input
-                    className={styles.input}
-                    type="number"
-                    min="0"
-                    step="0.5"
-                    placeholder="0"
-                    value={form.overtimeHours}
-                    onChange={(e) => set("overtimeHours", e.target.value)}
-                  />
+              const hasOT = svc?.overtime?.isEnabled ?? false;
+              return (
+                <div className={styles.formRow}>
+                  <div className={styles.formGroup}>
+                    <label className={styles.label}>{l.timeDuration}</label>
+                    <input
+                      className={styles.input}
+                      type="number"
+                      min="0"
+                      step="1"
+                      value={form.timeDuration}
+                      onChange={(e) => handleDurationChange(e.target.value)}
+                    />
+                  </div>
+                  {hasOT && (
+                    <div className={styles.formGroup}>
+                      <label className={styles.label}>
+                        {l.overtimeHours}
+                        <span className={styles.badgeOT}>
+                          OT +{svc!.overtime!.extraPercentage}%
+                        </span>
+                      </label>
+                      <input
+                        className={styles.input}
+                        type="number"
+                        min="0"
+                        step="0.5"
+                        placeholder="0"
+                        value={form.overtimeHours}
+                        onChange={(e) => set("overtimeHours", e.target.value)}
+                      />
+                    </div>
+                  )}
                 </div>
-              ) : null;
+              );
             })()}
 
             {/* Assigned Users */}
