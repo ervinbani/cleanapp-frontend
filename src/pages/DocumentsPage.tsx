@@ -147,6 +147,7 @@ export default function DocumentsPage() {
   ); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
+    if (!canRead) return;
     fetchDocs();
   }, [fetchDocs]);
 
@@ -159,6 +160,22 @@ export default function DocumentsPage() {
   };
 
   const t = (en: string, es: string) => (lang === "en" ? en : es);
+
+  if (!canRead) {
+    return (
+      <div className={styles.page}>
+        <div className={styles.pageHeader}>
+          <h1 className={styles.title}>{t("Documents", "Documentos")}</h1>
+        </div>
+        <p className={styles.empty}>
+          {t(
+            "You don't have permission to view documents.",
+            "No tienes permiso para ver los documentos.",
+          )}
+        </p>
+      </div>
+    );
+  }
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] ?? null;
@@ -288,15 +305,6 @@ export default function DocumentsPage() {
         )}
       </div>
 
-      {!canRead ? (
-        <p className={styles.empty}>
-          {t(
-            "You don't have permission to view documents.",
-            "No tienes permiso para ver los documentos.",
-          )}
-        </p>
-      ) : (
-        <>
       {/* Upload card */}
       {showForm && (
         <div className={styles.card}>
@@ -505,8 +513,6 @@ export default function DocumentsPage() {
         <p className={styles.empty}>
           {t("No documents uploaded yet.", "Aún no hay documentos cargados.")}
         </p>
-      )}
-        </>
       )}
     </div>
   );
