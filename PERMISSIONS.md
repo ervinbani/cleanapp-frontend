@@ -59,6 +59,11 @@
 | DELETE /api/roles/:id | ✗ | ✗ | ✗ | ✗ | ✗ | ✅ |
 | **PERMISSIONS** | | | | | | |
 | GET /api/permissions | ✗ | ✗ | ✗ | ✗ | ✅ | ✅ |
+| **DOCUMENTS** | | | | | | |
+| GET /api/files/:resource | ✗ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| POST /api/files/:resource/:refId | ✗ | ✗ | ✅ | ✅ | ✅ | ✅ |
+| PUT /api/files/:key | ✗ | ✗ | ✅ | ✅ | ✅ | ✅ |
+| DELETE /api/files/:key | ✗ | ✗ | ✗ | ✅ | ✅ | ✅ |
 | **TENANT** | | | | | | |
 | GET /api/tenant | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | PUT /api/tenant | ✗ | ✗ | ✅ | ✅ | ✅ | ✅ |

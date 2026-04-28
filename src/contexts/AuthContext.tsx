@@ -43,6 +43,10 @@ const ROLE_PERMISSIONS: Record<UserRole, string[]> = {
     "roles.delete",
     "permissions.read",
     "permissions.update",
+    "documents.read",
+    "documents.create",
+    "documents.update",
+    "documents.delete",
   ],
   director: [
     "users.read",
@@ -58,6 +62,10 @@ const ROLE_PERMISSIONS: Record<UserRole, string[]> = {
     "invoices.update",
     "roles.read",
     "permissions.read",
+    "documents.read",
+    "documents.create",
+    "documents.update",
+    "documents.delete",
   ],
   manager_operations: [
     "jobs.read",
@@ -67,9 +75,18 @@ const ROLE_PERMISSIONS: Record<UserRole, string[]> = {
     "services.read",
     "users.read",
     "invoices.read",
+    "documents.read",
+    "documents.create",
+    "documents.update",
   ],
-  manager_hr: ["users.read", "users.create", "users.update", "users.delete"],
-  staff: ["jobs.read", "services.read", "invoices.read"],
+  manager_hr: [
+    "users.read",
+    "users.create",
+    "users.update",
+    "users.delete",
+    "documents.read",
+  ],
+  staff: ["jobs.read", "services.read", "invoices.read", "documents.read"],
   worker: ["jobs.read"],
 };
 
