@@ -1050,7 +1050,7 @@ function JobModal({ job, lang, onClose, onSaved }: JobModalProps) {
                   <div key={idx} className={styles.checklistRow}>
                     <input
                       type="checkbox"
-                      className={`${styles.checklistCompleted}${item.completed ? ` ${styles.checklistCompletedChecked}` : ""}`}
+                      className={styles.checklistCompleted}
                       checked={item.completed}
                       onChange={() => toggleChecklistCompleted(idx)}
                       title={item.completed ? "Mark as incomplete" : "Mark as completed"}

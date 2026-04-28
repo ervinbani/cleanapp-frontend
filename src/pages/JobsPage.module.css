@@ -848,10 +848,6 @@
   flex-shrink: 0;
 }
 
-.checklistCompletedChecked {
-  accent-color: #16a34a;
-}
-
 .checklistLabelDone {
   text-decoration: line-through;
   color: var(--text-muted) !important;
