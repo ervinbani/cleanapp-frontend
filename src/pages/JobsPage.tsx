@@ -110,6 +110,7 @@ function getMonthRange(): { dateFrom: string; dateTo: string } {
 interface ChecklistItem {
   labelEn: string;
   labelEs: string;
+  completed: boolean;
 }
 
 interface JobForm {
@@ -195,6 +196,7 @@ function jobToForm(j: Job): JobForm {
     checklist: j.checklist.map((item) => ({
       labelEn: item.label.en,
       labelEs: item.label.es,
+      completed: item.completed,
     })),
   };
 }
@@ -518,7 +520,7 @@ function JobModal({ job, lang, onClose, onSaved }: JobModalProps) {
   const addChecklistItem = () =>
     setForm((prev) => ({
       ...prev,
-      checklist: [...prev.checklist, { labelEn: "", labelEs: "" }],
+      checklist: [...prev.checklist, { labelEn: "", labelEs: "", completed: false }],
     }));
 
   const updateChecklistItem = (
@@ -537,6 +539,14 @@ function JobModal({ job, lang, onClose, onSaved }: JobModalProps) {
     setForm((prev) => ({
       ...prev,
       checklist: prev.checklist.filter((_, i) => i !== idx),
+    }));
+
+  const toggleChecklistCompleted = (idx: number) =>
+    setForm((prev) => ({
+      ...prev,
+      checklist: prev.checklist.map((item, i) =>
+        i === idx ? { ...item, completed: !item.completed } : item,
+      ),
     }));
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -613,7 +623,7 @@ function JobModal({ job, lang, onClose, onSaved }: JobModalProps) {
             .filter((item) => item.labelEn.trim() || item.labelEs.trim())
             .map((item) => ({
               label: { en: item.labelEn.trim(), es: item.labelEs.trim() },
-              completed: false,
+              completed: item.completed,
             })),
         };
         if (isEdit) {
@@ -1039,7 +1049,14 @@ function JobModal({ job, lang, onClose, onSaved }: JobModalProps) {
                 {form.checklist.map((item, idx) => (
                   <div key={idx} className={styles.checklistRow}>
                     <input
-                      className={styles.input}
+                      type="checkbox"
+                      className={styles.checklistCompleted}
+                      checked={item.completed}
+                      onChange={() => toggleChecklistCompleted(idx)}
+                      title={item.completed ? "Mark as incomplete" : "Mark as completed"}
+                    />
+                    <input
+                      className={`${styles.input}${item.completed ? ` ${styles.checklistLabelDone}` : ""}`}
                       placeholder={
                         checklistTab === "en" ? l.checkItemEn : l.checkItemEs
                       }
