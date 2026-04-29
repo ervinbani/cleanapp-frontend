@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useLang } from "../contexts/LangContext";
+import { useAuth } from "../contexts/AuthContext";
 import {
   uploadFile,
   getReadUrl,
@@ -58,7 +59,12 @@ function FileThumbnail({
 
 export default function DocumentsPage() {
   const { lang } = useLang();
+  const { hasPermission } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const canRead = hasPermission("documents", "read");
+  const canCreate = hasPermission("documents", "create");
+  const canDelete = hasPermission("documents", "delete");
 
   const [docs, setDocs] = useState<FileListItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -141,6 +147,7 @@ export default function DocumentsPage() {
   ); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
+    if (!canRead) return;
     fetchDocs();
   }, [fetchDocs]);
 
@@ -153,6 +160,22 @@ export default function DocumentsPage() {
   };
 
   const t = (en: string, es: string) => (lang === "en" ? en : es);
+
+  if (!canRead) {
+    return (
+      <div className={styles.page}>
+        <div className={styles.pageHeader}>
+          <h1 className={styles.title}>{t("Documents", "Documentos")}</h1>
+        </div>
+        <p className={styles.empty}>
+          {t(
+            "You don't have permission to view documents.",
+            "No tienes permiso para ver los documentos.",
+          )}
+        </p>
+      </div>
+    );
+  }
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] ?? null;
@@ -275,7 +298,7 @@ export default function DocumentsPage() {
     <div className={styles.page}>
       <div className={styles.pageHeader}>
         <h1 className={styles.title}>{t("Documents", "Documentos")}</h1>
-        {!showForm && (
+        {!showForm && canCreate && (
           <button className={styles.addBtn} onClick={() => setShowForm(true)}>
             + {t("Add file", "Agregar archivo")}
           </button>
@@ -453,13 +476,15 @@ export default function DocumentsPage() {
                       >
                         ⬇️
                       </button>
-                      <button
-                        className={styles.deleteBtn}
-                        onClick={() => handleDelete(doc)}
-                        title={t("Delete", "Eliminar")}
-                      >
-                        🗑
-                      </button>
+                      {canDelete && (
+                        <button
+                          className={styles.deleteBtn}
+                          onClick={() => handleDelete(doc)}
+                          title={t("Delete", "Eliminar")}
+                        >
+                          🗑
+                        </button>
+                      )}
                     </div>
                   </td>
                 </tr>
