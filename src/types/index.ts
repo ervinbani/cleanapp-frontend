@@ -258,7 +258,8 @@ export type PermissionResource =
   | "services"
   | "invoices"
   | "roles"
-  | "permissions";
+  | "permissions"
+  | "documents";
 
 export interface Permission {
   _id: string;
