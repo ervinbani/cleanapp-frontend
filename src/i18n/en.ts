@@ -146,6 +146,13 @@ const en = {
     save: "Save",
     update: "Update",
     required: "Name is required for at least the EN tab.",
+    overtimeLabel: "Enable Overtime",
+    overtimeOn: "Overtime enabled",
+    overtimeOff: "No overtime",
+    overtimeUnit: "Overtime Unit",
+    overtimePercentage: "Extra %",
+    overtimePercentageRequired:
+      "Extra percentage is required when overtime is enabled.",
   },
   jobs: {
     title: "Jobs",

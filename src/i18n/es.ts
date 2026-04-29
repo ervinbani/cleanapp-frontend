@@ -148,6 +148,13 @@ const es: Translations = {
     save: "Guardar",
     update: "Actualizar",
     required: "El nombre es obligatorio al menos en el tab EN.",
+    overtimeLabel: "Activar Horas Extra",
+    overtimeOn: "Horas extra activadas",
+    overtimeOff: "Sin horas extra",
+    overtimeUnit: "Unidad de HE",
+    overtimePercentage: "Porcentaje extra %",
+    overtimePercentageRequired:
+      "El porcentaje extra es obligatorio cuando las horas extra están activadas.",
   },
   jobs: {
     title: "Trabajos",

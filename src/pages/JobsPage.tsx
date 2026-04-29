@@ -102,7 +102,15 @@ function getWeekRange(): { dateFrom: string; dateTo: string } {
 function getMonthRange(): { dateFrom: string; dateTo: string } {
   const now = new Date();
   const from = new Date(now.getFullYear(), now.getMonth(), 1);
-  const to = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+  const to = new Date(
+    now.getFullYear(),
+    now.getMonth() + 1,
+    0,
+    23,
+    59,
+    59,
+    999,
+  );
   return { dateFrom: from.toISOString(), dateTo: to.toISOString() };
 }
 
@@ -123,6 +131,7 @@ interface JobForm {
   price: string;
   priceUnit: string;
   timeDuration: string;
+  overtimeHours: string;
   assignedUsers: string[];
   notesInternal: string;
   notesCustomer: string;
@@ -144,6 +153,7 @@ const EMPTY_JOB_FORM: JobForm = {
   price: "",
   priceUnit: "per_job",
   timeDuration: "",
+  overtimeHours: "",
   assignedUsers: [],
   notesInternal: "",
   notesCustomer: "",
@@ -188,6 +198,7 @@ function jobToForm(j: Job): JobForm {
     assignedUsers: assignedUserIds,
     notesInternal: j.notesInternal ?? "",
     notesCustomer: j.notesCustomer ?? "",
+    overtimeHours: j.overtimeHours != null ? String(j.overtimeHours) : "",
     street: j.propertyAddress?.street ?? "",
     city: j.propertyAddress?.city ?? "",
     state: j.propertyAddress?.state ?? "",
@@ -239,6 +250,7 @@ const jmT = {
       per_day: "Daily",
     } as Record<string, string>,
     timeDuration: "Duration",
+    overtimeHours: "Overtime Hours",
     assignedUsers: "Assigned To",
     notesInternal: "Internal Notes",
     notesCustomer: "Customer Notes",
@@ -313,6 +325,7 @@ const jmT = {
       per_day: "Por día",
     } as Record<string, string>,
     timeDuration: "Duración",
+    overtimeHours: "Horas Extra",
     assignedUsers: "Asignado a",
     notesInternal: "Notas Internas",
     notesCustomer: "Notas para el Cliente",
@@ -380,6 +393,11 @@ interface DropdownService {
   name: { en: string; es: string };
   basePrice?: number;
   priceUnit?: string;
+  overtime?: {
+    isEnabled: boolean;
+    unit?: string;
+    extraPercentage?: number;
+  };
 }
 interface DropdownUser {
   _id: string;
@@ -609,6 +627,8 @@ function JobModal({ job, lang, onClose, onSaved }: JobModalProps) {
           priceUnit: form.priceUnit || undefined,
           timeDuration:
             form.timeDuration !== "" ? Number(form.timeDuration) : undefined,
+          overtimeHours:
+            form.overtimeHours !== "" ? Number(form.overtimeHours) : undefined,
           assignedUsers: form.assignedUsers,
           notesInternal: form.notesInternal.trim() || undefined,
           notesCustomer: form.notesCustomer.trim() || undefined,
@@ -921,18 +941,47 @@ function JobModal({ job, lang, onClose, onSaved }: JobModalProps) {
                   </select>
                 </div>
               </div>
-              <div className={styles.formGroup}>
-                <label className={styles.label}>{l.timeDuration}</label>
-                <input
-                  className={styles.input}
-                  type="number"
-                  min="0"
-                  step="1"
-                  value={form.timeDuration}
-                  onChange={(e) => handleDurationChange(e.target.value)}
-                />
-              </div>
             </div>
+
+            {/* Duration + Overtime Hours side by side */}
+            {(() => {
+              const svc = services.find((s) => s._id === form.serviceId);
+              const hasOT = svc?.overtime?.isEnabled ?? false;
+              return (
+                <div className={styles.formRow}>
+                  <div className={styles.formGroup}>
+                    <label className={styles.label}>{l.timeDuration}</label>
+                    <input
+                      className={styles.input}
+                      type="number"
+                      min="0"
+                      step="1"
+                      value={form.timeDuration}
+                      onChange={(e) => handleDurationChange(e.target.value)}
+                    />
+                  </div>
+                  {hasOT && (
+                    <div className={styles.formGroup}>
+                      <label className={styles.label}>
+                        {l.overtimeHours}
+                        <span className={styles.badgeOT}>
+                          OT +{svc!.overtime!.extraPercentage}%
+                        </span>
+                      </label>
+                      <input
+                        className={styles.input}
+                        type="number"
+                        min="0"
+                        step="0.5"
+                        placeholder="0"
+                        value={form.overtimeHours}
+                        onChange={(e) => set("overtimeHours", e.target.value)}
+                      />
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
 
             {/* Assigned Users */}
             <div className={styles.formGroup}>
@@ -1132,9 +1181,9 @@ export default function JobsPage() {
   const [apiStatus, setApiStatus] = useState<JobStatus | "">("");
   const [filterUserId, setFilterUserId] = useState("");
   const [filterUsers, setFilterUsers] = useState<FilterUser[]>([]);
-  const [dateMode, setDateMode] = useState<"" | "today" | "week" | "month" | "custom">(
-    "",
-  );
+  const [dateMode, setDateMode] = useState<
+    "" | "today" | "week" | "month" | "custom"
+  >("");
   const [customDateFrom, setCustomDateFrom] = useState("");
   const [customDateTo, setCustomDateTo] = useState("");
 
