@@ -700,6 +700,15 @@ interface DropdownJob {
   price?: number;
   priceUnit?: string;
   timeDuration?: number;
+  overtimeHours?: number;
+  serviceId?: {
+    _id: string;
+    overtime?: {
+      isEnabled: boolean;
+      unit?: string;
+      extraPercentage?: number;
+    };
+  } | string;
 }
 
 interface InvoiceFormProps {
@@ -708,6 +717,50 @@ interface InvoiceFormProps {
   tenant?: Tenant | null;
   onClose: () => void;
   onSaved: () => void;
+}
+
+function buildJobItems(job: DropdownJob, lang: "en" | "es"): ItemForm[] {
+  const qty =
+    job.priceUnit === "per_job" ? 1 : job.timeDuration || 1;
+  const unitPrice = job.price ?? 0;
+  const unit =
+    job.priceUnit === "per_day"
+      ? "days"
+      : job.priceUnit === "per_hour"
+        ? "hours"
+        : "job";
+
+  const baseItem: ItemForm = {
+    description: job.title || job._id.slice(-6),
+    serviceType: `job:${job._id}`,
+    quantity: String(qty),
+    unit,
+    unitPrice: String(unitPrice),
+    priceUnit: job.priceUnit || "per_job",
+  };
+
+  const svc =
+    job.serviceId && typeof job.serviceId === "object"
+      ? job.serviceId
+      : null;
+  const otEnabled = svc?.overtime?.isEnabled && (job.overtimeHours ?? 0) > 0;
+
+  if (!otEnabled) return [baseItem];
+
+  const otPct = (svc!.overtime!.extraPercentage ?? 0) / 100;
+  const otUnitPrice = unitPrice * (1 + otPct);
+  const otLabel = lang === "es" ? "Horas extra" : "Overtime";
+
+  const otItem: ItemForm = {
+    description: `${job.title || job._id.slice(-6)} — ${otLabel} (+${svc!.overtime!.extraPercentage}%)`,
+    serviceType: `job:${job._id}:overtime`,
+    quantity: String(job.overtimeHours),
+    unit,
+    unitPrice: String(Math.round(otUnitPrice * 100) / 100),
+    priceUnit: job.priceUnit || "per_job",
+  };
+
+  return [baseItem, otItem];
 }
 
 function InvoiceFormSection({
@@ -1201,31 +1254,13 @@ function InvoiceFormSection({
                       if (!id || form.jobIds.includes(id)) return;
                       const job = jobs.find((j) => j._id === id);
                       setForm((prev) => {
-                        // per_job = fixed price, qty always 1; otherwise use timeDuration (fallback 1 if 0/unset)
-                        const qty =
-                          job?.priceUnit === "per_job"
-                            ? 1
-                            : job?.timeDuration || 1;
-                        const unitPrice = job?.price ?? 0;
-                        const newItem: ItemForm = {
-                          description: job?.title || id.slice(-6),
-                          serviceType: `job:${id}`,
-                          quantity: String(qty),
-                          unit:
-                            job?.priceUnit === "per_day"
-                              ? "days"
-                              : job?.priceUnit === "per_hour"
-                                ? "hours"
-                                : "job",
-                          unitPrice: String(unitPrice),
-                          priceUnit: job?.priceUnit || "per_job",
-                        };
+                        const newItems = job ? buildJobItems(job, lang) : [];
                         const items =
                           prev.items.length === 1 &&
                           !prev.items[0].description &&
                           !prev.items[0].unitPrice
-                            ? [newItem]
-                            : [...prev.items, newItem];
+                            ? newItems
+                            : [...prev.items, ...newItems];
                         return { ...prev, jobIds: [...prev.jobIds, id], items };
                       });
                       e.target.value = "";
@@ -1262,23 +1297,9 @@ function InvoiceFormSection({
                         (j) => !form.jobIds.includes(j._id),
                       );
                       setForm((prev) => {
-                        const newItems: ItemForm[] = unlinked.map((job) => ({
-                          description: job.title || job._id.slice(-6),
-                          serviceType: `job:${job._id}`,
-                          quantity: String(
-                            job.priceUnit === "per_job"
-                              ? 1
-                              : job.timeDuration || 1,
-                          ),
-                          unit:
-                            job.priceUnit === "per_day"
-                              ? "days"
-                              : job.priceUnit === "per_hour"
-                                ? "hours"
-                                : "job",
-                          unitPrice: String(job.price ?? 0),
-                          priceUnit: job.priceUnit || "per_job",
-                        }));
+                        const newItems: ItemForm[] = unlinked.flatMap((job) =>
+                          buildJobItems(job, lang),
+                        );
                         const existingItems =
                           prev.items.length === 1 &&
                           !prev.items[0].description &&
