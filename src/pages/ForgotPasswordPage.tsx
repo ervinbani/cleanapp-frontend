@@ -48,9 +48,18 @@ export default function ForgotPasswordPage() {
           </div>
           <h2 className={styles.headline}>
             {lang === "en" ? (
-              <>Recover your<br /><span className={styles.headlineAccent}>access</span> easily.</>
+              <>
+                Recover your
+                <br />
+                <span className={styles.headlineAccent}>access</span> easily.
+              </>
             ) : (
-              <>Recupera tu<br /><span className={styles.headlineAccent}>acceso</span> fácilmente.</>
+              <>
+                Recupera tu
+                <br />
+                <span className={styles.headlineAccent}>acceso</span>{" "}
+                fácilmente.
+              </>
             )}
           </h2>
           <p className={styles.leftSub}>
@@ -102,7 +111,11 @@ export default function ForgotPasswordPage() {
               </p>
             </div>
           ) : (
-            <form className={styles.form} onSubmit={handleSubmit(onSubmit)} noValidate>
+            <form
+              className={styles.form}
+              onSubmit={handleSubmit(onSubmit)}
+              noValidate
+            >
               <div className={styles.field}>
                 <label className={styles.label} htmlFor="email">
                   {lang === "en" ? "EMAIL ADDRESS" : "CORREO ELECTRÓNICO"}
@@ -111,21 +124,35 @@ export default function ForgotPasswordPage() {
                   id="email"
                   type="email"
                   className={`${styles.input} ${errors.email ? styles.inputError : ""}`}
-                  placeholder={lang === "en" ? "you@example.com" : "correo@ejemplo.com"}
+                  placeholder={
+                    lang === "en" ? "you@example.com" : "correo@ejemplo.com"
+                  }
                   autoComplete="email"
                   {...register("email")}
                 />
                 {errors.email && (
-                  <span className={styles.errorMsg}>{errors.email.message}</span>
+                  <span className={styles.errorMsg}>
+                    {errors.email.message}
+                  </span>
                 )}
               </div>
 
-              {serverError && <div className={styles.serverError}>{serverError}</div>}
+              {serverError && (
+                <div className={styles.serverError}>{serverError}</div>
+              )}
 
-              <button type="submit" className={styles.submitBtn} disabled={isSubmitting}>
+              <button
+                type="submit"
+                className={styles.submitBtn}
+                disabled={isSubmitting}
+              >
                 {isSubmitting
-                  ? lang === "en" ? "Sending…" : "Enviando…"
-                  : lang === "en" ? "Send Reset Link" : "Enviar Enlace"}
+                  ? lang === "en"
+                    ? "Sending…"
+                    : "Enviando…"
+                  : lang === "en"
+                    ? "Send Reset Link"
+                    : "Enviar Enlace"}
               </button>
             </form>
           )}
