@@ -42,6 +42,17 @@ export const updateMe = async (data: {
   return res.data.data;
 };
 
+export const forgotPassword = async (email: string): Promise<void> => {
+  await apiClient.post("/auth/forgot-password", { email });
+};
+
+export const resetPassword = async (
+  token: string,
+  newPassword: string,
+): Promise<void> => {
+  await apiClient.post("/auth/reset-password", { token, newPassword });
+};
+
 export const deleteTenant = async (password: string): Promise<void> => {
   await apiClient.delete("/tenant", { data: { password } });
 };
