@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -14,35 +14,15 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 const features = [
-  {
-    icon: "📋",
-    en: "Smart job scheduling & dispatch",
-    es: "Programación inteligente de trabajos",
-  },
-  {
-    icon: "💰",
-    en: "Auto-invoicing & payment tracking",
-    es: "Facturación automática y pagos",
-  },
-  {
-    icon: "📍",
-    en: "Real-time team location & status",
-    es: "Ubicación y estado del equipo en tiempo real",
-  },
-  {
-    icon: "📊",
-    en: "Revenue analytics & insights",
-    es: "Análisis de ingresos e informes",
-  },
+  { icon: "📋", en: "Smart job scheduling & dispatch", es: "Programación inteligente de trabajos" },
+  { icon: "💰", en: "Auto-invoicing & payment tracking", es: "Facturación automática y pagos" },
+  { icon: "📍", en: "Real-time team location & status", es: "Ubicación y estado del equipo en tiempo real" },
+  { icon: "📊", en: "Revenue analytics & insights", es: "Análisis de ingresos e informes" },
 ];
 
 export default function LoginPage() {
   const { login } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
-  const successMessage =
-    (location.state as { successMessage?: string } | null)?.successMessage ??
-    "";
   const [serverError, setServerError] = useState("");
   const [lang, setLang] = useState<"en" | "es">("en");
   const [showPassword, setShowPassword] = useState(false);
@@ -77,18 +57,9 @@ export default function LoginPage() {
           </div>
           <h2 className={styles.headline}>
             {lang === "en" ? (
-              <>
-                Clean spaces.
-                <br />
-                <span className={styles.headlineAccent}>Simple</span>{" "}
-                management.
-              </>
+              <>Clean spaces.<br /><span className={styles.headlineAccent}>Simple</span> management.</>
             ) : (
-              <>
-                Espacios limpios.
-                <br />
-                <span className={styles.headlineAccent}>Simple</span> gestión.
-              </>
+              <>Espacios limpios.<br /><span className={styles.headlineAccent}>Simple</span> gestión.</>
             )}
           </h2>
           <p className={styles.leftSub}>
@@ -135,11 +106,7 @@ export default function LoginPage() {
               : "Inicia sesión en tu cuenta Brillo"}
           </p>
 
-          <form
-            className={styles.form}
-            onSubmit={handleSubmit(onSubmit)}
-            noValidate
-          >
+          <form className={styles.form} onSubmit={handleSubmit(onSubmit)} noValidate>
             <div className={styles.field}>
               <label className={styles.label} htmlFor="email">
                 {lang === "en" ? "EMAIL ADDRESS" : "CORREO ELECTRÓNICO"}
@@ -148,9 +115,7 @@ export default function LoginPage() {
                 id="email"
                 type="email"
                 className={`${styles.input} ${errors.email ? styles.inputError : ""}`}
-                placeholder={
-                  lang === "en" ? "you@example.com" : "correo@ejemplo.com"
-                }
+                placeholder={lang === "en" ? "you@example.com" : "correo@ejemplo.com"}
                 autoComplete="email"
                 {...register("email")}
               />
@@ -180,32 +145,12 @@ export default function LoginPage() {
                   aria-label={showPassword ? "Hide password" : "Show password"}
                 >
                   {showPassword ? (
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="18"
-                      height="18"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
                       <circle cx="12" cy="12" r="3" />
                     </svg>
                   ) : (
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="18"
-                      height="18"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24" />
                       <line x1="1" y1="1" x2="23" y2="23" />
                     </svg>
@@ -213,39 +158,22 @@ export default function LoginPage() {
                 </button>
               </div>
               {errors.password && (
-                <span className={styles.errorMsg}>
-                  {errors.password.message}
-                </span>
+                <span className={styles.errorMsg}>{errors.password.message}</span>
               )}
             </div>
 
             <div className={styles.forgotRow}>
-              <Link to="/forgot-password" className={styles.forgotLink}>
-                {lang === "en"
-                  ? "Forgot password?"
-                  : "¿Olvidaste tu contraseña?"}
-              </Link>
+              <span className={styles.forgotLink}>
+                {lang === "en" ? "Forgot password?" : "¿Olvidaste tu contraseña?"}
+              </span>
             </div>
 
-            {successMessage && (
-              <div className={styles.successBanner}>{successMessage}</div>
-            )}
-            {serverError && (
-              <div className={styles.serverError}>{serverError}</div>
-            )}
+            {serverError && <div className={styles.serverError}>{serverError}</div>}
 
-            <button
-              type="submit"
-              className={styles.submitBtn}
-              disabled={isSubmitting}
-            >
+            <button type="submit" className={styles.submitBtn} disabled={isSubmitting}>
               {isSubmitting
-                ? lang === "en"
-                  ? "Signing in…"
-                  : "Iniciando sesión…"
-                : lang === "en"
-                  ? "Sign In"
-                  : "Iniciar Sesión"}
+                ? lang === "en" ? "Signing in…" : "Iniciando sesión…"
+                : lang === "en" ? "Sign In" : "Iniciar Sesión"}
             </button>
           </form>
 

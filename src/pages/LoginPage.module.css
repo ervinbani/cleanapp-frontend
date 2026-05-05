@@ -304,15 +304,6 @@
   padding: 0.65rem 0.85rem;
 }
 
-.successBanner {
-  background-color: #f0fdf4;
-  border: 1px solid #bbf7d0;
-  border-radius: 8px;
-  color: #15803d;
-  font-size: 0.85rem;
-  padding: 0.65rem 0.85rem;
-}
-
 .submitBtn {
   width: 100%;
   background: linear-gradient(135deg, #00c9aa, #4a90d9);
