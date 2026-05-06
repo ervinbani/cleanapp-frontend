@@ -49,7 +49,7 @@ export default function RegisterPage() {
         .replace(/[^a-z0-9]+/g, "-")
         .replace(/^-|-$/g, "");
       await registerUser({ ...rest, slug });
-      navigate("/");
+      navigate("/register-success", { state: { email: data.email } });
     } catch (err: unknown) {
       const msg =
         (err as { response?: { data?: { error?: string } } })?.response?.data

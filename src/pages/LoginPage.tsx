@@ -55,10 +55,26 @@ export default function LoginPage() {
       await login(data);
       navigate("/");
     } catch (err: unknown) {
-      const msg =
-        (err as { response?: { data?: { error?: string } } })?.response?.data
-          ?.error ?? "Connection error. Please try again.";
-      setServerError(msg);
+      const apiErr = err as {
+        response?: { status?: number; data?: { error?: string; code?: string } };
+      };
+      if (
+        apiErr?.response?.status === 403 &&
+        apiErr?.response?.data?.code === "EMAIL_NOT_VERIFIED"
+      ) {
+        setServerError(
+          lang === "en"
+            ? "You need to verify your email before logging in. Check your inbox."
+            : "Debes verificar tu correo antes de iniciar sesión. Revisa tu bandeja de entrada.",
+        );
+      } else {
+        const msg =
+          apiErr?.response?.data?.error ??
+          (lang === "en"
+            ? "Connection error. Please try again."
+            : "Error de conexión. Inténtalo de nuevo.");
+        setServerError(msg);
+      }
     }
   };
 
@@ -216,11 +232,11 @@ export default function LoginPage() {
             </div>
 
             <div className={styles.forgotRow}>
-              <span className={styles.forgotLink}>
+              <Link to="/forgot-password" className={styles.forgotLink}>
                 {lang === "en"
                   ? "Forgot password?"
                   : "¿Olvidaste tu contraseña?"}
-              </span>
+              </Link>
             </div>
 
             {serverError && (

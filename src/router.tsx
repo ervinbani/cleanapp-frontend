@@ -3,6 +3,8 @@ import AppLayout from "./layouts/AppLayout";
 import PrivateRoute from "./components/PrivateRoute";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
+import RegisterSuccessPage from "./pages/RegisterSuccessPage";
+import VerifyEmailPage from "./pages/VerifyEmailPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import DashboardPage from "./pages/DashboardPage";
@@ -20,6 +22,8 @@ const router = createBrowserRouter([
   // Public routes
   { path: "/login", element: <LoginPage /> },
   { path: "/register", element: <RegisterPage /> },
+  { path: "/register-success", element: <RegisterSuccessPage /> },
+  { path: "/verify-email", element: <VerifyEmailPage /> },
   { path: "/forgot-password", element: <ForgotPasswordPage /> },
   { path: "/reset-password", element: <ResetPasswordPage /> },
 

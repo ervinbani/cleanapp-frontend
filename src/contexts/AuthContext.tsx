@@ -12,6 +12,7 @@ import {
   getMe,
   updateMe as updateMeApi,
 } from "../services/authService";
+import type { RegisterSuccessData } from "../services/authService";
 import type { LoginCredentials, RegisterPayload } from "../types";
 import { QueryClient } from "@tanstack/react-query";
 
@@ -95,7 +96,7 @@ interface AuthContextValue {
   token: string | null;
   isLoading: boolean;
   login: (credentials: LoginCredentials) => Promise<void>;
-  register: (payload: RegisterPayload) => Promise<void>;
+  register: (payload: RegisterPayload) => Promise<RegisterSuccessData>;
   logout: () => void;
   updateUser: (data: Partial<User>) => Promise<void>;
   hasRole: (...roles: UserRole[]) => boolean;
@@ -132,11 +133,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(data.user);
   };
 
-  const register = async (payload: RegisterPayload) => {
-    const data = await registerApi(payload);
-    localStorage.setItem("brillo_token", data.token);
-    setToken(data.token);
-    setUser(data.user);
+  const register = async (payload: RegisterPayload): Promise<RegisterSuccessData> => {
+    return registerApi(payload);
   };
 
   const logout = () => {

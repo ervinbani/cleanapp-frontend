@@ -8,6 +8,11 @@ import type {
   User,
 } from "../types";
 
+export interface RegisterSuccessData {
+  message: string;
+  email: string;
+}
+
 export const login = async (
   credentials: LoginCredentials,
 ): Promise<AuthData> => {
@@ -18,12 +23,21 @@ export const login = async (
   return res.data.data;
 };
 
-export const register = async (payload: RegisterPayload): Promise<AuthData> => {
-  const res = await apiClient.post<ApiResponse<AuthData>>(
+export const register = async (
+  payload: RegisterPayload,
+): Promise<RegisterSuccessData> => {
+  const res = await apiClient.post<ApiResponse<RegisterSuccessData>>(
     "/auth/register",
     payload,
   );
   return res.data.data;
+};
+
+export const verifyEmail = async (token: string): Promise<string> => {
+  const res = await apiClient.get<ApiResponse<{ message: string }>>(
+    `/auth/verify-email?token=${encodeURIComponent(token)}`,
+  );
+  return res.data.data.message;
 };
 
 export const getMe = async (): Promise<AuthData["user"]> => {
