@@ -340,6 +340,9 @@ function EditUserModal({ user, lang, onClose, onSaved }: EditUserModalProps) {
   });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [verifying, setVerifying] = useState(false);
+  const [verifyError, setVerifyError] = useState("");
+  const originalEmail = user.email;
 
   const ml = {
     en: {
@@ -357,6 +360,11 @@ function EditUserModal({ user, lang, onClose, onSaved }: EditUserModalProps) {
       langHint: "Default EN",
       phone: "Phone",
       activeUser: "Active user",
+      emailChangeWarning:
+        "Changing the email will require the user to re-verify it.",
+      verifyEmail: "Verify Email",
+      verifyingEmail: "Verifying…",
+      emailNotVerifiedNote: "This user's email has not been verified yet.",
       cancel: "Cancel",
       save: "Save Changes",
       saving: "Saving…",
@@ -377,6 +385,12 @@ function EditUserModal({ user, lang, onClose, onSaved }: EditUserModalProps) {
       langHint: "Por defecto EN",
       phone: "Teléfono",
       activeUser: "Usuario activo",
+      emailChangeWarning:
+        "Cambiar el correo requerirá que el usuario lo verifique de nuevo.",
+      verifyEmail: "Verificar email",
+      verifyingEmail: "Verificando…",
+      emailNotVerifiedNote:
+        "El correo de este usuario aún no ha sido verificado.",
       cancel: "Cancelar",
       save: "Guardar Cambios",
       saving: "Guardando…",
@@ -412,6 +426,24 @@ function EditUserModal({ user, lang, onClose, onSaved }: EditUserModalProps) {
       setError(msg);
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleVerifyEmail = async () => {
+    setVerifying(true);
+    setVerifyError("");
+    try {
+      await apiClient.put(`/users/${user._id ?? user.id}`, {
+        emailVerified: true,
+      });
+      onSaved();
+    } catch (err: unknown) {
+      const msg =
+        (err as { response?: { data?: { error?: string } } })?.response?.data
+          ?.error ?? "Error verifying email.";
+      setVerifyError(msg);
+    } finally {
+      setVerifying(false);
     }
   };
 
@@ -474,8 +506,13 @@ function EditUserModal({ user, lang, onClose, onSaved }: EditUserModalProps) {
             <span className={styles.hint}>{ml2.emailHint}</span>
           </div>
 
+          {form.email !== originalEmail && (
+            <div className={styles.warningBanner}>
+              ⚠️ {ml2.emailChangeWarning}
+            </div>
+          )}
+
           <div className={styles.formGroup}>
-            <label className={styles.label}>{ml2.password}</label>
             <input
               className={styles.input}
               type="password"
@@ -543,6 +580,25 @@ function EditUserModal({ user, lang, onClose, onSaved }: EditUserModalProps) {
               onChange={(e) => set("phone", e.target.value)}
             />
           </div>
+
+          {!user.emailVerified && (
+            <div className={styles.verifyEmailSection}>
+              <p className={styles.emailNotVerifiedNote}>
+                {ml2.emailNotVerifiedNote}
+              </p>
+              <button
+                type="button"
+                className={styles.btnVerifyEmail}
+                onClick={handleVerifyEmail}
+                disabled={verifying}
+              >
+                {verifying ? ml2.verifyingEmail : ml2.verifyEmail}
+              </button>
+              {verifyError && (
+                <p className={styles.errorMsg}>{verifyError}</p>
+              )}
+            </div>
+          )}
 
           <div className={styles.toggleRow}>
             <div className={styles.toggleInfo}>
@@ -633,6 +689,7 @@ export default function UsersPage() {
   const [colPhone, setColPhone] = useState("");
   const [colRole, setColRole] = useState("");
   const [colStatus, setColStatus] = useState("");
+  const [colEmailVerified, setColEmailVerified] = useState("");
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
@@ -700,6 +757,8 @@ export default function UsersPage() {
     if (colRole && u.role !== colRole) return false;
     if (colStatus === "active" && !u.isActive) return false;
     if (colStatus === "inactive" && u.isActive) return false;
+    if (colEmailVerified === "verified" && !u.emailVerified) return false;
+    if (colEmailVerified === "unverified" && u.emailVerified) return false;
     return true;
   });
 
@@ -885,6 +944,7 @@ export default function UsersPage() {
               <th>{l.colPhone}</th>
               <th>{l.colRole}</th>
               <th>{l.colStatus}</th>
+              <th>{l.colEmailVerified}</th>
               <th>{l.colLastLogin}</th>
               <th>{l.colActions}</th>
             </tr>
@@ -938,6 +998,17 @@ export default function UsersPage() {
                   <option value="inactive">{l.inactive}</option>
                 </select>
               </th>
+              <th>
+                <select
+                  className={styles.colFilter}
+                  value={colEmailVerified}
+                  onChange={(e) => setColEmailVerified(e.target.value)}
+                >
+                  <option value="">{l.allEmailVerified}</option>
+                  <option value="verified">{l.emailVerified}</option>
+                  <option value="unverified">{l.emailNotVerified}</option>
+                </select>
+              </th>
               <th />
               <th />
             </tr>
@@ -945,13 +1016,13 @@ export default function UsersPage() {
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan={7} className={styles.empty}>
+                <td colSpan={8} className={styles.empty}>
                   {l.loading}
                 </td>
               </tr>
             ) : displayed.length === 0 ? (
               <tr>
-                <td colSpan={7} className={styles.empty}>
+                <td colSpan={8} className={styles.empty}>
                   {l.noResults}
                 </td>
               </tr>
@@ -981,6 +1052,13 @@ export default function UsersPage() {
                       className={`${styles.badge} ${u.isActive ? styles.badge_active : styles.badge_inactive}`}
                     >
                       {u.isActive ? l.active : l.inactive}
+                    </span>
+                  </td>
+                  <td>
+                    <span
+                      className={`${styles.badge} ${u.emailVerified ? styles.badge_verified : styles.badge_unverified}`}
+                    >
+                      {u.emailVerified ? l.emailVerified : l.emailNotVerified}
                     </span>
                   </td>
                   <td className={styles.dateCell}>

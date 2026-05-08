@@ -133,7 +133,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(data.user);
   };
 
-  const register = async (payload: RegisterPayload): Promise<RegisterSuccessData> => {
+  const register = async (
+    payload: RegisterPayload,
+  ): Promise<RegisterSuccessData> => {
     return registerApi(payload);
   };
 

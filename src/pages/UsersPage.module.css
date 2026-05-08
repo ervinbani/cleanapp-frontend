@@ -259,6 +259,64 @@
   background: var(--bg-surface-subtle);
   color: var(--text-muted);
 }
+.badge_verified {
+  background: #d1fae5;
+  color: #065f46;
+}
+.badge_unverified {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+/* ─── Email warning / verify section ─────────────────────────── */
+.warningBanner {
+  background: #fffbeb;
+  border: 1px solid #fcd34d;
+  border-radius: 8px;
+  color: #92400e;
+  font-size: 0.82rem;
+  padding: 0.55rem 0.85rem;
+  margin-bottom: 4px;
+}
+
+.verifyEmailSection {
+  background: #fef9ec;
+  border: 1px solid #fcd34d;
+  border-radius: 10px;
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.emailNotVerifiedNote {
+  font-size: 0.82rem;
+  color: #92400e;
+  margin: 0;
+}
+
+.btnVerifyEmail {
+  align-self: flex-start;
+  background: linear-gradient(135deg, #00c9aa, #4a90d9);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 7px 16px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: opacity 0.15s;
+}
+
+.btnVerifyEmail:hover:not(:disabled) {
+  opacity: 0.88;
+}
+
+.btnVerifyEmail:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
 
 /* ─── Actions ─────────────────────────────────────────────────── */
 .actions {

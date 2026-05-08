@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { verifyEmail } from "../services/authService";
 import styles from "./VerifyEmailPage.module.css";
@@ -12,6 +12,7 @@ export default function VerifyEmailPage() {
   const [lang, setLang] = useState<"en" | "es">("en");
   const [status, setStatus] = useState<Status>("loading");
   const [errorMsg, setErrorMsg] = useState("");
+  const hasRun = useRef(false);
 
   useEffect(() => {
     if (!token) {
@@ -23,6 +24,8 @@ export default function VerifyEmailPage() {
       );
       return;
     }
+    if (hasRun.current) return;
+    hasRun.current = true;
 
     verifyEmail(token)
       .then(() => {
@@ -78,9 +81,7 @@ export default function VerifyEmailPage() {
         </div>
         <div className={styles.leftBottom}>
           <p className={styles.leftFooter}>
-            {lang === "en"
-              ? "Already verified? "
-              : "¿Ya verificaste? "}
+            {lang === "en" ? "Already verified? " : "¿Ya verificaste? "}
             <Link to="/login" className={styles.leftLink}>
               {lang === "en" ? "Sign in" : "Inicia sesión"}
             </Link>
@@ -111,7 +112,9 @@ export default function VerifyEmailPage() {
             <div className={styles.statusBlock}>
               <div className={styles.spinner} />
               <p className={styles.statusTitle}>
-                {lang === "en" ? "Verifying your email…" : "Verificando tu correo…"}
+                {lang === "en"
+                  ? "Verifying your email…"
+                  : "Verificando tu correo…"}
               </p>
             </div>
           )}
@@ -120,9 +123,7 @@ export default function VerifyEmailPage() {
             <div className={styles.statusBlock}>
               <div className={styles.successIcon}>✓</div>
               <p className={styles.statusTitle}>
-                {lang === "en"
-                  ? "Email verified!"
-                  : "¡Correo verificado!"}
+                {lang === "en" ? "Email verified!" : "¡Correo verificado!"}
               </p>
               <p className={styles.statusSub}>
                 {lang === "en"
@@ -139,7 +140,9 @@ export default function VerifyEmailPage() {
             <div className={styles.statusBlock}>
               <div className={styles.errorIcon}>✕</div>
               <p className={styles.statusTitle}>
-                {lang === "en" ? "Verification failed" : "Error de verificación"}
+                {lang === "en"
+                  ? "Verification failed"
+                  : "Error de verificación"}
               </p>
               <p className={styles.statusSub}>{errorMsg}</p>
               <Link to="/login" className={styles.btnSecondary}>

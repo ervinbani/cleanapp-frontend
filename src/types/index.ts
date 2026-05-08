@@ -33,6 +33,7 @@ export interface User {
   preferredLanguage: Language;
   phone?: string;
   isActive: boolean;
+  emailVerified?: boolean;
   lastLoginAt?: string;
   createdAt: string;
   updatedAt: string;

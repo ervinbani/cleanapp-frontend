@@ -56,7 +56,10 @@ export default function LoginPage() {
       navigate("/");
     } catch (err: unknown) {
       const apiErr = err as {
-        response?: { status?: number; data?: { error?: string; code?: string } };
+        response?: {
+          status?: number;
+          data?: { error?: string; code?: string };
+        };
       };
       if (
         apiErr?.response?.status === 403 &&
