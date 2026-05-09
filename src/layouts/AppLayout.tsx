@@ -189,10 +189,7 @@ export default function AppLayout() {
       ) {
         setDropdownOpen(false);
       }
-      if (
-        langRef.current &&
-        !langRef.current.contains(e.target as Node)
-      ) {
+      if (langRef.current && !langRef.current.contains(e.target as Node)) {
         setLangOpen(false);
       }
     };
@@ -501,15 +498,21 @@ export default function AppLayout() {
               >
                 <span className={styles.langGlobe}>🌐</span>
                 <span className={styles.langCode}>{lang.toUpperCase()}</span>
-                <span className={`${styles.langChevron} ${langOpen ? styles.langChevronOpen : ""}`}>‹</span>
+                <span
+                  className={`${styles.langChevron} ${langOpen ? styles.langChevronOpen : ""}`}
+                >
+                  ‹
+                </span>
               </button>
               {langOpen && (
                 <div className={styles.langDropdown}>
-                  {([
-                    { code: "en", flag: "🇬🇧", label: "English" },
-                    { code: "es", flag: "🇪🇸", label: "Español" },
-                    { code: "it", flag: "🇮🇹", label: "Italiano" },
-                  ] as const).map(({ code, flag, label }) => (
+                  {(
+                    [
+                      { code: "en", flag: "🇬🇧", label: "English" },
+                      { code: "es", flag: "🇪🇸", label: "Español" },
+                      { code: "it", flag: "🇮🇹", label: "Italiano" },
+                    ] as const
+                  ).map(({ code, flag, label }) => (
                     <button
                       key={code}
                       className={`${styles.langOption} ${lang === code ? styles.langOptionActive : ""}`}
@@ -520,7 +523,9 @@ export default function AppLayout() {
                     >
                       <span>{flag}</span>
                       <span>{label}</span>
-                      {lang === code && <span className={styles.langCheck}>✓</span>}
+                      {lang === code && (
+                        <span className={styles.langCheck}>✓</span>
+                      )}
                     </button>
                   ))}
                 </div>
