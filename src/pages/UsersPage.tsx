@@ -23,7 +23,7 @@ interface AddUserForm {
   email: string;
   password: string;
   role: UserRole;
-  preferredLanguage: "en" | "es";
+  preferredLanguage: "en" | "es" | "it";
   phone: string;
   isActive: boolean;
 }
@@ -40,7 +40,7 @@ const EMPTY_FORM: AddUserForm = {
 };
 
 interface AddUserModalProps {
-  lang: "en" | "es";
+  lang: "en" | "es" | "it";
   onClose: () => void;
   onSaved: () => void;
 }
@@ -244,11 +244,12 @@ function AddUserModal({ lang, onClose, onSaved }: AddUserModalProps) {
                 className={styles.input}
                 value={form.preferredLanguage}
                 onChange={(e) =>
-                  set("preferredLanguage", e.target.value as "en" | "es")
+                  set("preferredLanguage", e.target.value as "en" | "es" | "it")
                 }
               >
                 <option value="en">EN</option>
                 <option value="es">ES</option>
+                <option value="it">IT</option>
               </select>
               <span className={styles.hint}>{ml2.langHint}</span>
             </div>
@@ -315,14 +316,14 @@ interface EditUserForm {
   email: string;
   password: string;
   role: UserRole;
-  preferredLanguage: "en" | "es";
+  preferredLanguage: "en" | "es" | "it";
   phone: string;
   isActive: boolean;
 }
 
 interface EditUserModalProps {
   user: User;
-  lang: "en" | "es";
+  lang: "en" | "es" | "it";
   onClose: () => void;
   onSaved: () => void;
 }
@@ -560,11 +561,12 @@ function EditUserModal({ user, lang, onClose, onSaved }: EditUserModalProps) {
                 className={styles.input}
                 value={form.preferredLanguage}
                 onChange={(e) =>
-                  set("preferredLanguage", e.target.value as "en" | "es")
+                  set("preferredLanguage", e.target.value as "en" | "es" | "it")
                 }
               >
                 <option value="en">EN</option>
                 <option value="es">ES</option>
+                <option value="it">IT</option>
               </select>
               <span className={styles.hint}>{ml2.langHint}</span>
             </div>

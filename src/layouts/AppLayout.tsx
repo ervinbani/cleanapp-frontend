@@ -12,6 +12,7 @@ const navItems = [
     path: "/",
     label: "Dashboard",
     labelEs: "Inicio",
+    labelIt: "Dashboard",
     icon: "⊞",
     permission: null,
   },
@@ -19,6 +20,7 @@ const navItems = [
     path: "/users",
     label: "Users",
     labelEs: "Usuarios",
+    labelIt: "Utenti",
     icon: "👥",
     permission: "users.read",
   },
@@ -26,6 +28,7 @@ const navItems = [
     path: "/customers",
     label: "Clients",
     labelEs: "Clientes",
+    labelIt: "Clienti",
     icon: "👤",
     permission: "users.read",
   },
@@ -33,6 +36,7 @@ const navItems = [
     path: "/jobs",
     label: "Jobs",
     labelEs: "Trabajos",
+    labelIt: "Lavori",
     icon: "🧹",
     permission: "jobs.read",
   },
@@ -40,6 +44,7 @@ const navItems = [
     path: "/services",
     label: "Services",
     labelEs: "Servicios",
+    labelIt: "Servizi",
     icon: "✨",
     permission: "services.read",
   },
@@ -47,6 +52,7 @@ const navItems = [
     path: "/calendar",
     label: "Calendar",
     labelEs: "Calendario",
+    labelIt: "Calendario",
     icon: "📅",
     permission: "jobs.read",
   },
@@ -54,6 +60,7 @@ const navItems = [
     path: "/invoices",
     label: "Invoices",
     labelEs: "Facturas",
+    labelIt: "Fatture",
     icon: "✉️",
     permission: "invoices.read",
   },
@@ -61,6 +68,7 @@ const navItems = [
     path: "/documents",
     label: "Documents",
     labelEs: "Documentos",
+    labelIt: "Documenti",
     icon: "📁",
     permission: null,
   },
@@ -68,6 +76,7 @@ const navItems = [
     path: "/messages",
     label: "Messages",
     labelEs: "Mensajes",
+    labelIt: "Messaggi",
     icon: "💬",
     permission: null,
   },
@@ -75,6 +84,7 @@ const navItems = [
     path: "/settings",
     label: "Settings",
     labelEs: "Configuración",
+    labelIt: "Impostazioni",
     icon: "⚙️",
     permission: "roles.read",
   },
@@ -85,30 +95,35 @@ const settingsSubItems = [
     path: "/settings/general",
     label: "General",
     labelEs: "General",
+    labelIt: "Generale",
     restricted: false,
   },
   {
     path: "/settings/team",
     label: "Team",
     labelEs: "Equipo",
+    labelIt: "Team",
     restricted: false,
   },
   {
     path: "/settings/roles",
     label: "Roles & Permissions",
     labelEs: "Roles y Permisos",
+    labelIt: "Ruoli e Permessi",
     restricted: true,
   },
   {
     path: "/settings/billing",
     label: "Billing",
     labelEs: "Facturación",
+    labelIt: "Fatturazione",
     restricted: false,
   },
   {
     path: "/settings/languages",
     label: "Languages",
     labelEs: "Idiomas",
+    labelIt: "Lingue",
     restricted: false,
   },
 ];
@@ -203,7 +218,7 @@ export default function AppLayout() {
       setProfileSuccess(true);
     } catch {
       setProfileError(
-        lang === "en" ? "Failed to save changes." : "Error al guardar.",
+        lang === "en" ? "Failed to save changes." : lang === "es" ? "Error al guardar." : "Impossibile salvare le modifiche.",
       );
     } finally {
       setProfileSaving(false);
@@ -223,7 +238,9 @@ export default function AppLayout() {
       setDeleteError(
         lang === "en"
           ? "You must type DELETE to confirm."
-          : "Debes escribir DELETE para confirmar.",
+          : lang === "es"
+            ? "Debes escribir DELETE para confirmar."
+            : "Devi scrivere DELETE per confermare.",
       );
       return;
     }
@@ -231,7 +248,9 @@ export default function AppLayout() {
       setDeleteError(
         lang === "en"
           ? "Password is required."
-          : "La contraseña es obligatoria.",
+          : lang === "es"
+            ? "La contraseña es obligatoria."
+            : "La password è obbligatoria.",
       );
       return;
     }
@@ -245,7 +264,9 @@ export default function AppLayout() {
       setDeleteError(
         lang === "en"
           ? "Incorrect password or server error."
-          : "Contraseña incorrecta o error del servidor.",
+          : lang === "es"
+            ? "Contraseña incorrecta o error del servidor."
+            : "Password errata o errore del server.",
       );
     } finally {
       setDeleteLoading(false);
@@ -298,7 +319,9 @@ export default function AppLayout() {
                       sidebarCollapsed
                         ? lang === "en"
                           ? "Settings"
-                          : "Configuración"
+                          : lang === "es"
+                            ? "Configuración"
+                            : "Impostazioni"
                         : undefined
                     }
                   >
@@ -306,7 +329,7 @@ export default function AppLayout() {
                     {!sidebarCollapsed && (
                       <>
                         <span className={styles.navLabel}>
-                          {lang === "en" ? item.label : item.labelEs}
+                          {lang === "en" ? item.label : lang === "es" ? item.labelEs : item.labelIt}
                         </span>
                         <span
                           className={`${styles.chevron} ${settingsOpen ? styles.chevronOpen : ""}`}
@@ -332,7 +355,7 @@ export default function AppLayout() {
                             }
                             onClick={() => setSidebarOpen(false)}
                           >
-                            {lang === "en" ? sub.label : sub.labelEs}
+                            {lang === "en" ? sub.label : lang === "es" ? sub.labelEs : sub.labelIt}
                           </NavLink>
                         ))}
                     </div>
@@ -353,7 +376,7 @@ export default function AppLayout() {
                             }
                             onClick={() => setSidebarOpen(false)}
                           >
-                            {lang === "en" ? sub.label : sub.labelEs}
+                            {lang === "en" ? sub.label : lang === "es" ? sub.labelEs : sub.labelIt}
                           </NavLink>
                         ))}
                     </div>
@@ -372,7 +395,9 @@ export default function AppLayout() {
                     sidebarCollapsed
                       ? lang === "en"
                         ? item.label
-                        : item.labelEs
+                        : lang === "es"
+                          ? item.labelEs
+                          : item.labelIt
                       : undefined
                   }
                 >
@@ -380,8 +405,8 @@ export default function AppLayout() {
                   {!sidebarCollapsed && (
                     <>
                       <span className={styles.navLabel}>
-                        {lang === "en" ? item.label : item.labelEs}
-                        {lang === "es" && (
+                        {lang === "en" ? item.label : lang === "es" ? item.labelEs : item.labelIt}
+                        {(lang === "es" || lang === "it") && (
                           <span className={styles.navLabelSub}>
                             {item.label}
                           </span>
@@ -424,10 +449,14 @@ export default function AppLayout() {
                 theme === "dark"
                   ? lang === "en"
                     ? "Light mode"
-                    : "Modo claro"
+                    : lang === "es"
+                      ? "Modo claro"
+                      : "Modalità chiara"
                   : lang === "en"
                     ? "Dark mode"
-                    : "Modo oscuro"
+                    : lang === "es"
+                      ? "Modo oscuro"
+                      : "Modalità scura"
               }
             >
               {theme === "dark" ? "☀️" : "🌙"}
@@ -445,6 +474,12 @@ export default function AppLayout() {
                 onClick={() => setLang("es")}
               >
                 ES
+              </button>
+              <button
+                className={`${styles.langBtn} ${lang === "it" ? styles.langActive : ""}`}
+                onClick={() => setLang("it")}
+              >
+                IT
               </button>
             </div>
 
@@ -482,7 +517,7 @@ export default function AppLayout() {
                   </div>
                   <hr className={styles.dropdownDivider} />
                   <button className={styles.dropdownItem} onClick={openProfile}>
-                    👤 {lang === "en" ? "My Profile" : "Mi Perfil"}
+                    👤 {lang === "en" ? "My Profile" : lang === "es" ? "Mi Perfil" : "Il mio profilo"}
                   </button>
                   <hr className={styles.dropdownDivider} />
                   <button
@@ -492,7 +527,7 @@ export default function AppLayout() {
                       handleLogout();
                     }}
                   >
-                    ⏻ {lang === "en" ? "Logout" : "Cerrar sesión"}
+                    ⏻ {lang === "en" ? "Logout" : lang === "es" ? "Cerrar sesión" : "Esci"}
                   </button>
                 </div>
               )}
@@ -519,13 +554,13 @@ export default function AppLayout() {
             aria-modal="true"
           >
             <h2 className={styles.modalTitle}>
-              {lang === "en" ? "My Profile" : "Mi Perfil"}
+              {lang === "en" ? "My Profile" : lang === "es" ? "Mi Perfil" : "Il mio profilo"}
             </h2>
 
             <div className={styles.profileGrid}>
               <div>
                 <label className={styles.formLabel}>
-                  {lang === "en" ? "First Name" : "Nombre"}
+                  {lang === "en" ? "First Name" : lang === "es" ? "Nombre" : "Nome"}
                 </label>
                 <input
                   className={styles.formInput}
@@ -537,7 +572,7 @@ export default function AppLayout() {
               </div>
               <div>
                 <label className={styles.formLabel}>
-                  {lang === "en" ? "Last Name" : "Apellido"}
+                  {lang === "en" ? "Last Name" : lang === "es" ? "Apellido" : "Cognome"}
                 </label>
                 <input
                   className={styles.formInput}
@@ -560,7 +595,7 @@ export default function AppLayout() {
               </div>
               <div className={styles.profileFullWidth}>
                 <label className={styles.formLabel}>
-                  {lang === "en" ? "Phone" : "Teléfono"}
+                  {lang === "en" ? "Phone" : lang === "es" ? "Teléfono" : "Telefono"}
                 </label>
                 <input
                   className={styles.formInput}
@@ -576,7 +611,7 @@ export default function AppLayout() {
             {profileError && <p className={styles.formError}>{profileError}</p>}
             {profileSuccess && (
               <p className={styles.formSuccess}>
-                {lang === "en" ? "Saved successfully." : "Guardado con éxito."}
+                {lang === "en" ? "Saved successfully." : lang === "es" ? "Guardado con éxito." : "Salvato con successo."}
               </p>
             )}
 
@@ -586,14 +621,14 @@ export default function AppLayout() {
                   className={styles.deleteAccBtn}
                   onClick={openDeleteAccount}
                 >
-                  {lang === "en" ? "Delete Account" : "Eliminar cuenta"}
+                  {lang === "en" ? "Delete Account" : lang === "es" ? "Eliminar cuenta" : "Elimina account"}
                 </button>
               )}
               <button
                 className={styles.cancelBtn}
                 onClick={() => setShowProfile(false)}
               >
-                {lang === "en" ? "Cancel" : "Cancelar"}
+                {lang === "en" ? "Cancel" : lang === "es" ? "Cancelar" : "Annulla"}
               </button>
               <button
                 className={styles.saveBtn}
@@ -603,10 +638,14 @@ export default function AppLayout() {
                 {profileSaving
                   ? lang === "en"
                     ? "Saving…"
-                    : "Guardando…"
+                    : lang === "es"
+                      ? "Guardando…"
+                      : "Salvataggio…"
                   : lang === "en"
                     ? "Save"
-                    : "Guardar"}
+                    : lang === "es"
+                      ? "Guardar"
+                      : "Salva"}
               </button>
             </div>
           </div>
@@ -626,16 +665,18 @@ export default function AppLayout() {
             aria-modal="true"
           >
             <h2 className={`${styles.modalTitle} ${styles.dangerTitle}`}>
-              ⚠️ {lang === "en" ? "Delete Account" : "Eliminar cuenta"}
+              ⚠️ {lang === "en" ? "Delete Account" : lang === "es" ? "Eliminar cuenta" : "Elimina account"}
             </h2>
             <p className={styles.dangerBody}>
               {lang === "en"
                 ? "This will permanently delete your account, all users, jobs, invoices, and all data associated with your organisation. This action cannot be undone."
-                : "Esto eliminará permanentemente tu cuenta, todos los usuarios, trabajos, facturas y todos los datos de tu organización. Esta acción no se puede deshacer."}
+                : lang === "es"
+                  ? "Esto eliminará permanentemente tu cuenta, todos los usuarios, trabajos, facturas y todos los datos de tu organización. Esta acción no se puede deshacer."
+                  : "Questo eliminerà definitivamente il tuo account, tutti gli utenti, lavori, fatture e tutti i dati della tua organizzazione. Questa azione non può essere annullata."}
             </p>
 
             <label className={styles.formLabel}>
-              {lang === "en" ? "Your password" : "Tu contraseña"}
+              {lang === "en" ? "Your password" : lang === "es" ? "Tu contraseña" : "La tua password"}
             </label>
             <input
               className={styles.formInput}
@@ -651,7 +692,9 @@ export default function AppLayout() {
             >
               {lang === "en"
                 ? "Type DELETE to confirm"
-                : "Escribe DELETE para confirmar"}
+                : lang === "es"
+                  ? "Escribe DELETE para confirmar"
+                  : "Scrivi DELETE per confermare"}
             </label>
             <input
               className={styles.formInput}
@@ -668,7 +711,7 @@ export default function AppLayout() {
                 onClick={() => setShowDeleteAccount(false)}
                 disabled={deleteLoading}
               >
-                {lang === "en" ? "Cancel" : "Cancelar"}
+                {lang === "en" ? "Cancel" : lang === "es" ? "Cancelar" : "Annulla"}
               </button>
               <button
                 className={styles.confirmDeleteBtn}
@@ -682,10 +725,14 @@ export default function AppLayout() {
                 {deleteLoading
                   ? lang === "en"
                     ? "Deleting…"
-                    : "Eliminando…"
+                    : lang === "es"
+                      ? "Eliminando…"
+                      : "Eliminazione…"
                   : lang === "en"
                     ? "Delete Everything"
-                    : "Eliminar todo"}
+                    : lang === "es"
+                      ? "Eliminar todo"
+                      : "Elimina tutto"}
               </button>
             </div>
           </div>

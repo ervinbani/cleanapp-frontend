@@ -11,8 +11,7 @@ type TenantForm = {
   contactEmail: string;
   contactPhone: string;
   timezone: string;
-  defaultLanguage: "en" | "es";
-  street: string;
+  defaultLanguage: "en" | "es" | "it";
   city: string;
   state: string;
   zipCode: string;
@@ -114,6 +113,29 @@ export default function GeneralPage() {
       savedOk: "Guardado con éxito.",
       loading: "Cargando…",
     },
+    it: {
+      title: "Impostazioni aziendali",
+      subtitle: "Gestisci le informazioni della tua azienda",
+      sectionCompany: "Dati aziendali",
+      sectionAddress: "Indirizzo",
+      sectionBranding: "Branding",
+      labelName: "Nome azienda",
+      labelEmail: "Email di contatto",
+      labelPhone: "Telefono di contatto",
+      labelTimezone: "Fuso orario",
+      labelLang: "Lingua predefinita",
+      labelStreet: "Via",
+      labelCity: "Città",
+      labelState: "Stato / Provincia",
+      labelZip: "CAP",
+      labelCountry: "Paese",
+      labelLogo: "URL logo",
+      labelColor: "Colore principale",
+      save: "Salva modifiche",
+      saving: "Salvataggio…",
+      savedOk: "Salvato con successo.",
+      loading: "Caricamento…",
+    },
   }[lang];
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -124,7 +146,9 @@ export default function GeneralPage() {
         setError(
           lang === "en"
             ? "Failed to load company data."
-            : "Error al cargar los datos.",
+            : lang === "es"
+              ? "Error al cargar los datos."
+              : "Impossibile caricare i dati aziendali.",
         ),
       )
       .finally(() => setLoading(false));
@@ -159,7 +183,7 @@ export default function GeneralPage() {
       });
       setSuccess(true);
     } catch {
-      setError(lang === "en" ? "Failed to save changes." : "Error al guardar.");
+      setError(lang === "en" ? "Failed to save changes." : lang === "es" ? "Error al guardar." : "Impossibile salvare le modifiche.");
     } finally {
       setSaving(false);
     }
@@ -227,11 +251,12 @@ export default function GeneralPage() {
                 className={styles.input}
                 value={form.defaultLanguage}
                 onChange={(e) =>
-                  set("defaultLanguage", e.target.value as "en" | "es")
+                  set("defaultLanguage", e.target.value as "en" | "es" | "it")
                 }
               >
                 <option value="en">English</option>
                 <option value="es">Español</option>
+                <option value="it">Italiano</option>
               </select>
             </div>
           </div>

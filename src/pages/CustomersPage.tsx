@@ -32,7 +32,7 @@ interface CustomerForm {
   lastName: string;
   email: string;
   phone: string;
-  preferredLanguage: "en" | "es";
+  preferredLanguage: "en" | "es" | "it";
   status: CustomerStatus;
   source: CustomerSource;
   notes: string;
@@ -79,7 +79,7 @@ function customerToForm(c: Customer): CustomerForm {
 
 interface CustomerModalProps {
   customer?: Customer; // undefined = add mode
-  lang: "en" | "es";
+  lang: "en" | "es" | "it";
   onClose: () => void;
   onSaved: () => void;
 }
@@ -148,6 +148,38 @@ const ml = {
     placeholderState: "FL",
     placeholderZip: "33101",
     placeholderCountry: "US",
+  },
+  it: {
+    titleAdd: "Aggiungi cliente",
+    subtitleAdd: "Crea un nuovo cliente",
+    titleEdit: "Modifica cliente",
+    subtitleEdit: "Aggiorna i dati del cliente",
+    firstName: "Nome",
+    lastName: "Cognome",
+    email: "Email",
+    phone: "Telefono",
+    prefLang: "Lingua preferita",
+    status: "Stato",
+    source: "Fonte",
+    notes: "Note interne",
+    addressSection: "Indirizzo",
+    street: "Via",
+    city: "Città",
+    stateField: "Stato / Provincia",
+    zipCode: "CAP",
+    country: "Paese",
+    cancel: "Annulla",
+    save: "Salva cliente",
+    saveEdit: "Salva modifiche",
+    saving: "Salvataggio…",
+    placeholderEmail: "cliente@esempio.it",
+    placeholderPhone: "+39 02 1234 5678",
+    placeholderNotes: "Note interne…",
+    placeholderStreet: "Via Roma 1",
+    placeholderCity: "Milano",
+    placeholderState: "MI",
+    placeholderZip: "20100",
+    placeholderCountry: "IT",
   },
 };
 
@@ -326,11 +358,12 @@ function CustomerModal({
               className={styles.input}
               value={form.preferredLanguage}
               onChange={(e) =>
-                set("preferredLanguage", e.target.value as "en" | "es")
+                set("preferredLanguage", e.target.value as "en" | "es" | "it")
               }
             >
               <option value="en">EN</option>
               <option value="es">ES</option>
+              <option value="it">IT</option>
             </select>
           </div>
 

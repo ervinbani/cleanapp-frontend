@@ -29,7 +29,7 @@ export default function RegisterPage() {
   const { register: registerUser } = useAuth();
   const navigate = useNavigate();
   const [serverError, setServerError] = useState("");
-  const [lang, setLang] = useState<"en" | "es">("en");
+  const [lang, setLang] = useState<"en" | "es" | "it">("en");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -58,7 +58,8 @@ export default function RegisterPage() {
     }
   };
 
-  const t = (en: string, es: string) => (lang === "en" ? en : es);
+  const t = (en: string, es: string, it = en) =>
+    lang === "en" ? en : lang === "es" ? es : it;
 
   return (
     <AuthLayout>
@@ -75,15 +76,22 @@ export default function RegisterPage() {
         >
           ES
         </button>
+        <button
+          className={`${styles.langBtn} ${lang === "it" ? styles.langActive : ""}`}
+          onClick={() => setLang("it")}
+        >
+          IT
+        </button>
       </div>
 
       <h1 className={styles.title}>
-        {t("Create your account", "Crea tu cuenta")}
+        {t("Create your account", "Crea tu cuenta", "Crea il tuo account")}
       </h1>
       <p className={styles.subtitle}>
         {t(
           "Start managing your cleaning business",
           "Empieza a gestionar tu negocio",
+          "Inizia a gestire la tua attività",
         )}
       </p>
 
@@ -95,13 +103,13 @@ export default function RegisterPage() {
         {/* Business name */}
         <div className={styles.field}>
           <label className={styles.label} htmlFor="tenantName">
-            {t("Business Name", "Nombre del negocio")}
+            {t("Business Name", "Nombre del negocio", "Nome dell'attività")}
           </label>
           <input
             id="tenantName"
             type="text"
             className={`${styles.input} ${errors.tenantName ? styles.inputError : ""}`}
-            placeholder={t("Sparkle Clean LLC", "Brillo Limpieza S.A.")}
+            placeholder={t("Sparkle Clean LLC", "Brillo Limpieza S.A.", "Pulizie Brillo s.r.l.")}
             {...register("tenantName")}
           />
           {errors.tenantName && (
@@ -112,7 +120,7 @@ export default function RegisterPage() {
         {/* First Name */}
         <div className={styles.field}>
           <label className={styles.label} htmlFor="firstName">
-            {t("First Name", "Nombre")}
+            {t("First Name", "Nombre", "Nome")}
           </label>
           <input
             id="firstName"
@@ -129,7 +137,7 @@ export default function RegisterPage() {
         {/* Last Name */}
         <div className={styles.field}>
           <label className={styles.label} htmlFor="lastName">
-            {t("Last Name", "Apellido")}
+            {t("Last Name", "Apellido", "Cognome")}
           </label>
           <input
             id="lastName"
@@ -146,13 +154,13 @@ export default function RegisterPage() {
         {/* Email */}
         <div className={styles.field}>
           <label className={styles.label} htmlFor="email">
-            {t("Email", "Correo electrónico")}
+            {t("Email", "Correo electrónico", "Email")}
           </label>
           <input
             id="email"
             type="email"
             className={`${styles.input} ${errors.email ? styles.inputError : ""}`}
-            placeholder={t("you@example.com", "correo@ejemplo.com")}
+            placeholder={t("you@example.com", "correo@ejemplo.com", "tu@esempio.it")}
             autoComplete="email"
             {...register("email")}
           />
@@ -164,7 +172,7 @@ export default function RegisterPage() {
         {/* Password */}
         <div className={styles.field}>
           <label className={styles.label} htmlFor="password">
-            {t("Password", "Contraseña")}
+            {t("Password", "Contraseña", "Password")}
           </label>
           <div className={styles.inputWrap}>
             <input
@@ -223,7 +231,7 @@ export default function RegisterPage() {
         {/* Confirm Password */}
         <div className={styles.field}>
           <label className={styles.label} htmlFor="confirmPassword">
-            {t("Confirm Password", "Confirmar contraseña")}
+            {t("Confirm Password", "Confirmar contraseña", "Conferma password")}
           </label>
           <div className={styles.inputWrap}>
             <input
@@ -291,15 +299,15 @@ export default function RegisterPage() {
           disabled={isSubmitting}
         >
           {isSubmitting
-            ? t("Creating account…", "Creando cuenta…")
-            : t("Create Account", "Crear Cuenta")}
+            ? t("Creating account…", "Creando cuenta…", "Creazione account…")
+            : t("Create Account", "Crear Cuenta", "Crea account")}
         </button>
       </form>
 
       <p className={styles.footer}>
-        {t("Already have an account?", "¿Ya tienes una cuenta?")}{" "}
+        {t("Already have an account?", "¿Ya tienes una cuenta?", "Hai già un account?")}{" "}
         <Link to="/login" className={styles.link}>
-          {t("Sign in", "Iniciar sesión")}
+          {t("Sign in", "Iniciar sesión", "Accedi")}
         </Link>
       </p>
     </AuthLayout>
