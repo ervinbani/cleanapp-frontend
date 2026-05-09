@@ -64,24 +64,23 @@ export default function RegisterPage() {
   return (
     <AuthLayout>
       <div className={styles.langToggle}>
-        <button
-          className={`${styles.langBtn} ${lang === "en" ? styles.langActive : ""}`}
-          onClick={() => setLang("en")}
-        >
-          EN
-        </button>
-        <button
-          className={`${styles.langBtn} ${lang === "es" ? styles.langActive : ""}`}
-          onClick={() => setLang("es")}
-        >
-          ES
-        </button>
-        <button
-          className={`${styles.langBtn} ${lang === "it" ? styles.langActive : ""}`}
-          onClick={() => setLang("it")}
-        >
-          IT
-        </button>
+        {(
+          [
+            { code: "en", flag: "🇬🇧", label: "EN" },
+            { code: "es", flag: "🇪🇸", label: "ES" },
+            { code: "it", flag: "🇮🇹", label: "IT" },
+          ] as const
+        ).map(({ code, flag, label }) => (
+          <button
+            key={code}
+            className={`${styles.langBtn} ${lang === code ? styles.langActive : ""}`}
+            onClick={() => setLang(code)}
+            type="button"
+          >
+            <span className={styles.langFlag}>{flag}</span>
+            {label}
+          </button>
+        ))}
       </div>
 
       <h1 className={styles.title}>

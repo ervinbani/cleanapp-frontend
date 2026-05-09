@@ -145,6 +145,10 @@ export default function AppLayout() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
+  // ── lang dropdown
+  const [langOpen, setLangOpen] = useState(false);
+  const langRef = useRef<HTMLDivElement>(null);
+
   // ── profile modal
   const [showProfile, setShowProfile] = useState(false);
   const [profileForm, setProfileForm] = useState({
@@ -175,9 +179,9 @@ export default function AppLayout() {
     return () => clearInterval(id);
   }, []);
 
-  // close dropdown on outside click
+  // close dropdowns on outside click
   useEffect(() => {
-    if (!dropdownOpen) return;
+    if (!dropdownOpen && !langOpen) return;
     const handler = (e: MouseEvent) => {
       if (
         dropdownRef.current &&
@@ -185,10 +189,16 @@ export default function AppLayout() {
       ) {
         setDropdownOpen(false);
       }
+      if (
+        langRef.current &&
+        !langRef.current.contains(e.target as Node)
+      ) {
+        setLangOpen(false);
+      }
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
-  }, [dropdownOpen]);
+  }, [dropdownOpen, langOpen]);
 
   // sync profile form when user changes
   useEffect(() => {
@@ -482,25 +492,39 @@ export default function AppLayout() {
               {theme === "dark" ? "☀️" : "🌙"}
             </button>
 
-            <div className={styles.langToggle}>
+            <div className={styles.langSelector} ref={langRef}>
               <button
-                className={`${styles.langBtn} ${lang === "en" ? styles.langActive : ""}`}
-                onClick={() => setLang("en")}
+                className={styles.langSelectorBtn}
+                onClick={() => setLangOpen((o) => !o)}
+                aria-expanded={langOpen}
+                aria-label="Select language"
               >
-                EN
+                <span className={styles.langGlobe}>🌐</span>
+                <span className={styles.langCode}>{lang.toUpperCase()}</span>
+                <span className={`${styles.langChevron} ${langOpen ? styles.langChevronOpen : ""}`}>‹</span>
               </button>
-              <button
-                className={`${styles.langBtn} ${lang === "es" ? styles.langActive : ""}`}
-                onClick={() => setLang("es")}
-              >
-                ES
-              </button>
-              <button
-                className={`${styles.langBtn} ${lang === "it" ? styles.langActive : ""}`}
-                onClick={() => setLang("it")}
-              >
-                IT
-              </button>
+              {langOpen && (
+                <div className={styles.langDropdown}>
+                  {([
+                    { code: "en", flag: "🇬🇧", label: "English" },
+                    { code: "es", flag: "🇪🇸", label: "Español" },
+                    { code: "it", flag: "🇮🇹", label: "Italiano" },
+                  ] as const).map(({ code, flag, label }) => (
+                    <button
+                      key={code}
+                      className={`${styles.langOption} ${lang === code ? styles.langOptionActive : ""}`}
+                      onClick={() => {
+                        setLang(code);
+                        setLangOpen(false);
+                      }}
+                    >
+                      <span>{flag}</span>
+                      <span>{label}</span>
+                      {lang === code && <span className={styles.langCheck}>✓</span>}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
             <div className={styles.userMenu} ref={dropdownRef}>

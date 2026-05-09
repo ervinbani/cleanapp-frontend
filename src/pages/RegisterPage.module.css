@@ -1,35 +1,43 @@
 .langToggle {
   display: flex;
+  gap: 0.4rem;
   justify-content: flex-end;
   margin-bottom: 1.25rem;
-  border: 1px solid var(--border-input);
-  border-radius: 8px;
-  overflow: hidden;
-  width: fit-content;
-  margin-left: auto;
 }
 
 .langBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
   padding: 0.3rem 0.7rem;
-  background: none;
-  border: none;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-input);
+  border-radius: 20px;
   font-size: 0.78rem;
   font-weight: 600;
   color: var(--text-muted);
   cursor: pointer;
   transition:
     background 0.15s,
+    border-color 0.15s,
     color 0.15s;
+}
+
+.langFlag {
+  font-size: 0.95rem;
+  line-height: 1;
 }
 
 .langBtn:hover {
   background-color: var(--bg-accent-subtle);
+  border-color: var(--accent);
   color: var(--accent);
 }
 
 .langActive {
   background-color: var(--accent) !important;
-  color: var(--bg-surface) !important;
+  border-color: var(--accent) !important;
+  color: #ffffff !important;
 }
 
 .title {
