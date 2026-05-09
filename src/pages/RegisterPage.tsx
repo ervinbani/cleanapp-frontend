@@ -109,7 +109,11 @@ export default function RegisterPage() {
             id="tenantName"
             type="text"
             className={`${styles.input} ${errors.tenantName ? styles.inputError : ""}`}
-            placeholder={t("Sparkle Clean LLC", "Brillo Limpieza S.A.", "Pulizie Brillo s.r.l.")}
+            placeholder={t(
+              "Sparkle Clean LLC",
+              "Brillo Limpieza S.A.",
+              "Pulizie Brillo s.r.l.",
+            )}
             {...register("tenantName")}
           />
           {errors.tenantName && (
@@ -160,7 +164,11 @@ export default function RegisterPage() {
             id="email"
             type="email"
             className={`${styles.input} ${errors.email ? styles.inputError : ""}`}
-            placeholder={t("you@example.com", "correo@ejemplo.com", "tu@esempio.it")}
+            placeholder={t(
+              "you@example.com",
+              "correo@ejemplo.com",
+              "tu@esempio.it",
+            )}
             autoComplete="email"
             {...register("email")}
           />
@@ -305,7 +313,11 @@ export default function RegisterPage() {
       </form>
 
       <p className={styles.footer}>
-        {t("Already have an account?", "¿Ya tienes una cuenta?", "Hai già un account?")}{" "}
+        {t(
+          "Already have an account?",
+          "¿Ya tienes una cuenta?",
+          "Hai già un account?",
+        )}{" "}
         <Link to="/login" className={styles.link}>
           {t("Sign in", "Iniciar sesión", "Accedi")}
         </Link>

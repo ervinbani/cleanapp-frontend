@@ -183,7 +183,13 @@ export default function GeneralPage() {
       });
       setSuccess(true);
     } catch {
-      setError(lang === "en" ? "Failed to save changes." : lang === "es" ? "Error al guardar." : "Impossibile salvare le modifiche.");
+      setError(
+        lang === "en"
+          ? "Failed to save changes."
+          : lang === "es"
+            ? "Error al guardar."
+            : "Impossibile salvare le modifiche.",
+      );
     } finally {
       setSaving(false);
     }

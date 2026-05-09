@@ -596,9 +596,7 @@ function EditUserModal({ user, lang, onClose, onSaved }: EditUserModalProps) {
               >
                 {verifying ? ml2.verifyingEmail : ml2.verifyEmail}
               </button>
-              {verifyError && (
-                <p className={styles.errorMsg}>{verifyError}</p>
-              )}
+              {verifyError && <p className={styles.errorMsg}>{verifyError}</p>}
             </div>
           )}
 

@@ -218,7 +218,11 @@ export default function AppLayout() {
       setProfileSuccess(true);
     } catch {
       setProfileError(
-        lang === "en" ? "Failed to save changes." : lang === "es" ? "Error al guardar." : "Impossibile salvare le modifiche.",
+        lang === "en"
+          ? "Failed to save changes."
+          : lang === "es"
+            ? "Error al guardar."
+            : "Impossibile salvare le modifiche.",
       );
     } finally {
       setProfileSaving(false);
@@ -329,7 +333,11 @@ export default function AppLayout() {
                     {!sidebarCollapsed && (
                       <>
                         <span className={styles.navLabel}>
-                          {lang === "en" ? item.label : lang === "es" ? item.labelEs : item.labelIt}
+                          {lang === "en"
+                            ? item.label
+                            : lang === "es"
+                              ? item.labelEs
+                              : item.labelIt}
                         </span>
                         <span
                           className={`${styles.chevron} ${settingsOpen ? styles.chevronOpen : ""}`}
@@ -355,7 +363,11 @@ export default function AppLayout() {
                             }
                             onClick={() => setSidebarOpen(false)}
                           >
-                            {lang === "en" ? sub.label : lang === "es" ? sub.labelEs : sub.labelIt}
+                            {lang === "en"
+                              ? sub.label
+                              : lang === "es"
+                                ? sub.labelEs
+                                : sub.labelIt}
                           </NavLink>
                         ))}
                     </div>
@@ -376,7 +388,11 @@ export default function AppLayout() {
                             }
                             onClick={() => setSidebarOpen(false)}
                           >
-                            {lang === "en" ? sub.label : lang === "es" ? sub.labelEs : sub.labelIt}
+                            {lang === "en"
+                              ? sub.label
+                              : lang === "es"
+                                ? sub.labelEs
+                                : sub.labelIt}
                           </NavLink>
                         ))}
                     </div>
@@ -405,7 +421,11 @@ export default function AppLayout() {
                   {!sidebarCollapsed && (
                     <>
                       <span className={styles.navLabel}>
-                        {lang === "en" ? item.label : lang === "es" ? item.labelEs : item.labelIt}
+                        {lang === "en"
+                          ? item.label
+                          : lang === "es"
+                            ? item.labelEs
+                            : item.labelIt}
                         {(lang === "es" || lang === "it") && (
                           <span className={styles.navLabelSub}>
                             {item.label}
@@ -517,7 +537,12 @@ export default function AppLayout() {
                   </div>
                   <hr className={styles.dropdownDivider} />
                   <button className={styles.dropdownItem} onClick={openProfile}>
-                    👤 {lang === "en" ? "My Profile" : lang === "es" ? "Mi Perfil" : "Il mio profilo"}
+                    👤{" "}
+                    {lang === "en"
+                      ? "My Profile"
+                      : lang === "es"
+                        ? "Mi Perfil"
+                        : "Il mio profilo"}
                   </button>
                   <hr className={styles.dropdownDivider} />
                   <button
@@ -527,7 +552,12 @@ export default function AppLayout() {
                       handleLogout();
                     }}
                   >
-                    ⏻ {lang === "en" ? "Logout" : lang === "es" ? "Cerrar sesión" : "Esci"}
+                    ⏻{" "}
+                    {lang === "en"
+                      ? "Logout"
+                      : lang === "es"
+                        ? "Cerrar sesión"
+                        : "Esci"}
                   </button>
                 </div>
               )}
@@ -554,13 +584,21 @@ export default function AppLayout() {
             aria-modal="true"
           >
             <h2 className={styles.modalTitle}>
-              {lang === "en" ? "My Profile" : lang === "es" ? "Mi Perfil" : "Il mio profilo"}
+              {lang === "en"
+                ? "My Profile"
+                : lang === "es"
+                  ? "Mi Perfil"
+                  : "Il mio profilo"}
             </h2>
 
             <div className={styles.profileGrid}>
               <div>
                 <label className={styles.formLabel}>
-                  {lang === "en" ? "First Name" : lang === "es" ? "Nombre" : "Nome"}
+                  {lang === "en"
+                    ? "First Name"
+                    : lang === "es"
+                      ? "Nombre"
+                      : "Nome"}
                 </label>
                 <input
                   className={styles.formInput}
@@ -572,7 +610,11 @@ export default function AppLayout() {
               </div>
               <div>
                 <label className={styles.formLabel}>
-                  {lang === "en" ? "Last Name" : lang === "es" ? "Apellido" : "Cognome"}
+                  {lang === "en"
+                    ? "Last Name"
+                    : lang === "es"
+                      ? "Apellido"
+                      : "Cognome"}
                 </label>
                 <input
                   className={styles.formInput}
@@ -595,7 +637,11 @@ export default function AppLayout() {
               </div>
               <div className={styles.profileFullWidth}>
                 <label className={styles.formLabel}>
-                  {lang === "en" ? "Phone" : lang === "es" ? "Teléfono" : "Telefono"}
+                  {lang === "en"
+                    ? "Phone"
+                    : lang === "es"
+                      ? "Teléfono"
+                      : "Telefono"}
                 </label>
                 <input
                   className={styles.formInput}
@@ -611,7 +657,11 @@ export default function AppLayout() {
             {profileError && <p className={styles.formError}>{profileError}</p>}
             {profileSuccess && (
               <p className={styles.formSuccess}>
-                {lang === "en" ? "Saved successfully." : lang === "es" ? "Guardado con éxito." : "Salvato con successo."}
+                {lang === "en"
+                  ? "Saved successfully."
+                  : lang === "es"
+                    ? "Guardado con éxito."
+                    : "Salvato con successo."}
               </p>
             )}
 
@@ -621,14 +671,22 @@ export default function AppLayout() {
                   className={styles.deleteAccBtn}
                   onClick={openDeleteAccount}
                 >
-                  {lang === "en" ? "Delete Account" : lang === "es" ? "Eliminar cuenta" : "Elimina account"}
+                  {lang === "en"
+                    ? "Delete Account"
+                    : lang === "es"
+                      ? "Eliminar cuenta"
+                      : "Elimina account"}
                 </button>
               )}
               <button
                 className={styles.cancelBtn}
                 onClick={() => setShowProfile(false)}
               >
-                {lang === "en" ? "Cancel" : lang === "es" ? "Cancelar" : "Annulla"}
+                {lang === "en"
+                  ? "Cancel"
+                  : lang === "es"
+                    ? "Cancelar"
+                    : "Annulla"}
               </button>
               <button
                 className={styles.saveBtn}
@@ -665,7 +723,12 @@ export default function AppLayout() {
             aria-modal="true"
           >
             <h2 className={`${styles.modalTitle} ${styles.dangerTitle}`}>
-              ⚠️ {lang === "en" ? "Delete Account" : lang === "es" ? "Eliminar cuenta" : "Elimina account"}
+              ⚠️{" "}
+              {lang === "en"
+                ? "Delete Account"
+                : lang === "es"
+                  ? "Eliminar cuenta"
+                  : "Elimina account"}
             </h2>
             <p className={styles.dangerBody}>
               {lang === "en"
@@ -676,7 +739,11 @@ export default function AppLayout() {
             </p>
 
             <label className={styles.formLabel}>
-              {lang === "en" ? "Your password" : lang === "es" ? "Tu contraseña" : "La tua password"}
+              {lang === "en"
+                ? "Your password"
+                : lang === "es"
+                  ? "Tu contraseña"
+                  : "La tua password"}
             </label>
             <input
               className={styles.formInput}
@@ -711,7 +778,11 @@ export default function AppLayout() {
                 onClick={() => setShowDeleteAccount(false)}
                 disabled={deleteLoading}
               >
-                {lang === "en" ? "Cancel" : lang === "es" ? "Cancelar" : "Annulla"}
+                {lang === "en"
+                  ? "Cancel"
+                  : lang === "es"
+                    ? "Cancelar"
+                    : "Annulla"}
               </button>
               <button
                 className={styles.confirmDeleteBtn}
