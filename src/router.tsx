@@ -17,6 +17,8 @@ import DocumentsPage from "./pages/DocumentsPage";
 import GeneralPage from "./pages/settings/GeneralPage";
 import RolesPermissionsPage from "./pages/settings/RolesPermissionsPage";
 import MessagesPage from "./pages/MessagesPage";
+import UserDetailPage from "./pages/UserDetailPage";
+import CustomerDetailPage from "./pages/CustomerDetailPage";
 
 const router = createBrowserRouter([
   // Public routes
@@ -36,7 +38,9 @@ const router = createBrowserRouter([
         children: [
           { path: "/", element: <DashboardPage /> },
           { path: "/users", element: <UsersPage /> },
+          { path: "/users/:id", element: <UserDetailPage /> },
           { path: "/customers", element: <CustomersPage /> },
+          { path: "/customers/:id", element: <CustomerDetailPage /> },
           { path: "/jobs", element: <JobsPage /> },
           { path: "/invoices", element: <InvoicesPage /> },
           { path: "/documents", element: <DocumentsPage /> },
