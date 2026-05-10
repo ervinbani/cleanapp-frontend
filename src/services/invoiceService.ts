@@ -45,4 +45,9 @@ export const invoiceService = {
   remove: async (id: string): Promise<void> => {
     await apiClient.delete(`/invoices/${id}`);
   },
+
+  send: async (id: string, body?: { email?: string; name?: string }): Promise<Invoice> => {
+    const res = await apiClient.post<{ success: boolean; data: { invoice: Invoice } }>(`/invoices/${id}/send`, body ?? {});
+    return res.data.data.invoice;
+  },
 };

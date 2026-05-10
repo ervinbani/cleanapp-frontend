@@ -178,6 +178,7 @@ export interface Invoice {
   total?: number;
   currency: string;
   status: InvoiceStatus;
+  sentAt?: string;
   paidAt?: string;
   paymentMethod?:
     | "cash"

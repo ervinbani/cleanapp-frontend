@@ -21,9 +21,10 @@ function getPageRange(current: number, total: number): (number | "…")[] {
   return [1, "…", current - 1, current, current + 1, "…", total];
 }
 
-function formatDate(iso: string | undefined, lang: "en" | "es"): string {
+function formatDate(iso: string | undefined, lang: "en" | "es" | "it"): string {
   if (!iso) return "—";
-  return new Date(iso).toLocaleDateString(lang === "es" ? "es-ES" : "en-US", {
+  const locale = lang === "es" ? "es-ES" : lang === "it" ? "it-IT" : "en-US";
+  return new Date(iso).toLocaleDateString(locale, {
     month: "short",
     day: "numeric",
     year: "numeric",
@@ -113,7 +114,7 @@ async function buildInvoicePdfHeader(
   invoiceNumber: string,
   issuedDate: string | undefined,
   dueDate: string | undefined,
-  lang: "en" | "es",
+  lang: "en" | "es" | "it",
 ): Promise<number> {
   const l = formT[lang];
   const PAGE_W = 210; // A4 mm
@@ -262,7 +263,7 @@ async function buildInvoicePdfHeader(
 
 async function downloadInvoicePdf(
   inv: Invoice,
-  lang: "en" | "es",
+  lang: "en" | "es" | "it",
   tenant?: Tenant | null,
 ) {
   const { default: jsPDF } = await import("jspdf");
@@ -621,6 +622,18 @@ const formT = {
     status_partially_paid: "Partially Paid",
     status_overdue: "Overdue",
     status_void: "Void",
+    sendInvoice: "Send Invoice",
+    sendConfirm: "Invoice already sent. Send again?",
+    sendSuccess: "Invoice sent successfully.",
+    sendNoEmail: "Customer has no email — add one to their profile first.",
+    sentOn: "Sent on",
+    sendModalTitle: "Send Invoice",
+    sendModalSubtitle: "The invoice will be sent to the following address.",
+    sendModalEmail: "Send to (email)",
+    sendModalName: "Recipient name",
+    sendModalBtn: "Send Invoice",
+    sendModalSending: "Sending…",
+    sendToastSuccess: "Invoice sent to",
   },
   es: {
     addTitle: "Agregar Factura",
@@ -684,6 +697,93 @@ const formT = {
     status_partially_paid: "Pago parcial",
     status_overdue: "Vencida",
     status_void: "Anulada",
+    sendInvoice: "Enviar factura",
+    sendConfirm: "Factura ya enviada. ¿Enviar de nuevo?",
+    sendSuccess: "Factura enviada con éxito.",
+    sendNoEmail: "El cliente no tiene email — añade uno a su perfil primero.",
+    sentOn: "Enviada el",
+    sendModalTitle: "Enviar factura",
+    sendModalSubtitle: "La factura se enviará a la siguiente dirección.",
+    sendModalEmail: "Enviar a (email)",
+    sendModalName: "Nombre del destinatario",
+    sendModalBtn: "Enviar factura",
+    sendModalSending: "Enviando…",
+    sendToastSuccess: "Factura enviada a",
+  },
+  it: {
+    addTitle: "Aggiungi Fattura",
+    editTitle: "Modifica Fattura",
+    customer: "Cliente *",
+    selectCustomer: "— Seleziona cliente —",
+    invoiceNumber: "Numero Fattura *",
+    issuedDate: "Data Emissione",
+    dueDate: "Data Scadenza",
+    status: "Stato",
+    currency: "Valuta",
+    discountType: "Tipo sconto",
+    discountTypePct: "Percentuale (%)",
+    discountTypeFixed: "Importo fisso",
+    discountValue: "Valore sconto",
+    taxRate: "Aliquota IVA (%)",
+    paymentMethod: "Metodo di pagamento",
+    selectPayment: "— Nessuno —",
+    notes: "Note",
+    servicePeriod: "Periodo servizio",
+    from: "Da",
+    to: "A",
+    periodLastWeek: "Settimana scorsa",
+    periodTwoWeeks: "2 settimane",
+    periodThisMonth: "Questo mese",
+    periodCustom: "Personalizzato",
+    itemsSection: "Voci",
+    description: "Descrizione",
+    serviceType: "Tipo",
+    priceUnit: "Tipo prezzo",
+    priceUnitLabels: {
+      per_hour: "A ora",
+      per_job: "Fisso",
+      per_day: "Al giorno",
+      no_price: "Senza prezzo",
+    },
+    quantity: "Q.tà",
+    unit: "Unità",
+    unitPrice: "Prezzo unit.",
+    lineTotal: "Totale",
+    addItem: "+ Aggiungi voce",
+    cancel: "Annulla",
+    save: "Salva",
+    update: "Aggiorna",
+    downloadPdf: "Scarica PDF",
+    required: "Cliente e numero fattura sono obbligatori.",
+    loadingOpts: "Caricamento opzioni…",
+    linkedJob: "Lavori collegati",
+    selectJob: "— Aggiungi lavoro —",
+    noJobs: "Nessun lavoro per questo cliente",
+    addAllJobs: "Aggiungi tutti",
+    pm_cash: "Contanti",
+    pm_card: "Carta",
+    pm_bank_transfer: "Bonifico",
+    pm_stripe: "Stripe",
+    pm_paypal: "PayPal",
+    pm_other: "Altro",
+    status_draft: "Bozza",
+    status_sent: "Inviata",
+    status_paid: "Pagata",
+    status_partially_paid: "Parzialmente pagata",
+    status_overdue: "Scaduta",
+    status_void: "Annullata",
+    sendInvoice: "Invia fattura",
+    sendConfirm: "Fattura già inviata. Inviare di nuovo?",
+    sendSuccess: "Fattura inviata con successo.",
+    sendNoEmail: "Il cliente non ha un'email — aggiungila al profilo.",
+    sentOn: "Inviata il",
+    sendModalTitle: "Invia fattura",
+    sendModalSubtitle: "La fattura verrà inviata al seguente indirizzo.",
+    sendModalEmail: "Invia a (email)",
+    sendModalName: "Nome destinatario",
+    sendModalBtn: "Invia fattura",
+    sendModalSending: "Invio in corso…",
+    sendToastSuccess: "Fattura inviata a",
   },
 };
 
@@ -713,13 +813,13 @@ interface DropdownJob {
 
 interface InvoiceFormProps {
   invoice?: Invoice;
-  lang: "en" | "es";
+  lang: "en" | "es" | "it";
   tenant?: Tenant | null;
   onClose: () => void;
   onSaved: () => void;
 }
 
-function buildJobItems(job: DropdownJob, lang: "en" | "es"): ItemForm[] {
+function buildJobItems(job: DropdownJob, lang: "en" | "es" | "it"): ItemForm[] {
   const qty =
     job.priceUnit === "per_job" ? 1 : job.timeDuration || 1;
   const unitPrice = job.price ?? 0;
@@ -749,7 +849,7 @@ function buildJobItems(job: DropdownJob, lang: "en" | "es"): ItemForm[] {
 
   const otPct = (svc!.overtime!.extraPercentage ?? 0) / 100;
   const otUnitPrice = unitPrice * (1 + otPct);
-  const otLabel = lang === "es" ? "Horas extra" : "Overtime";
+  const otLabel = lang === "es" ? "Horas extra" : lang === "it" ? "Ore extra" : "Overtime";
 
   const otItem: ItemForm = {
     description: `${job.title || job._id.slice(-6)} — ${otLabel} (+${svc!.overtime!.extraPercentage}%)`,
@@ -762,6 +862,102 @@ function buildJobItems(job: DropdownJob, lang: "en" | "es"): ItemForm[] {
 
   return [baseItem, otItem];
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+interface SendModalProps {
+  invoice: Invoice;
+  lang: "en" | "es" | "it";
+  onClose: () => void;
+  onSent: (updated: Invoice) => void;
+}
+
+function SendModal({ invoice, lang, onClose, onSent }: SendModalProps) {
+  const l = formT[lang];
+  const customer =
+    typeof invoice.customerId === "object" && invoice.customerId !== null
+      ? (invoice.customerId as { firstName?: string; lastName?: string; email?: string })
+      : null;
+
+  const defaultEmail = customer?.email ?? "";
+  const defaultName =
+    customer ? `${customer.firstName ?? ""} ${customer.lastName ?? ""}`.trim() : "";
+
+  const [email, setEmail] = useState(defaultEmail);
+  const [name, setName] = useState(defaultName);
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSending(true);
+    setError("");
+    try {
+      const body: { email?: string; name?: string } = {};
+      if (email.trim()) body.email = email.trim();
+      if (name.trim()) body.name = name.trim();
+      const updated = await invoiceService.send(invoice._id, body);
+      onSent(updated);
+    } catch (err: unknown) {
+      const apiMsg =
+        (err as { response?: { data?: { error?: string } } })?.response?.data
+          ?.error ?? l.sendNoEmail;
+      setError(apiMsg);
+    } finally {
+      setSending(false);
+    }
+  };
+
+  return (
+    <div className={styles.modalOverlay} onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
+      <div className={styles.sendModal}>
+        <div className={styles.sendModalHeader}>
+          <div>
+            <h3 className={styles.sendModalTitle}>{l.sendModalTitle}</h3>
+            <p className={styles.sendModalSubtitle}>{l.sendModalSubtitle}</p>
+          </div>
+          <button className={styles.sendModalClose} onClick={onClose} aria-label="Close">×</button>
+        </div>
+        <form className={styles.sendModalBody} onSubmit={handleSubmit}>
+          <div className={styles.sendModalField}>
+            <label className={styles.sendModalLabel}>{l.sendModalEmail}</label>
+            <input
+              className={styles.sendModalInput}
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="email@example.com"
+              autoFocus
+            />
+          </div>
+          <div className={styles.sendModalField}>
+            <label className={styles.sendModalLabel}>{l.sendModalName}</label>
+            <input
+              className={styles.sendModalInput}
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+          </div>
+          {error && <p className={styles.sendModalError}>{error}</p>}
+          <div className={styles.sendModalFooter}>
+            <button type="button" className={styles.sendModalBtnCancel} onClick={onClose} disabled={sending}>
+              {l.cancel}
+            </button>
+            <button type="submit" className={styles.sendModalBtnSend} disabled={sending || !email.trim()}>
+              <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15">
+                <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
+              </svg>
+              {sending ? l.sendModalSending : l.sendModalBtn}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 
 function InvoiceFormSection({
   invoice,
@@ -777,6 +973,7 @@ function InvoiceFormSection({
   );
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
+  const [showSendModal, setShowSendModal] = useState(false);
   const [customers, setCustomers] = useState<DropdownCustomer[]>([]);
   const [loadingOptions, setLoadingOptions] = useState(true);
   const [showPeriodDates, setShowPeriodDates] = useState(
@@ -1185,7 +1382,7 @@ function InvoiceFormSection({
                 customers.find((cx) => cx._id === form.customerId) && (
                   <div className={styles.invoiceBillTo}>
                     <div className={styles.invoiceBillToLabel}>
-                      {lang === "en" ? "Bill To" : "Facturar a"}
+                      {lang === "en" ? "Bill To" : lang === "es" ? "Facturar a" : "Intestato a"}
                     </div>
                     <div className={styles.invoiceBillToName}>
                       {
@@ -1792,6 +1989,19 @@ function InvoiceFormSection({
                 {l.downloadPdf}
               </button>
             )}
+            {isEdit && invoice!.status !== "void" && (
+              <button
+                type="button"
+                className={styles.btnSendInvoice}
+                onClick={() => setShowSendModal(true)}
+                disabled={saving}
+              >
+                <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15">
+                  <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
+                </svg>
+                {l.sendInvoice}
+              </button>
+            )}
             <button
               type="button"
               className={styles.btnCancel}
@@ -1805,6 +2015,17 @@ function InvoiceFormSection({
             </button>
           </div>
         </form>
+      )}
+      {showSendModal && invoice && (
+        <SendModal
+          invoice={invoice}
+          lang={lang}
+          onClose={() => setShowSendModal(false)}
+          onSent={() => {
+            setShowSendModal(false);
+            onSaved();
+          }}
+        />
       )}
     </div>
   );
@@ -1850,6 +2071,9 @@ export default function InvoicesPage() {
     "staff",
   );
   const canDelete = hasRole("owner");
+
+  const [sendModalInvoice, setSendModalInvoice] = useState<Invoice | null>(null);
+  const [sendToast, setSendToast] = useState<string | null>(null);
 
   const [showForm, setShowForm] = useState(false);
   const [editingInvoice, setEditingInvoice] = useState<Invoice | null>(null);
@@ -2027,6 +2251,12 @@ export default function InvoicesPage() {
           </button>
         )}
       </div>
+
+      {sendToast && (
+        <p className={styles.sendSuccess}>
+          {sendToast}
+        </p>
+      )}
 
       {/* Inline Form */}
       {showForm && canWrite && (
@@ -2258,6 +2488,11 @@ export default function InvoicesPage() {
                           >
                             {l[`status_${inv.status}` as keyof typeof l]}
                           </span>
+                          {inv.sentAt && (
+                            <div className={styles.sentAtLabel}>
+                              {l.sentOn} {formatDate(inv.sentAt, lang)}
+                            </div>
+                          )}
                         </td>
                         <td>
                           <div className={styles.actions}>
@@ -2289,6 +2524,17 @@ export default function InvoicesPage() {
                                 />
                               </svg>
                             </button>
+                            {canWrite && inv.status !== "void" && (
+                              <button
+                                className={styles.btnSendRow}
+                                title={l.btnSend}
+                                onClick={() => setSendModalInvoice(inv)}
+                              >
+                                <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14">
+                                  <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
+                                </svg>
+                              </button>
+                            )}
                             {canWrite && (
                               <button
                                 className={styles.btnUpdate}
@@ -2365,6 +2611,26 @@ export default function InvoicesPage() {
             </span>
           </div>
         </>
+      )}
+
+      {sendModalInvoice && (
+        <SendModal
+          invoice={sendModalInvoice}
+          lang={lang}
+          onClose={() => setSendModalInvoice(null)}
+          onSent={(updated) => {
+            setInvoices((prev) =>
+              prev.map((inv) => (inv._id === updated._id ? updated : inv)),
+            );
+            setSendModalInvoice(null);
+            const email =
+              typeof updated.customerId === "object" && updated.customerId !== null
+                ? (updated.customerId as { email?: string }).email ?? ""
+                : "";
+            setSendToast(`${l.sendToastSuccess} ${email}`);
+            setTimeout(() => setSendToast(null), 4000);
+          }}
+        />
       )}
     </div>
   );

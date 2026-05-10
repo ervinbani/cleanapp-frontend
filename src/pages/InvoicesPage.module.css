@@ -923,6 +923,12 @@
   margin: 0.25rem 0 0.75rem;
 }
 
+.sendSuccess {
+  font-size: 0.85rem;
+  color: #16a34a;
+  margin: 0.25rem 0 0.75rem;
+}
+
 .formFooter {
   display: flex;
   justify-content: flex-end;
@@ -1025,4 +1031,215 @@
 .btnDownloadRow:hover {
   background: #fee2e2;
   border-color: #f87171;
+}
+
+.btnSendRow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid #6ee7b7;
+  border-radius: 6px;
+  background: #ecfdf5;
+  color: #065f46;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
+  flex-shrink: 0;
+}
+
+.btnSendRow:hover {
+  background: #d1fae5;
+  border-color: #34d399;
+}
+
+.btnSendRow:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btnSendInvoice {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.9rem;
+  border: 1px solid #6ee7b7;
+  border-radius: 8px;
+  background: #ecfdf5;
+  color: #065f46;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
+}
+
+.btnSendInvoice:hover {
+  background: #d1fae5;
+  border-color: #34d399;
+}
+
+.btnSendInvoice:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.sentAtLabel {
+  font-size: 0.72rem;
+  color: var(--text-muted, #6b7280);
+  margin-top: 2px;
+}
+
+/* ─── Send Invoice Modal ───────────────────────────────────────── */
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.sendModal {
+  background: var(--bg-surface);
+  border-radius: 14px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+}
+
+.sendModalHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 1.5rem 1.5rem 0;
+}
+
+.sendModalTitle {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.sendModalSubtitle {
+  font-size: 0.83rem;
+  color: var(--text-muted, #6b7280);
+  margin: 0.2rem 0 0;
+}
+
+.sendModalClose {
+  background: none;
+  border: none;
+  font-size: 1.25rem;
+  color: var(--text-placeholder, #9ca3af);
+  cursor: pointer;
+  padding: 0.1rem 0.3rem;
+  line-height: 1;
+  border-radius: 4px;
+  transition: color 0.15s;
+  flex-shrink: 0;
+}
+
+.sendModalClose:hover {
+  color: var(--text-secondary, #374151);
+}
+
+.sendModalBody {
+  padding: 1.25rem 1.5rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.sendModalField {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.sendModalLabel {
+  font-size: 0.83rem;
+  font-weight: 600;
+  color: var(--text-secondary, #374151);
+}
+
+.sendModalInput {
+  padding: 0.5rem 0.75rem;
+  border: 1.5px solid var(--border-input, #d1d5db);
+  border-radius: 8px;
+  font-size: 0.92rem;
+  color: var(--text-primary);
+  background: var(--bg-input, #fff);
+  transition: border-color 0.15s;
+  outline: none;
+}
+
+.sendModalInput:focus {
+  border-color: var(--accent, #2563eb);
+}
+
+.sendModalError {
+  font-size: 0.83rem;
+  color: #ef4444;
+  margin: 0;
+}
+
+.sendModalFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
+  margin-top: 0.25rem;
+}
+
+.sendModalBtnCancel {
+  padding: 0.45rem 1rem;
+  border: 1.5px solid var(--border-input, #d1d5db);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-secondary, #374151);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.sendModalBtnCancel:hover {
+  background: var(--bg-surface-subtle, #f3f4f6);
+}
+
+.sendModalBtnCancel:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.sendModalBtnSend {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 1rem;
+  border: none;
+  border-radius: 8px;
+  background: #2563eb;
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.sendModalBtnSend:hover {
+  background: #1d4ed8;
+}
+
+.sendModalBtnSend:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
