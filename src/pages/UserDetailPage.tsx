@@ -44,7 +44,8 @@ const T = {
     updatedAt: "Updated",
     newPassword: "New Password",
     passwordHint: "Leave blank to keep current password",
-    emailChangeWarning: "Changing the email will require the user to re-verify it.",
+    emailChangeWarning:
+      "Changing the email will require the user to re-verify it.",
     roleReadonly: "Role cannot be changed for owners",
     active: "Active",
     inactive: "Inactive",
@@ -85,7 +86,8 @@ const T = {
     updatedAt: "Actualizado",
     newPassword: "Nueva Contraseña",
     passwordHint: "Dejar en blanco para mantener la contraseña actual",
-    emailChangeWarning: "Cambiar el correo requerirá que el usuario lo verifique de nuevo.",
+    emailChangeWarning:
+      "Cambiar el correo requerirá que el usuario lo verifique de nuevo.",
     roleReadonly: "El rol no se puede cambiar para propietarios",
     active: "Activo",
     inactive: "Inactivo",
@@ -96,7 +98,8 @@ const T = {
     savedOk: "Cambios guardados.",
     verifyEmail: "Marcar como verificado",
     verifyingEmail: "Verificando…",
-    emailNotVerifiedNote: "El correo de este usuario aún no ha sido verificado.",
+    emailNotVerifiedNote:
+      "El correo de este usuario aún no ha sido verificado.",
     errorVerify: "Error al verificar el email.",
   },
   it: {
@@ -126,7 +129,8 @@ const T = {
     updatedAt: "Modificato il",
     newPassword: "Nuova password",
     passwordHint: "Lascia vuoto per mantenere la password attuale",
-    emailChangeWarning: "Cambiare l'email richiederà all'utente di riverificarla.",
+    emailChangeWarning:
+      "Cambiare l'email richiederà all'utente di riverificarla.",
     roleReadonly: "Il ruolo non può essere cambiato per i proprietari",
     active: "Attivo",
     inactive: "Inattivo",
@@ -137,7 +141,8 @@ const T = {
     savedOk: "Modifiche salvate.",
     verifyEmail: "Segna come verificata",
     verifyingEmail: "Verifica in corso…",
-    emailNotVerifiedNote: "L'email di questo utente non è ancora stata verificata.",
+    emailNotVerifiedNote:
+      "L'email di questo utente non è ancora stata verificata.",
     errorVerify: "Errore nella verifica dell'email.",
   },
 };
@@ -162,7 +167,13 @@ interface EditForm {
 }
 
 // ─── Read-only field ──────────────────────────────────────────────
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+function Field({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
   return (
     <div className={styles.field}>
       <span className={styles.fieldLabel}>{label}</span>
@@ -191,7 +202,12 @@ export default function UserDetailPage() {
   const [verifying, setVerifying] = useState(false);
   const [verifyError, setVerifyError] = useState("");
 
-  const canWrite = hasRole("owner", "director", "manager_operations", "manager_hr");
+  const canWrite = hasRole(
+    "owner",
+    "director",
+    "manager_operations",
+    "manager_hr",
+  );
 
   // ── Load user ──────────────────────────────────────────────────
   useEffect(() => {
@@ -285,7 +301,9 @@ export default function UserDetailPage() {
     setVerifying(true);
     setVerifyError("");
     try {
-      await apiClient.put(`/users/${user._id ?? user.id}`, { emailVerified: true });
+      await apiClient.put(`/users/${user._id ?? user.id}`, {
+        emailVerified: true,
+      });
       setUser((u) => (u ? { ...u, emailVerified: true } : u));
     } catch (err: unknown) {
       const msg =
@@ -381,7 +399,9 @@ export default function UserDetailPage() {
                 required
               />
               {form.email !== user.email && (
-                <p className={styles.warningBanner}>⚠️ {l.emailChangeWarning}</p>
+                <p className={styles.warningBanner}>
+                  ⚠️ {l.emailChangeWarning}
+                </p>
               )}
             </div>
 
@@ -404,7 +424,12 @@ export default function UserDetailPage() {
                 </label>
                 {isOwner ? (
                   <>
-                    <input className={styles.input} value="Owner" disabled readOnly />
+                    <input
+                      className={styles.input}
+                      value="Owner"
+                      disabled
+                      readOnly
+                    />
                     <span className={styles.hint}>{l.roleReadonly}</span>
                   </>
                 ) : (
@@ -428,7 +453,10 @@ export default function UserDetailPage() {
                   className={styles.input}
                   value={form.preferredLanguage}
                   onChange={(e) =>
-                    set("preferredLanguage", e.target.value as "en" | "es" | "it")
+                    set(
+                      "preferredLanguage",
+                      e.target.value as "en" | "es" | "it",
+                    )
                   }
                 >
                   <option value="en">EN</option>
@@ -480,7 +508,9 @@ export default function UserDetailPage() {
                 >
                   {verifying ? l.verifyingEmail : l.verifyEmail}
                 </button>
-                {verifyError && <p className={styles.errorMsg}>{verifyError}</p>}
+                {verifyError && (
+                  <p className={styles.errorMsg}>{verifyError}</p>
+                )}
               </div>
             )}
 
@@ -495,7 +525,11 @@ export default function UserDetailPage() {
               >
                 {l.cancel}
               </button>
-              <button type="submit" className={styles.btnSave} disabled={saving}>
+              <button
+                type="submit"
+                className={styles.btnSave}
+                disabled={saving}
+              >
                 {saving ? l.saving : l.save}
               </button>
             </div>
@@ -523,9 +557,7 @@ export default function UserDetailPage() {
         )}
       </div>
 
-      {saveSuccess && (
-        <div className={styles.successBanner}>{l.savedOk}</div>
-      )}
+      {saveSuccess && <div className={styles.successBanner}>{l.savedOk}</div>}
 
       <div className={styles.card}>
         {/* Card header */}
@@ -605,12 +637,8 @@ export default function UserDetailPage() {
               <Field label={l.lastLogin}>
                 {formatDate(user.lastLoginAt, l.never)}
               </Field>
-              <Field label={l.createdAt}>
-                {formatDate(user.createdAt)}
-              </Field>
-              <Field label={l.updatedAt}>
-                {formatDate(user.updatedAt)}
-              </Field>
+              <Field label={l.createdAt}>{formatDate(user.createdAt)}</Field>
+              <Field label={l.updatedAt}>{formatDate(user.updatedAt)}</Field>
             </div>
           </section>
         </div>

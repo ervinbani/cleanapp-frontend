@@ -193,7 +193,13 @@ function customerToForm(c: Customer): EditForm {
   };
 }
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+function Field({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
   return (
     <div className={styles.field}>
       <span className={styles.fieldLabel}>{label}</span>
@@ -406,7 +412,9 @@ export default function CustomerDetailPage() {
                 <select
                   className={styles.input}
                   value={form.status}
-                  onChange={(e) => set("status", e.target.value as CustomerStatus)}
+                  onChange={(e) =>
+                    set("status", e.target.value as CustomerStatus)
+                  }
                   required
                 >
                   <option value="lead">Lead</option>
@@ -421,7 +429,9 @@ export default function CustomerDetailPage() {
                 <select
                   className={styles.input}
                   value={form.source}
-                  onChange={(e) => set("source", e.target.value as CustomerSource)}
+                  onChange={(e) =>
+                    set("source", e.target.value as CustomerSource)
+                  }
                   required
                 >
                   <option value="manual">Manual</option>
@@ -527,7 +537,11 @@ export default function CustomerDetailPage() {
               >
                 {l.cancel}
               </button>
-              <button type="submit" className={styles.btnSave} disabled={saving}>
+              <button
+                type="submit"
+                className={styles.btnSave}
+                disabled={saving}
+              >
                 {saving ? l.saving : l.save}
               </button>
             </div>
@@ -539,7 +553,9 @@ export default function CustomerDetailPage() {
 
   // ── View mode ────────────────────────────────────────────────
   const addr = customer.address;
-  const hasAddress = addr && (addr.street || addr.city || addr.state || addr.zipCode || addr.country);
+  const hasAddress =
+    addr &&
+    (addr.street || addr.city || addr.state || addr.zipCode || addr.country);
   const fullAddress = [addr?.street, addr?.city, addr?.state, addr?.zipCode]
     .filter(Boolean)
     .join(", ");
@@ -547,7 +563,10 @@ export default function CustomerDetailPage() {
   return (
     <div className={styles.page}>
       <div className={styles.topBar}>
-        <button className={styles.backBtn} onClick={() => navigate("/customers")}>
+        <button
+          className={styles.backBtn}
+          onClick={() => navigate("/customers")}
+        >
           {l.back}
         </button>
         {canWrite && (
@@ -560,9 +579,7 @@ export default function CustomerDetailPage() {
         )}
       </div>
 
-      {saveSuccess && (
-        <div className={styles.successBanner}>{l.savedOk}</div>
-      )}
+      {saveSuccess && <div className={styles.successBanner}>{l.savedOk}</div>}
 
       <div className={styles.card}>
         {/* Card header */}
@@ -659,8 +676,12 @@ export default function CustomerDetailPage() {
           <section className={styles.section}>
             <h3 className={styles.sectionTitle}>{l.sectionActivity}</h3>
             <div className={styles.fields}>
-              <Field label={l.createdAt}>{formatDate(customer.createdAt)}</Field>
-              <Field label={l.updatedAt}>{formatDate(customer.updatedAt)}</Field>
+              <Field label={l.createdAt}>
+                {formatDate(customer.createdAt)}
+              </Field>
+              <Field label={l.updatedAt}>
+                {formatDate(customer.updatedAt)}
+              </Field>
             </div>
           </section>
         </div>

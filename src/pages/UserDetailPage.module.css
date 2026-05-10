@@ -192,12 +192,30 @@
   text-transform: capitalize;
 }
 
-.role_owner       { background: #ede9fe; color: #5b21b6; }
-.role_director    { background: #e0f2fe; color: #075985; }
-.role_manager_operations { background: var(--bg-accent-active); color: #1e40af; }
-.role_manager_hr  { background: #ffe4e6; color: #9f1239; }
-.role_staff       { background: #fef3c7; color: #92400e; }
-.role_worker      { background: #d1fae5; color: #065f46; }
+.role_owner {
+  background: #ede9fe;
+  color: #5b21b6;
+}
+.role_director {
+  background: #e0f2fe;
+  color: #075985;
+}
+.role_manager_operations {
+  background: var(--bg-accent-active);
+  color: #1e40af;
+}
+.role_manager_hr {
+  background: #ffe4e6;
+  color: #9f1239;
+}
+.role_staff {
+  background: #fef3c7;
+  color: #92400e;
+}
+.role_worker {
+  background: #d1fae5;
+  color: #065f46;
+}
 
 .badge {
   display: inline-block;
@@ -207,10 +225,22 @@
   font-weight: 600;
 }
 
-.badge_active   { background: #d1fae5; color: #065f46; }
-.badge_inactive { background: var(--bg-surface-subtle); color: var(--text-muted); }
-.badge_verified { background: #d1fae5; color: #065f46; }
-.badge_unverified { background: #fef3c7; color: #92400e; }
+.badge_active {
+  background: #d1fae5;
+  color: #065f46;
+}
+.badge_inactive {
+  background: var(--bg-surface-subtle);
+  color: var(--text-muted);
+}
+.badge_verified {
+  background: #d1fae5;
+  color: #065f46;
+}
+.badge_unverified {
+  background: #fef3c7;
+  color: #92400e;
+}
 
 /* ─── Edit form ───────────────────────────────────────────────── */
 .editForm {

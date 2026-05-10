@@ -219,9 +219,18 @@
   text-transform: capitalize;
 }
 
-.badge_lead     { background: #e0f2fe; color: #075985; }
-.badge_active   { background: #d1fae5; color: #065f46; }
-.badge_inactive { background: var(--bg-surface-subtle); color: var(--text-muted); }
+.badge_lead {
+  background: #e0f2fe;
+  color: #075985;
+}
+.badge_active {
+  background: #d1fae5;
+  color: #065f46;
+}
+.badge_inactive {
+  background: var(--bg-surface-subtle);
+  color: var(--text-muted);
+}
 
 .sourceChip {
   display: inline-block;
@@ -257,7 +266,9 @@
 }
 
 @media (max-width: 560px) {
-  .formRow { grid-template-columns: 1fr; }
+  .formRow {
+    grid-template-columns: 1fr;
+  }
 }
 
 .formGroup {
