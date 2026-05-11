@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { useLang } from "../contexts/LangContext";
 import { useTrans } from "../i18n";
 import { useAuth } from "../contexts/AuthContext";
@@ -1201,6 +1201,7 @@ export default function JobsPage() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingJob, setEditingJob] = useState<Job | null>(null);
 
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   useEffect(() => {
     if (searchParams.get("new") === "1" && canCreate) {
@@ -1627,7 +1628,7 @@ export default function JobsPage() {
                     )}
                     <td>
                       <div className={styles.actions}>
-                        <button className={styles.btnView} title={l.btnView}>
+                        <button className={styles.btnView} title={l.btnView} onClick={() => navigate(`/jobs/${j._id}`)}>
                           <svg viewBox="0 0 20 20" fill="currentColor">
                             <path d="M10 3C5 3 1.73 7.11 1.07 9.69a1 1 0 000 .62C1.73 12.89 5 17 10 17s8.27-4.11 8.93-6.69a1 1 0 000-.62C18.27 7.11 15 3 10 3zm0 11a4 4 0 110-8 4 4 0 010 8zm0-6a2 2 0 100 4 2 2 0 000-4z" />
                           </svg>

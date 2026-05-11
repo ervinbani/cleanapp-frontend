@@ -19,6 +19,9 @@ import RolesPermissionsPage from "./pages/settings/RolesPermissionsPage";
 import MessagesPage from "./pages/MessagesPage";
 import UserDetailPage from "./pages/UserDetailPage";
 import CustomerDetailPage from "./pages/CustomerDetailPage";
+import JobDetailPage from "./pages/JobDetailPage";
+import ServiceDetailPage from "./pages/ServiceDetailPage";
+import InvoiceDetailPage from "./pages/InvoiceDetailPage";
 
 const router = createBrowserRouter([
   // Public routes
@@ -42,9 +45,12 @@ const router = createBrowserRouter([
           { path: "/customers", element: <CustomersPage /> },
           { path: "/customers/:id", element: <CustomerDetailPage /> },
           { path: "/jobs", element: <JobsPage /> },
+          { path: "/jobs/:id", element: <JobDetailPage /> },
           { path: "/invoices", element: <InvoicesPage /> },
+          { path: "/invoices/:id", element: <InvoiceDetailPage /> },
           { path: "/documents", element: <DocumentsPage /> },
           { path: "/services", element: <ServicesPage /> },
+          { path: "/services/:id", element: <ServiceDetailPage /> },
           { path: "/messages", element: <MessagesPage /> },
           {
             path: "/settings",
