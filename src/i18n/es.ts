@@ -246,7 +246,8 @@ const es: Translations = {
     btnWhatsApp: "Enviar por WhatsApp",
     btnDownload: "Descargar PDF",
     btnDelete: "Eliminar",
-    sendNoPhone: "El cliente no tiene teléfono — añade uno a su perfil primero.",
+    sendNoPhone:
+      "El cliente no tiene teléfono — añade uno a su perfil primero.",
   },
   users: {
     title: "Usuarios",
