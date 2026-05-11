@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { useSearchParams, useNavigate, useLocation } from "react-router-dom";
 import { useLang } from "../contexts/LangContext";
 import { useTrans } from "../i18n";
 import { useAuth } from "../contexts/AuthContext";
@@ -2120,7 +2120,25 @@ export default function InvoicesPage() {
   const [editingInvoice, setEditingInvoice] = useState<Invoice | null>(null);
 
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
+
+  // Open edit form if navigated from InvoiceDetailPage, or close it on plain navigation
+  useEffect(() => {
+    const editInvoice = (location.state as { editInvoice?: Invoice } | null)?.editInvoice;
+    if (editInvoice && canWrite) {
+      setShowForm(false);
+      setEditingInvoice(editInvoice);
+      // Clear the state so a back-navigation doesn't re-trigger
+      // Preserve React Router's internal key; only clear user state
+      window.history.replaceState({ ...window.history.state, usr: null }, "");
+    } else if (!editInvoice) {
+      // User navigated to /invoices without edit intent (menu click, back, etc.) — show the table
+      setShowForm(false);
+      setEditingInvoice(null);
+    }
+  }, [location.key]); // eslint-disable-line react-hooks/exhaustive-deps
+
   useEffect(() => {
     if (searchParams.get("new") === "1" && canWrite) {
       setShowForm(true);

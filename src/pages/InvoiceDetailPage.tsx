@@ -2,32 +2,9 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useLang } from "../contexts/LangContext";
 import { useAuth } from "../contexts/AuthContext";
-import invoiceService from "../services/invoiceService";
+import { invoiceService } from "../services/invoiceService";
 import type { Invoice, Customer, Job } from "../types";
 import styles from "./InvoiceDetailPage.module.css";
-
-// ─── Constants ────────────────────────────────────────────────────
-const STATUS_ORDER = [
-  "draft",
-  "sent",
-  "paid",
-  "partially_paid",
-  "overdue",
-  "void",
-] as const;
-type InvoiceStatus = (typeof STATUS_ORDER)[number];
-
-const PAYMENT_METHODS = [
-  "cash",
-  "card",
-  "bank_transfer",
-  "stripe",
-  "paypal",
-  "other",
-] as const;
-type PaymentMethod = (typeof PAYMENT_METHODS)[number];
-
-const CURRENCIES = ["USD", "EUR"] as const;
 
 // ─── Translations ─────────────────────────────────────────────────
 const T = {
@@ -258,6 +235,49 @@ function formatCurrency(amount?: number, currency = "USD"): string {
   }).format(amount);
 }
 
+function formatAddress(addr: unknown): string {
+  if (!addr) return "—";
+
+  // Runtime object (backend sends address as object despite type saying string)
+  if (typeof addr === "object") {
+    const a = addr as {
+      street?: string;
+      city?: string;
+      state?: string;
+      zipCode?: string;
+      country?: string;
+    };
+    return (
+      [a.street, a.city, a.state, a.zipCode, a.country]
+        .filter(Boolean)
+        .join(", ") || "—"
+    );
+  }
+
+  if (typeof addr === "string") {
+    const s = addr.trim();
+    if (!s) return "—";
+    // If it's a JS-object-notation string, extract fields via regex
+    if (s.startsWith("{")) {
+      const extract = (key: string) => {
+        const m = s.match(new RegExp(`${key}:\\s*'([^']*)'`));
+        return m?.[1] || "";
+      };
+      const parts = [
+        extract("street"),
+        extract("city"),
+        extract("state"),
+        extract("zipCode"),
+        extract("country"),
+      ].filter(Boolean);
+      return parts.length ? parts.join(", ") : s;
+    }
+    return s;
+  }
+
+  return "—";
+}
+
 function getCustomerName(inv: Invoice): string {
   if (inv.customerSnapshot?.name) return inv.customerSnapshot.name;
   if (typeof inv.customerId === "object" && inv.customerId !== null) {
@@ -285,35 +305,6 @@ function Field({
   );
 }
 
-// ─── Edit form state ──────────────────────────────────────────────
-interface EditForm {
-  invoiceNumber: string;
-  issuedDate: string;
-  dueDate: string;
-  status: InvoiceStatus;
-  currency: string;
-  discountType: "percentage" | "fixed";
-  discountValue: string;
-  taxRate: string;
-  paymentMethod: string;
-  notes: string;
-}
-
-function invoiceToEditForm(inv: Invoice): EditForm {
-  return {
-    invoiceNumber: inv.invoiceNumber,
-    issuedDate: inv.issuedDate ? inv.issuedDate.slice(0, 10) : "",
-    dueDate: inv.dueDate ? inv.dueDate.slice(0, 10) : "",
-    status: inv.status,
-    currency: inv.currency ?? "USD",
-    discountType: inv.discount?.type ?? "percentage",
-    discountValue: String(inv.discount?.value ?? 0),
-    taxRate: String(inv.taxRate ?? 0),
-    paymentMethod: inv.paymentMethod ?? "",
-    notes: inv.notes ?? "",
-  };
-}
-
 // ─── Main component ───────────────────────────────────────────────
 export default function InvoiceDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -330,12 +321,6 @@ export default function InvoiceDetailPage() {
   const [loadError, setLoadError] = useState("");
   const [loading, setLoading] = useState(!stateInvoice);
 
-  const [editing, setEditing] = useState(false);
-  const [form, setForm] = useState<EditForm | null>(null);
-  const [saving, setSaving] = useState(false);
-  const [saveError, setSaveError] = useState("");
-  const [saveSuccess, setSaveSuccess] = useState(false);
-
   const canWrite = hasRole("owner", "director", "manager_operations");
 
   // ── Load invoice ──────────────────────────────────────────────
@@ -343,76 +328,24 @@ export default function InvoiceDetailPage() {
     if (!id) return;
     const hasStateData = !!stateInvoice;
     if (!hasStateData) setLoading(true);
-    setLoadError("");
-
-    invoiceService
+    setLoadError("");    invoiceService
       .getById(id)
-      .then((data) => setInvoice(data))
+      .then((raw) => {
+        // Backend may wrap response as { success: true, data: Invoice }
+        const data =
+          raw &&
+          typeof raw === "object" &&
+          "success" in raw &&
+          "data" in raw
+            ? (raw as unknown as { success: boolean; data: Invoice }).data
+            : raw;
+        setInvoice(data);
+      })
       .catch(() => {
         if (!hasStateData) setLoadError(l.errorLoad);
       })
       .finally(() => setLoading(false));
   }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  // ── Start editing ─────────────────────────────────────────────
-  const startEditing = () => {
-    if (!invoice) return;
-    setForm(invoiceToEditForm(invoice));
-    setSaveError("");
-    setSaveSuccess(false);
-    setEditing(true);
-  };
-
-  const cancelEditing = () => {
-    setEditing(false);
-    setForm(null);
-    setSaveError("");
-  };
-
-  const set = <K extends keyof EditForm>(k: K, v: EditForm[K]) =>
-    setForm((f) => (f ? { ...f, [k]: v } : f));
-
-  // ── Save ──────────────────────────────────────────────────────
-  const handleSave = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!form || !invoice) return;
-    if (!form.invoiceNumber.trim()) {
-      setSaveError(l.required);
-      return;
-    }
-    setSaving(true);
-    setSaveError("");
-    setSaveSuccess(false);
-    try {
-      const payload: Partial<Invoice> = {
-        invoiceNumber: form.invoiceNumber.trim(),
-        issuedDate: form.issuedDate || undefined,
-        dueDate: form.dueDate || undefined,
-        status: form.status,
-        currency: form.currency,
-        discount:
-          Number(form.discountValue) > 0
-            ? { type: form.discountType, value: Number(form.discountValue) }
-            : undefined,
-        taxRate: Number(form.taxRate),
-        paymentMethod: (form.paymentMethod as PaymentMethod) || undefined,
-        notes: form.notes.trim() || undefined,
-      };
-      const updated = await invoiceService.update(invoice._id, payload);
-      setInvoice(updated);
-      setEditing(false);
-      setForm(null);
-      setSaveSuccess(true);
-      setTimeout(() => setSaveSuccess(false), 3000);
-    } catch (err: unknown) {
-      const msg =
-        (err as { response?: { data?: { error?: string } } })?.response?.data
-          ?.error ?? l.errorSave;
-      setSaveError(msg);
-    } finally {
-      setSaving(false);
-    }
-  };
 
   // ── Loading / error ───────────────────────────────────────────
   if (loading) {
@@ -447,189 +380,6 @@ export default function InvoiceDetailPage() {
         ]
       : [];
 
-  // ── Edit mode ─────────────────────────────────────────────────
-  if (editing && form) {
-    return (
-      <div className={styles.page}>
-        <div className={styles.topBar}>
-          <button className={styles.backBtn} onClick={cancelEditing}>
-            {l.cancel}
-          </button>
-        </div>
-
-        <div className={styles.card}>
-          <div className={styles.cardHeader}>
-            <div className={styles.avatarLg}>#</div>
-            <div className={styles.cardHeaderText}>
-              <h2 className={styles.cardTitle}>{l.editTitle}</h2>
-              <p className={styles.cardSubtitle}>{customerName}</p>
-            </div>
-          </div>
-
-          <form onSubmit={handleSave} className={styles.editForm}>
-            {saveError && <p className={styles.errorMsg}>{saveError}</p>}
-
-            <h3 className={styles.sectionTitle}>{l.sectionDetails}</h3>
-            <div className={styles.formRow}>
-              <div className={styles.formGroup}>
-                <label className={styles.label}>
-                  {l.invoiceNumber} <span className={styles.required}>*</span>
-                </label>
-                <input
-                  className={styles.input}
-                  value={form.invoiceNumber}
-                  onChange={(e) => set("invoiceNumber", e.target.value)}
-                  required
-                />
-              </div>
-              <div className={styles.formGroup}>
-                <label className={styles.label}>{l.status}</label>
-                <select
-                  className={styles.input}
-                  value={form.status}
-                  onChange={(e) =>
-                    set("status", e.target.value as InvoiceStatus)
-                  }
-                >
-                  {STATUS_ORDER.map((s) => (
-                    <option key={s} value={s}>
-                      {(l[`status_${s}` as keyof typeof l] as string) || s}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            <div className={styles.formRow}>
-              <div className={styles.formGroup}>
-                <label className={styles.label}>{l.issuedDate}</label>
-                <input
-                  className={styles.input}
-                  type="date"
-                  value={form.issuedDate}
-                  onChange={(e) => set("issuedDate", e.target.value)}
-                />
-              </div>
-              <div className={styles.formGroup}>
-                <label className={styles.label}>{l.dueDate}</label>
-                <input
-                  className={styles.input}
-                  type="date"
-                  value={form.dueDate}
-                  onChange={(e) => set("dueDate", e.target.value)}
-                />
-              </div>
-            </div>
-
-            <div className={styles.formRow}>
-              <div className={styles.formGroup}>
-                <label className={styles.label}>{l.currency}</label>
-                <select
-                  className={styles.input}
-                  value={form.currency}
-                  onChange={(e) => set("currency", e.target.value)}
-                >
-                  {CURRENCIES.map((c) => (
-                    <option key={c} value={c}>
-                      {c}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className={styles.formGroup}>
-                <label className={styles.label}>{l.paymentMethod}</label>
-                <select
-                  className={styles.input}
-                  value={form.paymentMethod}
-                  onChange={(e) => set("paymentMethod", e.target.value)}
-                >
-                  <option value="">{l.selectPayment}</option>
-                  {PAYMENT_METHODS.map((pm) => (
-                    <option key={pm} value={pm}>
-                      {(l[`pm_${pm}` as keyof typeof l] as string) || pm}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            <div className={styles.formRow}>
-              <div className={styles.formGroup}>
-                <label className={styles.label}>{l.discountType}</label>
-                <select
-                  className={styles.input}
-                  value={form.discountType}
-                  onChange={(e) =>
-                    set(
-                      "discountType",
-                      e.target.value as "percentage" | "fixed",
-                    )
-                  }
-                >
-                  <option value="percentage">{l.discountTypePct}</option>
-                  <option value="fixed">{l.discountTypeFixed}</option>
-                </select>
-              </div>
-              <div className={styles.formGroup}>
-                <label className={styles.label}>{l.discountValue}</label>
-                <input
-                  className={styles.input}
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  value={form.discountValue}
-                  onChange={(e) => set("discountValue", e.target.value)}
-                />
-              </div>
-            </div>
-
-            <div className={styles.formRow}>
-              <div className={styles.formGroup}>
-                <label className={styles.label}>{l.taxRate} (%)</label>
-                <input
-                  className={styles.input}
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  value={form.taxRate}
-                  onChange={(e) => set("taxRate", e.target.value)}
-                />
-              </div>
-            </div>
-
-            <h3 className={styles.sectionTitle}>{l.sectionNotes}</h3>
-            <div className={styles.formGroup}>
-              <textarea
-                className={styles.textarea}
-                value={form.notes}
-                onChange={(e) => set("notes", e.target.value)}
-                rows={4}
-              />
-            </div>
-
-            <div className={styles.formActions}>
-              <button
-                type="button"
-                className={styles.btnCancel}
-                onClick={cancelEditing}
-                disabled={saving}
-              >
-                {l.cancel}
-              </button>
-              <button
-                type="submit"
-                className={styles.btnSave}
-                disabled={saving}
-              >
-                {saving ? l.saving : l.save}
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    );
-  }
-
   // ── View mode ─────────────────────────────────────────────────
   return (
     <div className={styles.page}>
@@ -642,13 +392,16 @@ export default function InvoiceDetailPage() {
           {l.back}
         </button>
         {canWrite && (
-          <button className={styles.btnEdit} onClick={startEditing}>
+          <button
+            className={styles.btnEdit}
+            onClick={() =>
+              navigate("/invoices", { state: { editInvoice: invoice } })
+            }
+          >
             {l.edit}
           </button>
         )}
       </div>
-
-      {saveSuccess && <div className={styles.successBanner}>{l.savedOk}</div>}
 
       <div className={styles.card}>
         {/* Card Header */}
@@ -697,38 +450,44 @@ export default function InvoiceDetailPage() {
 
           {/* Customer */}
           {(invoice.customerSnapshot ||
-            typeof invoice.customerId === "object") && (
-            <div className={styles.section}>
-              <h3 className={styles.sectionTitle}>{l.sectionCustomer}</h3>
-              <div className={styles.fields}>
-                {invoice.customerSnapshot?.name && (
-                  <Field label={l.customerName}>
-                    {invoice.customerSnapshot.name}
-                  </Field>
-                )}
-                {invoice.customerSnapshot?.email && (
-                  <Field label={l.customerEmail}>
-                    <a
-                      href={`mailto:${invoice.customerSnapshot.email}`}
-                      className={styles.link}
-                    >
-                      {invoice.customerSnapshot.email}
-                    </a>
-                  </Field>
-                )}
-                {invoice.customerSnapshot?.address && (
-                  <Field label={l.customerAddress}>
-                    {invoice.customerSnapshot.address}
-                  </Field>
-                )}
-                {invoice.customerSnapshot?.vatNumber && (
-                  <Field label={l.customerVat}>
-                    {invoice.customerSnapshot.vatNumber}
-                  </Field>
-                )}
+            typeof invoice.customerId === "object") && (() => {
+            const snap = invoice.customerSnapshot;
+            const populated =
+              typeof invoice.customerId === "object" && invoice.customerId !== null
+                ? (invoice.customerId as Customer)
+                : null;
+            const name =
+              snap?.name ||
+              (populated
+                ? [populated.firstName, populated.lastName].filter(Boolean).join(" ")
+                : null);
+            const email = snap?.email || populated?.email;
+            const addr = snap?.address || populated?.address;
+            const vatNumber = snap?.vatNumber;
+            return (
+              <div className={styles.section}>
+                <h3 className={styles.sectionTitle}>{l.sectionCustomer}</h3>
+                <div className={styles.fields}>
+                  {name && <Field label={l.customerName}>{name}</Field>}
+                  {email && (
+                    <Field label={l.customerEmail}>
+                      <a href={`mailto:${email}`} className={styles.link}>
+                        {email}
+                      </a>
+                    </Field>
+                  )}
+                  {addr && (
+                    <Field label={l.customerAddress}>
+                      {formatAddress(addr)}
+                    </Field>
+                  )}
+                  {vatNumber && (
+                    <Field label={l.customerVat}>{vatNumber}</Field>
+                  )}
+                </div>
               </div>
-            </div>
-          )}
+            );
+          })()}
 
           {/* Line Items */}
           <div className={styles.section}>
