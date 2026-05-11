@@ -328,15 +328,13 @@ export default function InvoiceDetailPage() {
     if (!id) return;
     const hasStateData = !!stateInvoice;
     if (!hasStateData) setLoading(true);
-    setLoadError("");    invoiceService
+    setLoadError("");
+    invoiceService
       .getById(id)
       .then((raw) => {
         // Backend may wrap response as { success: true, data: Invoice }
         const data =
-          raw &&
-          typeof raw === "object" &&
-          "success" in raw &&
-          "data" in raw
+          raw && typeof raw === "object" && "success" in raw && "data" in raw
             ? (raw as unknown as { success: boolean; data: Invoice }).data
             : raw;
         setInvoice(data);
@@ -450,44 +448,48 @@ export default function InvoiceDetailPage() {
 
           {/* Customer */}
           {(invoice.customerSnapshot ||
-            typeof invoice.customerId === "object") && (() => {
-            const snap = invoice.customerSnapshot;
-            const populated =
-              typeof invoice.customerId === "object" && invoice.customerId !== null
-                ? (invoice.customerId as Customer)
-                : null;
-            const name =
-              snap?.name ||
-              (populated
-                ? [populated.firstName, populated.lastName].filter(Boolean).join(" ")
-                : null);
-            const email = snap?.email || populated?.email;
-            const addr = snap?.address || populated?.address;
-            const vatNumber = snap?.vatNumber;
-            return (
-              <div className={styles.section}>
-                <h3 className={styles.sectionTitle}>{l.sectionCustomer}</h3>
-                <div className={styles.fields}>
-                  {name && <Field label={l.customerName}>{name}</Field>}
-                  {email && (
-                    <Field label={l.customerEmail}>
-                      <a href={`mailto:${email}`} className={styles.link}>
-                        {email}
-                      </a>
-                    </Field>
-                  )}
-                  {addr && (
-                    <Field label={l.customerAddress}>
-                      {formatAddress(addr)}
-                    </Field>
-                  )}
-                  {vatNumber && (
-                    <Field label={l.customerVat}>{vatNumber}</Field>
-                  )}
+            typeof invoice.customerId === "object") &&
+            (() => {
+              const snap = invoice.customerSnapshot;
+              const populated =
+                typeof invoice.customerId === "object" &&
+                invoice.customerId !== null
+                  ? (invoice.customerId as Customer)
+                  : null;
+              const name =
+                snap?.name ||
+                (populated
+                  ? [populated.firstName, populated.lastName]
+                      .filter(Boolean)
+                      .join(" ")
+                  : null);
+              const email = snap?.email || populated?.email;
+              const addr = snap?.address || populated?.address;
+              const vatNumber = snap?.vatNumber;
+              return (
+                <div className={styles.section}>
+                  <h3 className={styles.sectionTitle}>{l.sectionCustomer}</h3>
+                  <div className={styles.fields}>
+                    {name && <Field label={l.customerName}>{name}</Field>}
+                    {email && (
+                      <Field label={l.customerEmail}>
+                        <a href={`mailto:${email}`} className={styles.link}>
+                          {email}
+                        </a>
+                      </Field>
+                    )}
+                    {addr && (
+                      <Field label={l.customerAddress}>
+                        {formatAddress(addr)}
+                      </Field>
+                    )}
+                    {vatNumber && (
+                      <Field label={l.customerVat}>{vatNumber}</Field>
+                    )}
+                  </div>
                 </div>
-              </div>
-            );
-          })()}
+              );
+            })()}
 
           {/* Line Items */}
           <div className={styles.section}>

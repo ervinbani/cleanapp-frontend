@@ -2125,7 +2125,8 @@ export default function InvoicesPage() {
 
   // Open edit form if navigated from InvoiceDetailPage, or close it on plain navigation
   useEffect(() => {
-    const editInvoice = (location.state as { editInvoice?: Invoice } | null)?.editInvoice;
+    const editInvoice = (location.state as { editInvoice?: Invoice } | null)
+      ?.editInvoice;
     if (editInvoice && canWrite) {
       setShowForm(false);
       setEditingInvoice(editInvoice);
