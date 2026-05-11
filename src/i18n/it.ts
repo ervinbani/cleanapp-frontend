@@ -243,6 +243,10 @@ const it: Translations = {
     sendModalBtn: "Invia fattura",
     sendModalSending: "Invio in corso…",
     sendToastSuccess: "Fattura inviata a",
+    btnWhatsApp: "Invia via WhatsApp",
+    btnDownload: "Scarica PDF",
+    btnDelete: "Elimina",
+    sendNoPhone: "Il cliente non ha un numero di telefono — aggiungilo al profilo.",
   },
   users: {
     title: "Utenti",

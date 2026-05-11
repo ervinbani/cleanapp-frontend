@@ -50,6 +50,25 @@
   background: var(--accent-hover);
 }
 
+.btnWhatsApp {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1.1rem;
+  background: #25d366;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btnWhatsApp:hover {
+  background: #1ebe5d;
+}
+
 /* ─── Banners ─────────────────────────────────────────────────── */
 .successBanner {
   background: #d1fae5;

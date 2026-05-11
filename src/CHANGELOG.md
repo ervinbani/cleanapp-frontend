@@ -29,3 +29,11 @@ Based on the work done in this session.
 4. **Invoices - Send toast** - A success toast notification slides in after a successful send, showing "Invoice sent to <email>", and auto-dismisses after 4 seconds.
 5. **Invoices - "Sent" status** - Added `sent` as a recognised invoice status with i18n labels (Sent / Enviada / Inviata) in the status badge and filter tab.
 6. **Invoices - No-email guard** - If the customer has no email on record, a warning message is shown ("Customer has no email — add one to their profile first") instead of opening the modal.
+
+## 2026-05-11
+
+1. **Invoices - Detail page** - Added `InvoiceDetailPage` (`/invoices/:id`) as a read-only detail view showing all invoice fields, line items table with totals, customer snapshot, payment info, notes, and linked jobs count.
+2. **Invoices - View button** - Each invoice row now has a View button that navigates to `/invoices/:id` passing the invoice via router state for instant display (background fetch refreshes from the API).
+3. **Invoices - Edit from detail** - The Edit button on the detail page navigates back to `/invoices` with the invoice in router state (`{ editInvoice }`) so the full `InvoiceFormSection` (with send, PDF download, line items, etc.) opens automatically.
+4. **Invoices - Menu navigation fix** - Clicking the Invoices menu item from the detail page or while the edit form is open now correctly returns to the invoice table (effect re-runs on `location.key` change and resets form state when no edit intent is present in the navigation state).
+5. **Invoices - WhatsApp deep link** - Added a WhatsApp button (green icon) to each invoice table row and on the detail page top bar; clicking it opens WhatsApp (web or app) pre-filled with the customer's phone number and a rich message containing: greeting, invoice number, issue/due dates, itemised list (description, qty × unit price = line total), subtotal, discount, tax, grand total, and notes; if the customer has no phone number, an alert is shown.

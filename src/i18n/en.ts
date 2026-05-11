@@ -241,6 +241,10 @@ const en = {
     sendModalBtn: "Send Invoice",
     sendModalSending: "Sending…",
     sendToastSuccess: "Invoice sent to",
+    btnWhatsApp: "Send via WhatsApp",
+    sendNoPhone: "Customer has no phone — add one to their profile first.",
+    btnDownload: "Download PDF",
+    btnDelete: "Delete",
   },
   users: {
     title: "Users",

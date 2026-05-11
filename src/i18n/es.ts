@@ -243,6 +243,10 @@ const es: Translations = {
     sendModalBtn: "Enviar factura",
     sendModalSending: "Enviando…",
     sendToastSuccess: "Factura enviada a",
+    btnWhatsApp: "Enviar por WhatsApp",
+    btnDownload: "Descargar PDF",
+    btnDelete: "Eliminar",
+    sendNoPhone: "El cliente no tiene teléfono — añade uno a su perfil primero.",
   },
   users: {
     title: "Usuarios",
