@@ -7,10 +7,13 @@ import type { Service } from "../types";
 import styles from "./ServiceDetailPage.module.css";
 
 // ─── Constants ────────────────────────────────────────────────────
-const PRICE_UNIT_LABELS: Record<string, { en: string; es: string; it: string }> = {
-  per_hour: { en: "Hourly",  es: "Por hora",    it: "Orario"       },
-  per_job:  { en: "Fixed",   es: "Por trabajo", it: "Fisso"        },
-  per_day:  { en: "Daily",   es: "Por día",     it: "Giornaliero"  },
+const PRICE_UNIT_LABELS: Record<
+  string,
+  { en: string; es: string; it: string }
+> = {
+  per_hour: { en: "Hourly", es: "Por hora", it: "Orario" },
+  per_job: { en: "Fixed", es: "Por trabajo", it: "Fisso" },
+  per_day: { en: "Daily", es: "Por día", it: "Giornaliero" },
 };
 
 // ─── Translations ─────────────────────────────────────────────────
@@ -49,7 +52,8 @@ const T = {
     errorSave: "Error saving service.",
     savedOk: "Changes saved.",
     required: "Name (EN) is required.",
-    overtimePctRequired: "Extra percentage is required when overtime is enabled.",
+    overtimePctRequired:
+      "Extra percentage is required when overtime is enabled.",
     placeholderNameEn: "Service Name",
     placeholderNameEs: "Nombre del servicio",
     placeholderDescEn: "Enter a description…",
@@ -91,7 +95,8 @@ const T = {
     errorSave: "Error al guardar el servicio.",
     savedOk: "Cambios guardados.",
     required: "El nombre (EN) es obligatorio.",
-    overtimePctRequired: "La % extra es obligatoria cuando las horas extra están habilitadas.",
+    overtimePctRequired:
+      "La % extra es obligatoria cuando las horas extra están habilitadas.",
     placeholderNameEn: "Service Name",
     placeholderNameEs: "Nombre del servicio",
     placeholderDescEn: "Enter a description…",
@@ -133,7 +138,8 @@ const T = {
     errorSave: "Errore nel salvataggio del servizio.",
     savedOk: "Modifiche salvate.",
     required: "Il nome (EN) è obbligatorio.",
-    overtimePctRequired: "La % extra è obbligatoria quando gli straordinari sono abilitati.",
+    overtimePctRequired:
+      "La % extra è obbligatoria quando gli straordinari sono abilitati.",
     placeholderNameEn: "Service Name",
     placeholderNameEs: "Nombre del servicio",
     placeholderDescEn: "Inserisci una descrizione…",
@@ -153,7 +159,13 @@ function formatDate(iso?: string, fallback = "—"): string {
 }
 
 // ─── Field component ──────────────────────────────────────────────
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+function Field({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
   return (
     <div className={styles.field}>
       <span className={styles.fieldLabel}>{label}</span>
@@ -206,7 +218,8 @@ export default function ServiceDetailPage() {
   const l = T[lang] ?? T.en;
 
   // If navigated from the list, the service is already in state — use it immediately
-  const stateService = (location.state as { service?: Service } | null)?.service ?? null;
+  const stateService =
+    (location.state as { service?: Service } | null)?.service ?? null;
 
   const [service, setService] = useState<Service | null>(stateService);
   const [loadError, setLoadError] = useState("");
@@ -357,8 +370,8 @@ export default function ServiceDetailPage() {
     lang === "es"
       ? service.name.es || service.name.en
       : lang === "it"
-      ? service.name.en
-      : service.name.en;
+        ? service.name.en
+        : service.name.en;
 
   const initials = displayName
     .split(" ")
@@ -471,7 +484,9 @@ export default function ServiceDetailPage() {
                 <select
                   className={styles.input}
                   value={form.priceUnit}
-                  onChange={(e) => set("priceUnit", e.target.value as PriceUnit)}
+                  onChange={(e) =>
+                    set("priceUnit", e.target.value as PriceUnit)
+                  }
                 >
                   <option value="per_job">
                     {PRICE_UNIT_LABELS.per_job[lang] ?? "Fixed"}
@@ -510,7 +525,9 @@ export default function ServiceDetailPage() {
                   <select
                     className={styles.input}
                     value={form.overtimeUnit}
-                    onChange={(e) => set("overtimeUnit", e.target.value as PriceUnit)}
+                    onChange={(e) =>
+                      set("overtimeUnit", e.target.value as PriceUnit)
+                    }
                   >
                     <option value="per_hour">
                       {PRICE_UNIT_LABELS.per_hour[lang] ?? "Hourly"}
@@ -549,7 +566,11 @@ export default function ServiceDetailPage() {
               >
                 {l.cancel}
               </button>
-              <button type="submit" className={styles.btnSave} disabled={saving}>
+              <button
+                type="submit"
+                className={styles.btnSave}
+                disabled={saving}
+              >
                 {saving ? l.saving : l.save}
               </button>
             </div>
@@ -563,7 +584,10 @@ export default function ServiceDetailPage() {
   return (
     <div className={styles.page}>
       <div className={styles.topBar}>
-        <button className={styles.backBtn} onClick={() => navigate("/services")}>
+        <button
+          className={styles.backBtn}
+          onClick={() => navigate("/services")}
+        >
           {l.back}
         </button>
         {canWrite && (
@@ -576,9 +600,7 @@ export default function ServiceDetailPage() {
         )}
       </div>
 
-      {saveSuccess && (
-        <div className={styles.successBanner}>{l.savedOk}</div>
-      )}
+      {saveSuccess && <div className={styles.successBanner}>{l.savedOk}</div>}
 
       <div className={styles.card}>
         {/* Header */}
@@ -626,7 +648,8 @@ export default function ServiceDetailPage() {
               </Field>
               <Field label={l.priceUnit}>
                 {service.priceUnit
-                  ? (PRICE_UNIT_LABELS[service.priceUnit]?.[lang] ?? service.priceUnit)
+                  ? (PRICE_UNIT_LABELS[service.priceUnit]?.[lang] ??
+                    service.priceUnit)
                   : l.none}
               </Field>
             </div>
@@ -648,7 +671,7 @@ export default function ServiceDetailPage() {
                   <Field label={l.overtimeUnit}>
                     {service.overtime.unit
                       ? (PRICE_UNIT_LABELS[service.overtime.unit]?.[lang] ??
-                          service.overtime.unit)
+                        service.overtime.unit)
                       : l.none}
                   </Field>
                   <Field label={l.overtimePercentage}>

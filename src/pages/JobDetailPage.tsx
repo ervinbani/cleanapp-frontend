@@ -17,19 +17,23 @@ const JOB_STATUSES: JobStatus[] = [
   "no_show",
 ];
 
-const STATUS_LABELS: Record<JobStatus, { en: string; es: string; it: string }> = {
-  scheduled:   { en: "Scheduled",   es: "Programado",     it: "Programmato"     },
-  confirmed:   { en: "Confirmed",   es: "Confirmado",     it: "Confermato"      },
-  in_progress: { en: "In Progress", es: "En Progreso",    it: "In corso"        },
-  completed:   { en: "Completed",   es: "Completado",     it: "Completato"      },
-  canceled:    { en: "Canceled",    es: "Cancelado",      it: "Annullato"       },
-  no_show:     { en: "No Show",     es: "No Presentado",  it: "Non presentato"  },
-};
+const STATUS_LABELS: Record<JobStatus, { en: string; es: string; it: string }> =
+  {
+    scheduled: { en: "Scheduled", es: "Programado", it: "Programmato" },
+    confirmed: { en: "Confirmed", es: "Confirmado", it: "Confermato" },
+    in_progress: { en: "In Progress", es: "En Progreso", it: "In corso" },
+    completed: { en: "Completed", es: "Completado", it: "Completato" },
+    canceled: { en: "Canceled", es: "Cancelado", it: "Annullato" },
+    no_show: { en: "No Show", es: "No Presentado", it: "Non presentato" },
+  };
 
-const PRICE_UNIT_LABELS: Record<string, { en: string; es: string; it: string }> = {
-  per_hour: { en: "Hourly",  es: "Por hora",       it: "Orario"      },
-  per_job:  { en: "Fixed",   es: "Por trabajo",    it: "A intervento" },
-  per_day:  { en: "Daily",   es: "Por día",        it: "Giornaliero" },
+const PRICE_UNIT_LABELS: Record<
+  string,
+  { en: string; es: string; it: string }
+> = {
+  per_hour: { en: "Hourly", es: "Por hora", it: "Orario" },
+  per_job: { en: "Fixed", es: "Por trabajo", it: "A intervento" },
+  per_day: { en: "Daily", es: "Por día", it: "Giornaliero" },
 };
 
 // ─── Translations ─────────────────────────────────────────────────
@@ -246,16 +250,31 @@ function getAssignedUsers(job: Job): { id: string; name: string }[] {
   return job.assignedUsers.map((u) => {
     if (typeof u === "object") {
       const usr = u as User & { _id?: string };
-      return { id: usr._id ?? usr.id, name: `${usr.firstName} ${usr.lastName}` };
+      return {
+        id: usr._id ?? usr.id,
+        name: `${usr.firstName} ${usr.lastName}`,
+      };
     }
     return { id: u, name: u };
   });
 }
 
 // ─── Dropdown types ───────────────────────────────────────────────
-interface DDCustomer { _id: string; firstName: string; lastName: string }
-interface DDService  { _id: string; name: { en: string; es: string } }
-interface DDUser     { _id: string; firstName: string; lastName: string; isActive: boolean }
+interface DDCustomer {
+  _id: string;
+  firstName: string;
+  lastName: string;
+}
+interface DDService {
+  _id: string;
+  name: { en: string; es: string };
+}
+interface DDUser {
+  _id: string;
+  firstName: string;
+  lastName: string;
+  isActive: boolean;
+}
 
 // ─── Edit form state ──────────────────────────────────────────────
 interface EditForm {
@@ -317,7 +336,13 @@ function jobToForm(j: Job): EditForm {
 }
 
 // ─── Field component ──────────────────────────────────────────────
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+function Field({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
   return (
     <div className={styles.field}>
       <span className={styles.fieldLabel}>{label}</span>
@@ -353,7 +378,12 @@ export default function JobDetailPage() {
   // Checklist toggle (view mode)
   const [checklistState, setChecklistState] = useState<boolean[]>([]);
 
-  const canWrite = hasRole("owner", "director", "manager_operations", "manager_hr");
+  const canWrite = hasRole(
+    "owner",
+    "director",
+    "manager_operations",
+    "manager_hr",
+  );
 
   // ── Load job ──────────────────────────────────────────────────
   useEffect(() => {
@@ -446,8 +476,10 @@ export default function JobDetailPage() {
         status: form.status,
         price: form.price !== "" ? Number(form.price) : undefined,
         priceUnit: form.priceUnit || undefined,
-        timeDuration: form.timeDuration !== "" ? Number(form.timeDuration) : undefined,
-        overtimeHours: form.overtimeHours !== "" ? Number(form.overtimeHours) : undefined,
+        timeDuration:
+          form.timeDuration !== "" ? Number(form.timeDuration) : undefined,
+        overtimeHours:
+          form.overtimeHours !== "" ? Number(form.overtimeHours) : undefined,
         assignedUsers: form.assignedUsers,
         notesInternal: form.notesInternal.trim() || undefined,
         notesCustomer: form.notesCustomer.trim() || undefined,
@@ -514,11 +546,15 @@ export default function JobDetailPage() {
   const service = getServiceObj(job);
   const assignedUsers = getAssignedUsers(job);
   const addr = job.propertyAddress;
-  const hasAddr = addr && (addr.street || addr.city || addr.state || addr.zipCode || addr.country);
+  const hasAddr =
+    addr &&
+    (addr.street || addr.city || addr.state || addr.zipCode || addr.country);
   const fullAddr = [addr?.street, addr?.city, addr?.state, addr?.zipCode]
     .filter(Boolean)
     .join(", ");
-  const jobTitle = job.title || (customer ? `${customer.firstName} ${customer.lastName}` : job._id);
+  const jobTitle =
+    job.title ||
+    (customer ? `${customer.firstName} ${customer.lastName}` : job._id);
 
   // ── Edit mode ─────────────────────────────────────────────────
   if (editing && form) {
@@ -599,7 +635,8 @@ export default function JobDetailPage() {
               <div className={styles.formRow}>
                 <div className={styles.formGroup}>
                   <label className={styles.label}>
-                    {l.scheduledStart} <span className={styles.required}>*</span>
+                    {l.scheduledStart}{" "}
+                    <span className={styles.required}>*</span>
                   </label>
                   <input
                     className={styles.input}
@@ -758,7 +795,10 @@ export default function JobDetailPage() {
                 {ddUsers.map((u) => {
                   const checked = form.assignedUsers.includes(u._id);
                   return (
-                    <label key={u._id} className={`${styles.userChip} ${checked ? styles.userChipActive : ""}`}>
+                    <label
+                      key={u._id}
+                      className={`${styles.userChip} ${checked ? styles.userChipActive : ""}`}
+                    >
                       <input
                         type="checkbox"
                         className={styles.userChipCheck}
@@ -805,7 +845,11 @@ export default function JobDetailPage() {
                 >
                   {l.cancel}
                 </button>
-                <button type="submit" className={styles.btnSave} disabled={saving}>
+                <button
+                  type="submit"
+                  className={styles.btnSave}
+                  disabled={saving}
+                >
                   {saving ? l.saving : l.save}
                 </button>
               </div>
@@ -833,25 +877,26 @@ export default function JobDetailPage() {
         )}
       </div>
 
-      {saveSuccess && (
-        <div className={styles.successBanner}>{l.savedOk}</div>
-      )}
+      {saveSuccess && <div className={styles.successBanner}>{l.savedOk}</div>}
 
       <div className={styles.card}>
         {/* Header */}
         <div className={styles.cardHeader}>
-          <div className={`${styles.statusDot} ${styles[`dot_${job.status}`]}`} />
+          <div
+            className={`${styles.statusDot} ${styles[`dot_${job.status}`]}`}
+          />
           <div className={styles.cardHeaderText}>
             <h2 className={styles.cardTitle}>{jobTitle}</h2>
             <p className={styles.cardSubtitle}>
-              {customer
-                ? `${customer.firstName} ${customer.lastName}`
-                : l.none}
-              {service && ` · ${lang === "es" ? service.name.es : service.name.en}`}
+              {customer ? `${customer.firstName} ${customer.lastName}` : l.none}
+              {service &&
+                ` · ${lang === "es" ? service.name.es : service.name.en}`}
             </p>
           </div>
           <div className={styles.headerBadges}>
-            <span className={`${styles.badge} ${styles[`badge_${job.status}`]}`}>
+            <span
+              className={`${styles.badge} ${styles[`badge_${job.status}`]}`}
+            >
               {STATUS_LABELS[job.status]?.[lang] ?? job.status}
             </span>
           </div>
@@ -876,16 +921,24 @@ export default function JobDetailPage() {
               </Field>
               <Field label={l.service}>
                 {service
-                  ? lang === "es" ? service.name.es : service.name.en
+                  ? lang === "es"
+                    ? service.name.es
+                    : service.name.en
                   : l.none}
               </Field>
-              <Field label={l.scheduledStart}>{formatDate(job.scheduledStart)}</Field>
-              <Field label={l.scheduledEnd}>{formatDate(job.scheduledEnd)}</Field>
+              <Field label={l.scheduledStart}>
+                {formatDate(job.scheduledStart)}
+              </Field>
+              <Field label={l.scheduledEnd}>
+                {formatDate(job.scheduledEnd)}
+              </Field>
               <Field label={l.timeDuration}>
                 {job.timeDuration != null ? `${job.timeDuration} h` : l.none}
               </Field>
               <Field label={l.status}>
-                <span className={`${styles.badge} ${styles[`badge_${job.status}`]}`}>
+                <span
+                  className={`${styles.badge} ${styles[`badge_${job.status}`]}`}
+                >
                   {STATUS_LABELS[job.status]?.[lang] ?? job.status}
                 </span>
               </Field>
@@ -919,7 +972,9 @@ export default function JobDetailPage() {
                 <Field label={l.city}>{addr?.city ?? l.none}</Field>
                 <Field label={l.stateField}>{addr?.state ?? l.none}</Field>
                 <Field label={l.zipCode}>{addr?.zipCode ?? l.none}</Field>
-                <Field label={l.country}>{addr?.country?.toUpperCase() ?? l.none}</Field>
+                <Field label={l.country}>
+                  {addr?.country?.toUpperCase() ?? l.none}
+                </Field>
                 {fullAddr && (
                   <div className={styles.mapLinkWrap}>
                     <a
@@ -964,18 +1019,39 @@ export default function JobDetailPage() {
                     <button
                       className={`${styles.checkboxBtn} ${checklistState[idx] ? styles.checkboxBtnDone : ""}`}
                       onClick={() => toggleChecklist(idx)}
-                      aria-label={checklistState[idx] ? "Mark incomplete" : "Mark complete"}
+                      aria-label={
+                        checklistState[idx]
+                          ? "Mark incomplete"
+                          : "Mark complete"
+                      }
                     >
                       {checklistState[idx] ? (
-                        <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        <svg
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                          width="16"
+                          height="16"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                            clipRule="evenodd"
+                          />
                         </svg>
                       ) : (
                         <span />
                       )}
                     </button>
-                    <span className={checklistState[idx] ? styles.checklistLabelDone : styles.checklistLabel}>
-                      {lang === "es" ? item.label.es || item.label.en : item.label.en || item.label.es}
+                    <span
+                      className={
+                        checklistState[idx]
+                          ? styles.checklistLabelDone
+                          : styles.checklistLabel
+                      }
+                    >
+                      {lang === "es"
+                        ? item.label.es || item.label.en
+                        : item.label.en || item.label.es}
                     </span>
                   </li>
                 ))}
@@ -991,11 +1067,15 @@ export default function JobDetailPage() {
             <div className={styles.notesGrid}>
               <div>
                 <p className={styles.notesSubLabel}>{l.notesInternal}</p>
-                <p className={styles.notesText}>{job.notesInternal || l.none}</p>
+                <p className={styles.notesText}>
+                  {job.notesInternal || l.none}
+                </p>
               </div>
               <div>
                 <p className={styles.notesSubLabel}>{l.notesCustomer}</p>
-                <p className={styles.notesText}>{job.notesCustomer || l.none}</p>
+                <p className={styles.notesText}>
+                  {job.notesCustomer || l.none}
+                </p>
               </div>
             </div>
           </section>

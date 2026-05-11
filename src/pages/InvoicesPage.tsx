@@ -801,14 +801,16 @@ interface DropdownJob {
   priceUnit?: string;
   timeDuration?: number;
   overtimeHours?: number;
-  serviceId?: {
-    _id: string;
-    overtime?: {
-      isEnabled: boolean;
-      unit?: string;
-      extraPercentage?: number;
-    };
-  } | string;
+  serviceId?:
+    | {
+        _id: string;
+        overtime?: {
+          isEnabled: boolean;
+          unit?: string;
+          extraPercentage?: number;
+        };
+      }
+    | string;
 }
 
 interface InvoiceFormProps {
@@ -820,8 +822,7 @@ interface InvoiceFormProps {
 }
 
 function buildJobItems(job: DropdownJob, lang: "en" | "es" | "it"): ItemForm[] {
-  const qty =
-    job.priceUnit === "per_job" ? 1 : job.timeDuration || 1;
+  const qty = job.priceUnit === "per_job" ? 1 : job.timeDuration || 1;
   const unitPrice = job.price ?? 0;
   const unit =
     job.priceUnit === "per_day"
@@ -840,16 +841,15 @@ function buildJobItems(job: DropdownJob, lang: "en" | "es" | "it"): ItemForm[] {
   };
 
   const svc =
-    job.serviceId && typeof job.serviceId === "object"
-      ? job.serviceId
-      : null;
+    job.serviceId && typeof job.serviceId === "object" ? job.serviceId : null;
   const otEnabled = svc?.overtime?.isEnabled && (job.overtimeHours ?? 0) > 0;
 
   if (!otEnabled) return [baseItem];
 
   const otPct = (svc!.overtime!.extraPercentage ?? 0) / 100;
   const otUnitPrice = unitPrice * (1 + otPct);
-  const otLabel = lang === "es" ? "Horas extra" : lang === "it" ? "Ore extra" : "Overtime";
+  const otLabel =
+    lang === "es" ? "Horas extra" : lang === "it" ? "Ore extra" : "Overtime";
 
   const otItem: ItemForm = {
     description: `${job.title || job._id.slice(-6)} — ${otLabel} (+${svc!.overtime!.extraPercentage}%)`,
@@ -876,12 +876,17 @@ function SendModal({ invoice, lang, onClose, onSent }: SendModalProps) {
   const l = formT[lang];
   const customer =
     typeof invoice.customerId === "object" && invoice.customerId !== null
-      ? (invoice.customerId as { firstName?: string; lastName?: string; email?: string })
+      ? (invoice.customerId as {
+          firstName?: string;
+          lastName?: string;
+          email?: string;
+        })
       : null;
 
   const defaultEmail = customer?.email ?? "";
-  const defaultName =
-    customer ? `${customer.firstName ?? ""} ${customer.lastName ?? ""}`.trim() : "";
+  const defaultName = customer
+    ? `${customer.firstName ?? ""} ${customer.lastName ?? ""}`.trim()
+    : "";
 
   const [email, setEmail] = useState(defaultEmail);
   const [name, setName] = useState(defaultName);
@@ -909,14 +914,25 @@ function SendModal({ invoice, lang, onClose, onSent }: SendModalProps) {
   };
 
   return (
-    <div className={styles.modalOverlay} onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
+    <div
+      className={styles.modalOverlay}
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
       <div className={styles.sendModal}>
         <div className={styles.sendModalHeader}>
           <div>
             <h3 className={styles.sendModalTitle}>{l.sendModalTitle}</h3>
             <p className={styles.sendModalSubtitle}>{l.sendModalSubtitle}</p>
           </div>
-          <button className={styles.sendModalClose} onClick={onClose} aria-label="Close">×</button>
+          <button
+            className={styles.sendModalClose}
+            onClick={onClose}
+            aria-label="Close"
+          >
+            ×
+          </button>
         </div>
         <form className={styles.sendModalBody} onSubmit={handleSubmit}>
           <div className={styles.sendModalField}>
@@ -941,11 +957,25 @@ function SendModal({ invoice, lang, onClose, onSent }: SendModalProps) {
           </div>
           {error && <p className={styles.sendModalError}>{error}</p>}
           <div className={styles.sendModalFooter}>
-            <button type="button" className={styles.sendModalBtnCancel} onClick={onClose} disabled={sending}>
+            <button
+              type="button"
+              className={styles.sendModalBtnCancel}
+              onClick={onClose}
+              disabled={sending}
+            >
               {l.cancel}
             </button>
-            <button type="submit" className={styles.sendModalBtnSend} disabled={sending || !email.trim()}>
-              <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15">
+            <button
+              type="submit"
+              className={styles.sendModalBtnSend}
+              disabled={sending || !email.trim()}
+            >
+              <svg
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                width="15"
+                height="15"
+              >
                 <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
               </svg>
               {sending ? l.sendModalSending : l.sendModalBtn}
@@ -1382,7 +1412,11 @@ function InvoiceFormSection({
                 customers.find((cx) => cx._id === form.customerId) && (
                   <div className={styles.invoiceBillTo}>
                     <div className={styles.invoiceBillToLabel}>
-                      {lang === "en" ? "Bill To" : lang === "es" ? "Facturar a" : "Intestato a"}
+                      {lang === "en"
+                        ? "Bill To"
+                        : lang === "es"
+                          ? "Facturar a"
+                          : "Intestato a"}
                     </div>
                     <div className={styles.invoiceBillToName}>
                       {
@@ -1996,7 +2030,12 @@ function InvoiceFormSection({
                 onClick={() => setShowSendModal(true)}
                 disabled={saving}
               >
-                <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15">
+                <svg
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                  width="15"
+                  height="15"
+                >
                   <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
                 </svg>
                 {l.sendInvoice}
@@ -2072,7 +2111,9 @@ export default function InvoicesPage() {
   );
   const canDelete = hasRole("owner");
 
-  const [sendModalInvoice, setSendModalInvoice] = useState<Invoice | null>(null);
+  const [sendModalInvoice, setSendModalInvoice] = useState<Invoice | null>(
+    null,
+  );
   const [sendToast, setSendToast] = useState<string | null>(null);
 
   const [showForm, setShowForm] = useState(false);
@@ -2253,11 +2294,7 @@ export default function InvoicesPage() {
         )}
       </div>
 
-      {sendToast && (
-        <p className={styles.sendSuccess}>
-          {sendToast}
-        </p>
-      )}
+      {sendToast && <p className={styles.sendSuccess}>{sendToast}</p>}
 
       {/* Inline Form */}
       {showForm && canWrite && (
@@ -2500,7 +2537,11 @@ export default function InvoicesPage() {
                             <button
                               className={styles.btnView}
                               title={l.btnView}
-                              onClick={() => navigate(`/invoices/${inv._id}`, { state: { invoice: inv } })}
+                              onClick={() =>
+                                navigate(`/invoices/${inv._id}`, {
+                                  state: { invoice: inv },
+                                })
+                              }
                             >
                               <svg viewBox="0 0 20 20" fill="currentColor">
                                 <path d="M10 3C5 3 1.73 7.11 1.07 9.69a1 1 0 000 .62C1.73 12.89 5 17 10 17s8.27-4.11 8.93-6.69a1 1 0 000-.62C18.27 7.11 15 3 10 3zm0 11a4 4 0 110-8 4 4 0 010 8zm0-6a2 2 0 100 4 2 2 0 000-4z" />
@@ -2532,7 +2573,12 @@ export default function InvoicesPage() {
                                 title={l.btnSend}
                                 onClick={() => setSendModalInvoice(inv)}
                               >
-                                <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14">
+                                <svg
+                                  viewBox="0 0 20 20"
+                                  fill="currentColor"
+                                  width="14"
+                                  height="14"
+                                >
                                   <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
                                 </svg>
                               </button>
@@ -2626,8 +2672,9 @@ export default function InvoicesPage() {
             );
             setSendModalInvoice(null);
             const email =
-              typeof updated.customerId === "object" && updated.customerId !== null
-                ? (updated.customerId as { email?: string }).email ?? ""
+              typeof updated.customerId === "object" &&
+              updated.customerId !== null
+                ? ((updated.customerId as { email?: string }).email ?? "")
                 : "";
             setSendToast(`${l.sendToastSuccess} ${email}`);
             setTimeout(() => setSendToast(null), 4000);

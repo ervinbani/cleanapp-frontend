@@ -7,10 +7,24 @@ import type { Invoice, Customer, Job } from "../types";
 import styles from "./InvoiceDetailPage.module.css";
 
 // ─── Constants ────────────────────────────────────────────────────
-const STATUS_ORDER = ["draft", "sent", "paid", "partially_paid", "overdue", "void"] as const;
+const STATUS_ORDER = [
+  "draft",
+  "sent",
+  "paid",
+  "partially_paid",
+  "overdue",
+  "void",
+] as const;
 type InvoiceStatus = (typeof STATUS_ORDER)[number];
 
-const PAYMENT_METHODS = ["cash", "card", "bank_transfer", "stripe", "paypal", "other"] as const;
+const PAYMENT_METHODS = [
+  "cash",
+  "card",
+  "bank_transfer",
+  "stripe",
+  "paypal",
+  "other",
+] as const;
 type PaymentMethod = (typeof PAYMENT_METHODS)[number];
 
 const CURRENCIES = ["USD", "EUR"] as const;
@@ -238,20 +252,31 @@ function formatDateTime(iso?: string, fallback = "—"): string {
 
 function formatCurrency(amount?: number, currency = "USD"): string {
   if (amount == null) return "—";
-  return new Intl.NumberFormat(undefined, { style: "currency", currency }).format(amount);
+  return new Intl.NumberFormat(undefined, {
+    style: "currency",
+    currency,
+  }).format(amount);
 }
 
 function getCustomerName(inv: Invoice): string {
   if (inv.customerSnapshot?.name) return inv.customerSnapshot.name;
   if (typeof inv.customerId === "object" && inv.customerId !== null) {
     const c = inv.customerId as Customer;
-    return [c.firstName, c.lastName].filter(Boolean).join(" ") || c.email || "—";
+    return (
+      [c.firstName, c.lastName].filter(Boolean).join(" ") || c.email || "—"
+    );
   }
   return "—";
 }
 
 // ─── Field component ──────────────────────────────────────────────
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+function Field({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
   return (
     <div className={styles.field}>
       <span className={styles.fieldLabel}>{label}</span>
@@ -413,11 +438,13 @@ export default function InvoiceDetailPage() {
 
   // Linked job ids/numbers
   const jobIds: string[] = invoice.jobIds
-    ? invoice.jobIds.map((j) =>
-        typeof j === "object" ? (j as Job)._id : j,
-      )
+    ? invoice.jobIds.map((j) => (typeof j === "object" ? (j as Job)._id : j))
     : invoice.jobId
-      ? [typeof invoice.jobId === "object" ? (invoice.jobId as Job)._id : invoice.jobId]
+      ? [
+          typeof invoice.jobId === "object"
+            ? (invoice.jobId as Job)._id
+            : invoice.jobId,
+        ]
       : [];
 
   // ── Edit mode ─────────────────────────────────────────────────
@@ -460,7 +487,9 @@ export default function InvoiceDetailPage() {
                 <select
                   className={styles.input}
                   value={form.status}
-                  onChange={(e) => set("status", e.target.value as InvoiceStatus)}
+                  onChange={(e) =>
+                    set("status", e.target.value as InvoiceStatus)
+                  }
                 >
                   {STATUS_ORDER.map((s) => (
                     <option key={s} value={s}>
@@ -501,7 +530,9 @@ export default function InvoiceDetailPage() {
                   onChange={(e) => set("currency", e.target.value)}
                 >
                   {CURRENCIES.map((c) => (
-                    <option key={c} value={c}>{c}</option>
+                    <option key={c} value={c}>
+                      {c}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -529,7 +560,10 @@ export default function InvoiceDetailPage() {
                   className={styles.input}
                   value={form.discountType}
                   onChange={(e) =>
-                    set("discountType", e.target.value as "percentage" | "fixed")
+                    set(
+                      "discountType",
+                      e.target.value as "percentage" | "fixed",
+                    )
                   }
                 >
                   <option value="percentage">{l.discountTypePct}</option>
@@ -582,7 +616,11 @@ export default function InvoiceDetailPage() {
               >
                 {l.cancel}
               </button>
-              <button type="submit" className={styles.btnSave} disabled={saving}>
+              <button
+                type="submit"
+                className={styles.btnSave}
+                disabled={saving}
+              >
                 {saving ? l.saving : l.save}
               </button>
             </div>
@@ -597,7 +635,10 @@ export default function InvoiceDetailPage() {
     <div className={styles.page}>
       {/* Top bar */}
       <div className={styles.topBar}>
-        <button className={styles.backBtn} onClick={() => navigate("/invoices")}>
+        <button
+          className={styles.backBtn}
+          onClick={() => navigate("/invoices")}
+        >
           {l.back}
         </button>
         {canWrite && (
@@ -607,9 +648,7 @@ export default function InvoiceDetailPage() {
         )}
       </div>
 
-      {saveSuccess && (
-        <div className={styles.successBanner}>{l.savedOk}</div>
-      )}
+      {saveSuccess && <div className={styles.successBanner}>{l.savedOk}</div>}
 
       <div className={styles.card}>
         {/* Card Header */}
@@ -639,7 +678,9 @@ export default function InvoiceDetailPage() {
             <h3 className={styles.sectionTitle}>{l.sectionDetails}</h3>
             <div className={styles.fields}>
               <Field label={l.invoiceNumber}>{invoice.invoiceNumber}</Field>
-              <Field label={l.issuedDate}>{formatDate(invoice.issuedDate)}</Field>
+              <Field label={l.issuedDate}>
+                {formatDate(invoice.issuedDate)}
+              </Field>
               <Field label={l.dueDate}>{formatDate(invoice.dueDate)}</Field>
               <Field label={l.currency}>{currency}</Field>
               {invoice.servicePeriod && (
@@ -655,16 +696,22 @@ export default function InvoiceDetailPage() {
           </div>
 
           {/* Customer */}
-          {(invoice.customerSnapshot || typeof invoice.customerId === "object") && (
+          {(invoice.customerSnapshot ||
+            typeof invoice.customerId === "object") && (
             <div className={styles.section}>
               <h3 className={styles.sectionTitle}>{l.sectionCustomer}</h3>
               <div className={styles.fields}>
                 {invoice.customerSnapshot?.name && (
-                  <Field label={l.customerName}>{invoice.customerSnapshot.name}</Field>
+                  <Field label={l.customerName}>
+                    {invoice.customerSnapshot.name}
+                  </Field>
                 )}
                 {invoice.customerSnapshot?.email && (
                   <Field label={l.customerEmail}>
-                    <a href={`mailto:${invoice.customerSnapshot.email}`} className={styles.link}>
+                    <a
+                      href={`mailto:${invoice.customerSnapshot.email}`}
+                      className={styles.link}
+                    >
                       {invoice.customerSnapshot.email}
                     </a>
                   </Field>
@@ -675,7 +722,9 @@ export default function InvoiceDetailPage() {
                   </Field>
                 )}
                 {invoice.customerSnapshot?.vatNumber && (
-                  <Field label={l.customerVat}>{invoice.customerSnapshot.vatNumber}</Field>
+                  <Field label={l.customerVat}>
+                    {invoice.customerSnapshot.vatNumber}
+                  </Field>
                 )}
               </div>
             </div>
@@ -699,7 +748,9 @@ export default function InvoiceDetailPage() {
                     <div key={i} className={styles.itemsRow}>
                       <span>{item.description || l.none}</span>
                       <span>{item.serviceType || l.none}</span>
-                      <span className={styles.right}>{item.quantity ?? l.none}</span>
+                      <span className={styles.right}>
+                        {item.quantity ?? l.none}
+                      </span>
                       <span>{item.unit || l.none}</span>
                       <span className={styles.right}>
                         {formatCurrency(item.unitPrice, currency)}
@@ -733,7 +784,10 @@ export default function InvoiceDetailPage() {
                         −{" "}
                         {invoice.discount.type === "percentage"
                           ? `${invoice.discount.value}%`
-                          : formatCurrency(invoice.discount.amount ?? invoice.discount.value, currency)}
+                          : formatCurrency(
+                              invoice.discount.amount ?? invoice.discount.value,
+                              currency,
+                            )}
                       </span>
                     </div>
                   )}
@@ -769,7 +823,8 @@ export default function InvoiceDetailPage() {
               <Field label={l.status}>
                 <span
                   className={`${styles.badge} ${
-                    styles[`badge_${invoice.status}` as keyof typeof styles] ?? ""
+                    styles[`badge_${invoice.status}` as keyof typeof styles] ??
+                    ""
                   }`}
                 >
                   {statusLabel}
@@ -777,8 +832,9 @@ export default function InvoiceDetailPage() {
               </Field>
               {invoice.paymentMethod && (
                 <Field label={l.paymentMethod}>
-                  {(l[`pm_${invoice.paymentMethod}` as keyof typeof l] as string) ||
-                    invoice.paymentMethod}
+                  {(l[
+                    `pm_${invoice.paymentMethod}` as keyof typeof l
+                  ] as string) || invoice.paymentMethod}
                 </Field>
               )}
               {invoice.sentAt && (
@@ -804,8 +860,12 @@ export default function InvoiceDetailPage() {
           <div className={styles.section}>
             <h3 className={styles.sectionTitle}>{l.sectionActivity}</h3>
             <div className={styles.fields}>
-              <Field label={l.createdAt}>{formatDateTime(invoice.createdAt)}</Field>
-              <Field label={l.updatedAt}>{formatDateTime(invoice.updatedAt)}</Field>
+              <Field label={l.createdAt}>
+                {formatDateTime(invoice.createdAt)}
+              </Field>
+              <Field label={l.updatedAt}>
+                {formatDateTime(invoice.updatedAt)}
+              </Field>
             </div>
           </div>
         </div>

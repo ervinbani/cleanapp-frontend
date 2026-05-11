@@ -104,12 +104,24 @@
   background: var(--border-light);
 }
 
-.dot_scheduled   { background: var(--accent); }
-.dot_confirmed   { background: #7c3aed; }
-.dot_in_progress { background: #f59e0b; }
-.dot_completed   { background: #10b981; }
-.dot_canceled    { background: #ef4444; }
-.dot_no_show     { background: var(--text-muted); }
+.dot_scheduled {
+  background: var(--accent);
+}
+.dot_confirmed {
+  background: #7c3aed;
+}
+.dot_in_progress {
+  background: #f59e0b;
+}
+.dot_completed {
+  background: #10b981;
+}
+.dot_canceled {
+  background: #ef4444;
+}
+.dot_no_show {
+  background: var(--text-muted);
+}
 
 .cardHeaderText {
   flex: 1;
@@ -310,7 +322,10 @@
   flex-shrink: 0;
   padding: 0;
   color: transparent;
-  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    color 0.15s;
 }
 
 .checkboxBtnDone {
@@ -452,7 +467,10 @@
   font-size: 0.8rem;
   font-weight: 500;
   cursor: pointer;
-  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    color 0.15s;
   user-select: none;
 }
 
