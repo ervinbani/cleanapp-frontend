@@ -230,7 +230,7 @@ const en = {
     thisWeek: "This Week",
     thisMonth: "This Month",
     customRange: "By Date",
-    btnSend: "Send",
+    btnSend: "Send via Email",
     sentOn: "Sent on",
     sendSuccess: "Invoice sent successfully.",
     sendNoEmail: "Customer has no email — add one to their profile first.",

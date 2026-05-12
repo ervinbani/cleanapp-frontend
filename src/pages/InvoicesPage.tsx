@@ -2629,28 +2629,27 @@ export default function InvoicesPage() {
                                   </svg>
                                   {l.btnView}
                                 </button>
-                                {/* Download PDF */}
-                                <button
-                                  className={styles.rowMenuItem}
-                                  onClick={() => {
-                                    setOpenMenuId(null);
-                                    downloadInvoicePdf(inv, lang, tenant);
-                                  }}
-                                >
-                                  <svg
-                                    viewBox="0 0 20 20"
-                                    fill="currentColor"
-                                    width="14"
-                                    height="14"
+                                {/* Edit */}
+                                {canWrite && (
+                                  <button
+                                    className={styles.rowMenuItem}
+                                    onClick={() => {
+                                      setOpenMenuId(null);
+                                      setShowForm(false);
+                                      setEditingInvoice(inv);
+                                    }}
                                   >
-                                    <path
-                                      fillRule="evenodd"
-                                      d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
-                                      clipRule="evenodd"
-                                    />
-                                  </svg>
-                                  {l.btnDownload}
-                                </button>
+                                    <svg
+                                      viewBox="0 0 20 20"
+                                      fill="currentColor"
+                                      width="14"
+                                      height="14"
+                                    >
+                                      <path d="M13.586 3.586a2 2 0 112.828 2.828l-9.5 9.5A2 2 0 015.5 16.5H4a1 1 0 01-1-1v-1.5a2 2 0 01.586-1.414l9.5-9.5z" />
+                                    </svg>
+                                    {l.btnUpdate}
+                                  </button>
+                                )}
                                 {/* Send Email */}
                                 {canWrite && inv.status !== "void" && (
                                   <button
@@ -2715,27 +2714,28 @@ export default function InvoicesPage() {
                                       </button>
                                     );
                                   })()}
-                                {/* Edit */}
-                                {canWrite && (
-                                  <button
-                                    className={styles.rowMenuItem}
-                                    onClick={() => {
-                                      setOpenMenuId(null);
-                                      setShowForm(false);
-                                      setEditingInvoice(inv);
-                                    }}
+                                {/* Download PDF */}
+                                <button
+                                  className={styles.rowMenuItem}
+                                  onClick={() => {
+                                    setOpenMenuId(null);
+                                    downloadInvoicePdf(inv, lang, tenant);
+                                  }}
+                                >
+                                  <svg
+                                    viewBox="0 0 20 20"
+                                    fill="currentColor"
+                                    width="14"
+                                    height="14"
                                   >
-                                    <svg
-                                      viewBox="0 0 20 20"
-                                      fill="currentColor"
-                                      width="14"
-                                      height="14"
-                                    >
-                                      <path d="M13.586 3.586a2 2 0 112.828 2.828l-9.5 9.5A2 2 0 015.5 16.5H4a1 1 0 01-1-1v-1.5a2 2 0 01.586-1.414l9.5-9.5z" />
-                                    </svg>
-                                    {l.btnUpdate}
-                                  </button>
-                                )}
+                                    <path
+                                      fillRule="evenodd"
+                                      d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
+                                      clipRule="evenodd"
+                                    />
+                                  </svg>
+                                  {l.btnDownload}
+                                </button>
                                 {/* Delete */}
                                 {canDelete && (
                                   <button

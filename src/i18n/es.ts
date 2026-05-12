@@ -232,7 +232,7 @@ const es: Translations = {
     thisWeek: "Esta semana",
     thisMonth: "Este mes",
     customRange: "Por fecha",
-    btnSend: "Enviar",
+    btnSend: "Enviar por Email",
     sentOn: "Enviada el",
     sendSuccess: "Factura enviada con éxito.",
     sendNoEmail: "El cliente no tiene email — añade uno a su perfil primero.",
