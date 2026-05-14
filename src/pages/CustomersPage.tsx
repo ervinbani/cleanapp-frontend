@@ -798,12 +798,12 @@ export default function CustomersPage() {
                   onChange={(e) => setColSource(e.target.value)}
                 >
                   <option value="">{l.filterSource}</option>
-                  <option value="manual">Manual</option>
-                  <option value="website">Website</option>
-                  <option value="phone">Phone</option>
-                  <option value="referral">Referral</option>
-                  <option value="facebook">Facebook</option>
-                  <option value="google">Google</option>
+                  <option value="manual">Manual.</option>
+                  <option value="website">Website.</option>
+                  <option value="phone">Phone.</option>
+                  <option value="referral">Referral.</option>
+                  <option value="facebook">Facebook.</option>
+                  <option value="google">Google.</option>
                 </select>
               </th>
               <th />
