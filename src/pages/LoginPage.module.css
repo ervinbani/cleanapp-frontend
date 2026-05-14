@@ -151,7 +151,7 @@
   display: flex;
   justify-content: flex-end;
   margin-bottom: 1.5rem;
-  border: 1px solid #e5e3df;
+  border: 1px solid var(--border-input);
   border-radius: 8px;
   overflow: hidden;
   width: fit-content;
@@ -210,10 +210,11 @@
 }
 
 .label {
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 600;
-  color: #6b6b6b;
-  letter-spacing: 0.3px;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
 }
 
 .inputWrap {
@@ -229,21 +230,18 @@
 
 .input {
   width: 100%;
-  background: #ffffff;
-  border: 1.5px solid #e5e3df;
+  padding: 0.7rem 0.9rem;
+  border: 1.5px solid var(--border-input);
   border-radius: 10px;
-  padding: 11px 14px;
-  font-size: 14px;
-  color: #1a1a1a;
-  font-family: inherit;
-  transition:
-    border-color 0.15s,
-    box-shadow 0.15s;
+  font-size: 0.9375rem;
+  color: var(--text-primary);
+  background: var(--bg-surface);
+  transition: border-color 0.15s, box-shadow 0.15s;
   outline: none;
 }
 
 .input:focus {
-  border-color: #00c9aa;
+  border-color: var(--teal);
   box-shadow: 0 0 0 3px rgba(0, 201, 170, 0.12);
 }
 
@@ -298,27 +296,24 @@
 .serverError {
   background-color: #fef2f2;
   border: 1px solid #fecaca;
-  border-radius: 8px;
+  border-radius: 10px;
   color: #b91c1c;
   font-size: 0.85rem;
   padding: 0.65rem 0.85rem;
 }
 
+/* ─── Submit button ──────────────────────────────────────────── */
 .submitBtn {
-  width: 100%;
-  background: linear-gradient(135deg, #00c9aa, #4a90d9);
-  color: white;
+  margin-top: 0.5rem;
+  padding: 0.8rem;
+  background: linear-gradient(135deg, var(--teal), var(--primary));
+  color: #ffffff;
   border: none;
   border-radius: 10px;
-  padding: 13px;
-  font-size: 15px;
+  font-size: 0.9375rem;
   font-weight: 700;
   cursor: pointer;
-  font-family: inherit;
-  margin-top: 8px;
-  transition:
-    opacity 0.15s,
-    transform 0.1s;
+  transition: opacity 0.15s, transform 0.1s;
 }
 
 .submitBtn:hover:not(:disabled) {
@@ -330,10 +325,11 @@
 }
 
 .submitBtn:disabled {
-  opacity: 0.65;
+  opacity: 0.6;
   cursor: not-allowed;
 }
 
+/* ─── Footer ─────────────────────────────────────────────────── */
 .footer {
   margin-top: 20px;
   font-size: 12px;
@@ -342,7 +338,7 @@
 }
 
 .link {
-  color: #00c9aa;
+  color: var(--teal);
   font-weight: 600;
   text-decoration: none;
 }

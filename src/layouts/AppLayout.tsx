@@ -7,7 +7,7 @@ import { messageService } from "../services/messageService";
 import { deleteTenant } from "../services/authService";
 import styles from "./AppLayout.module.css";
 
-const navItems = [
+const navSections = [
   {
     path: "/",
     label: "Dashboard",
@@ -89,6 +89,7 @@ const navItems = [
     permission: "roles.read",
   },
 ];
+
 
 const settingsSubItems = [
   {
@@ -298,27 +299,38 @@ export default function AppLayout() {
         className={`${styles.sidebar} ${sidebarOpen ? styles.sidebarOpen : ""} ${sidebarCollapsed ? styles.sidebarCollapsed : ""}`}
       >
         <div className={styles.sidebarBrand}>
-          <span className={styles.sidebarLogo}>🪣</span>
+          <div className={styles.sidebarLogoIcon}>🧹</div>
           {!sidebarCollapsed && (
-            <span className={styles.sidebarBrandName}>Brillo</span>
+            <div>
+              <div className={styles.sidebarBrandName}>Brillo</div>
+              <div className={styles.sidebarBrandTag}>Pro Plan</div>
+            </div>
           )}
           <button
             className={styles.collapseBtn}
             onClick={() => setSidebarCollapsed((v) => !v)}
-            title={sidebarCollapsed ? "Espandi sidebar" : "Comprimi sidebar"}
+            title={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
           >
             {sidebarCollapsed ? "›" : "‹"}
           </button>
         </div>
 
         <nav className={styles.nav}>
-          {navItems
-            .filter((item) => {
+          {navSections.map((section) => {
+            const visibleItems = section.items.filter((item) => {
               if (!item.permission) return true;
               const [entity, action] = item.permission.split(".");
               return hasPermission(entity, action);
-            })
-            .map((item) =>
+            });
+            if (visibleItems.length === 0) return null;
+            return (
+              <div key={section.label} className={styles.navSection}>
+                {!sidebarCollapsed && (
+                  <span className={styles.navSectionLabel}>
+                    {lang === "en" ? section.label : section.labelEs}
+                  </span>
+                )}
+                {visibleItems.map((item) =>
               item.path === "/settings" ? (
                 <div key="settings" className={styles.settingsGroup}>
                   <button
@@ -446,8 +458,29 @@ export default function AppLayout() {
                   )}
                 </NavLink>
               ),
-            )}
+                )}
+              </div>
+            );
+          })}
         </nav>
+
+        {/* Sidebar footer user card */}
+        {!sidebarCollapsed && (
+          <div className={styles.sidebarFooter}>
+            <div className={styles.sidebarUserCard}>
+              <div className={styles.avatar}>
+                {user?.firstName?.[0]}
+                {user?.lastName?.[0]}
+              </div>
+              <div className={styles.sidebarUserInfo}>
+                <div className={styles.sidebarUserName}>
+                  {user?.firstName} {user?.lastName}
+                </div>
+                <div className={styles.sidebarUserRole}>{user?.role}</div>
+              </div>
+            </div>
+          </div>
+        )}
       </aside>
 
       {/* Overlay for mobile */}

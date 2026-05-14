@@ -22,6 +22,7 @@ const subNavItems = [
     path: "/settings/roles",
     label: "Roles & Permissions",
     labelEs: "Roles y Permisos",
+    ownerOnly: false,
     restricted: true,
     ownerOnly: false,
   },
@@ -49,8 +50,8 @@ export default function SettingsLayout() {
   const canAccessRoles = hasRole("owner", "director");
 
   const visibleItems = subNavItems.filter((item) => {
-    if (item.ownerOnly) return isOwner;
-    if (item.restricted) return canAccessRoles;
+    if (item.ownerOnly && !isOwner) return false;
+    if (item.restricted && !canAccessRoles) return false;
     return true;
   });
 
