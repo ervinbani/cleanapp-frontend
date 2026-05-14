@@ -16,12 +16,16 @@ import InvoicesPage from "./pages/InvoicesPage";
 import DocumentsPage from "./pages/DocumentsPage";
 import GeneralPage from "./pages/settings/GeneralPage";
 import RolesPermissionsPage from "./pages/settings/RolesPermissionsPage";
+import TeamPage from "./pages/settings/TeamPage";
+import BillingPage from "./pages/settings/BillingPage";
+import LanguagesPage from "./pages/settings/LanguagesPage";
 import MessagesPage from "./pages/MessagesPage";
 import UserDetailPage from "./pages/UserDetailPage";
 import CustomerDetailPage from "./pages/CustomerDetailPage";
 import JobDetailPage from "./pages/JobDetailPage";
 import ServiceDetailPage from "./pages/ServiceDetailPage";
 import InvoiceDetailPage from "./pages/InvoiceDetailPage";
+import CalendarPage from "./pages/CalendarPage";
 
 const router = createBrowserRouter([
   // Public routes
@@ -51,6 +55,7 @@ const router = createBrowserRouter([
           { path: "/documents", element: <DocumentsPage /> },
           { path: "/services", element: <ServicesPage /> },
           { path: "/services/:id", element: <ServiceDetailPage /> },
+          { path: "/calendar", element: <CalendarPage /> },
           { path: "/messages", element: <MessagesPage /> },
           {
             path: "/settings",
@@ -58,6 +63,9 @@ const router = createBrowserRouter([
           },
           { path: "/settings/general", element: <GeneralPage /> },
           { path: "/settings/roles", element: <RolesPermissionsPage /> },
+          { path: "/settings/team", element: <TeamPage /> },
+          { path: "/settings/billing", element: <BillingPage /> },
+          { path: "/settings/languages", element: <LanguagesPage /> },
         ],
       },
     ],

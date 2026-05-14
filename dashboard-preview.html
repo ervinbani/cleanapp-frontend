@@ -1,0 +1,1947 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CleanApp – Dashboard Preview</title>
+    <style>
+      /* ── Tokens ── */
+      :root {
+        --bg-page: #f7f6f2;
+        --bg-surface: #ffffff;
+        --bg-surface-subtle: #eeecea;
+        --border: #e5e3df;
+        --border-faint: #eeecea;
+        --text-primary: #1a1a1a;
+        --text-secondary: #3a3a3a;
+        --text-muted: #6b6b6b;
+        --text-placeholder: #9b9b9b;
+        --teal: #00c9aa;
+        --teal-soft: #e0faf6;
+        --primary: #4a90d9;
+        --primary-soft: #ebf3fc;
+        --yellow: #f5a623;
+        --yellow-soft: #fef5e7;
+        --green: #34c78a;
+        --green-soft: #e6faf3;
+        --red: #e85454;
+        --terra: #e8602c;
+        --shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+        --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.1);
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        background: var(--bg-page);
+        color: var(--text-primary);
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        overflow: hidden;
+        font-size: 14px;
+      }
+
+      /* ── Top bar ── */
+      .topbar {
+        height: 48px;
+        min-height: 48px;
+        background: var(--bg-surface);
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        z-index: 300;
+      }
+      .topbar-left {
+        width: 220px;
+        min-width: 220px;
+        display: flex;
+        align-items: center;
+        padding: 0 1.25rem;
+        border-right: 1px solid var(--border);
+        height: 100%;
+      }
+      .topbar-right {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        padding: 0 1.75rem;
+        gap: 0.75rem;
+      }
+      .topbar-brand {
+        display: flex;
+        align-items: center;
+        gap: 0.55rem;
+      }
+      .topbar-icon {
+        width: 28px;
+        height: 28px;
+        background: linear-gradient(135deg, var(--teal), var(--primary));
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        flex-shrink: 0;
+      }
+      .topbar-name {
+        font-size: 0.9375rem;
+        font-weight: 700;
+        letter-spacing: -0.3px;
+        line-height: 1.1;
+      }
+      .topbar-plan {
+        font-size: 0.55rem;
+        color: var(--teal);
+        font-weight: 700;
+        letter-spacing: 0.6px;
+        text-transform: uppercase;
+      }
+      .topbar-search {
+        flex: 1;
+        max-width: 420px;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: var(--bg-surface-subtle);
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        padding: 0 1rem;
+        height: 32px;
+        cursor: text;
+        transition: border-color 0.15s, box-shadow 0.15s;
+      }
+      .topbar-search:focus-within {
+        border-color: var(--teal);
+        box-shadow: 0 0 0 3px var(--teal-soft);
+      }
+      .topbar-search-icon {
+        font-size: 0.8rem;
+        color: var(--text-placeholder);
+        flex-shrink: 0;
+      }
+      .topbar-search input {
+        border: none;
+        background: none;
+        outline: none;
+        font-size: 0.8125rem;
+        color: var(--text-primary);
+        flex: 1;
+        min-width: 0;
+      }
+      .topbar-search input::placeholder {
+        color: var(--text-placeholder);
+      }
+      .topbar-search-kbd {
+        font-size: 0.65rem;
+        color: var(--text-placeholder);
+        background: var(--bg-surface);
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        padding: 0.1rem 0.35rem;
+        flex-shrink: 0;
+      }
+      .topbar-btn {
+        background: var(--bg-surface-subtle);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 0.9rem;
+        color: var(--text-muted);
+        flex-shrink: 0;
+        margin-left: auto;
+      }
+      .topbar-lang {
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+        background: var(--bg-surface-subtle);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 0 0.65rem;
+        height: 32px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--text-secondary);
+        cursor: pointer;
+      }
+      .topbar-user {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: var(--bg-surface-subtle);
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        padding: 0.25rem 0.75rem 0.25rem 0.3rem;
+        cursor: pointer;
+      }
+      .topbar-avatar {
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--teal), var(--primary));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.65rem;
+        font-weight: 700;
+        color: #fff;
+        flex-shrink: 0;
+      }
+      .topbar-username {
+        font-size: 0.8125rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        white-space: nowrap;
+      }
+      .topbar-chevron {
+        font-size: 0.6rem;
+        color: var(--text-placeholder);
+        margin-left: 0.15rem;
+      }
+
+      /* ── App body (sidebar + main) ── */
+      .app-body {
+        display: flex;
+        flex: 1;
+        overflow: hidden;
+      }
+
+      /* ── Sidebar ── */
+      .sidebar {
+        width: 220px;
+        min-width: 220px;
+        background: var(--bg-surface);
+        border-right: 1px solid var(--border);
+        display: flex;
+        flex-direction: column;
+        padding: 0.95rem 0 1rem;
+        z-index: 200;
+        height: 100%;
+        overflow-y: auto;
+      }
+      .sidebar-brand {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        padding: 0 1.25rem 0.5rem;
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 0.5rem;
+      }
+      .brand-icon {
+        width: 36px;
+        height: 36px;
+        background: linear-gradient(135deg, var(--teal), var(--primary));
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        flex-shrink: 0;
+      }
+      .brand-name {
+        font-size: 1.125rem;
+        font-weight: 700;
+        letter-spacing: -0.3px;
+        line-height: 1.1;
+      }
+      .brand-tag {
+        font-size: 0.625rem;
+        color: var(--teal);
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+      }
+      .nav {
+        display: flex;
+        flex-direction: column;
+        gap: 1px;
+        padding: 0 0.75rem;
+        flex: 1;
+      }
+      .nav-item {
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+        padding: 0.6rem 0.75rem;
+        border-radius: 10px;
+        text-decoration: none;
+        color: var(--text-muted);
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background 0.15s;
+      }
+      .nav-item:hover {
+        background: var(--bg-surface-subtle);
+        color: var(--text-primary);
+      }
+      .nav-item.active {
+        background: var(--teal-soft);
+        color: var(--teal);
+        font-weight: 600;
+      }
+      .nav-icon {
+        font-size: 1rem;
+        width: 1.25rem;
+        text-align: center;
+        flex-shrink: 0;
+      }
+      .nav-badge {
+        margin-left: auto;
+        background: var(--terra);
+        color: #fff;
+        font-size: 0.68rem;
+        font-weight: 700;
+        border-radius: 999px;
+        padding: 0 0.45rem;
+        line-height: 1.6;
+      }
+      .sidebar-footer {
+        border-top: 1px solid var(--border);
+        padding: 0.75rem 1rem 0;
+        margin-top: auto;
+      }
+      .user-card {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        padding: 0.5rem 0.4rem;
+        border-radius: 10px;
+        cursor: pointer;
+      }
+      .user-card:hover {
+        background: var(--bg-surface-subtle);
+      }
+      .avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--teal), var(--primary));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: #fff;
+        flex-shrink: 0;
+      }
+      .user-info {
+        flex: 1;
+        min-width: 0;
+      }
+      .user-name {
+        font-size: 0.8125rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .user-role {
+        font-size: 0.7rem;
+        color: var(--text-placeholder);
+      }
+
+      /* ── Main ── */
+      .main {
+        flex: 1;
+        overflow-y: auto;
+        padding: 1.5rem 1.75rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+      }
+
+      /* ── Greeting card ── */
+      .greeting-card {
+        background: linear-gradient(
+          135deg,
+          var(--teal) 0%,
+          var(--primary) 60%,
+          #6366f1 100%
+        );
+        border-radius: 12px;
+        padding: 0.75rem 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: relative;
+        overflow: hidden;
+        gap: 1rem;
+      }
+      .greeting-card::before {
+        content: "";
+        position: absolute;
+        right: -40px;
+        top: -40px;
+        width: 180px;
+        height: 180px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.08);
+      }
+      .greeting-card::after {
+        content: "";
+        position: absolute;
+        right: 60px;
+        bottom: -60px;
+        width: 140px;
+        height: 140px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.05);
+      }
+      .greeting-text h2 {
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: #fff;
+        margin-bottom: 0.15rem;
+      }
+      .greeting-text p {
+        font-size: 0.8rem;
+        color: rgba(255, 255, 255, 0.75);
+      }
+      .greeting-stats {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        z-index: 1;
+        flex-shrink: 0;
+      }
+      .greeting-stat {
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(8px);
+        border-radius: 10px;
+        padding: 0.45rem 1rem;
+        text-align: center;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+      .stat-num {
+        font-size: 1.375rem;
+        font-weight: 700;
+        color: #fff;
+        line-height: 1;
+      }
+      .stat-lbl {
+        font-size: 0.625rem;
+        color: rgba(255, 255, 255, 0.7);
+        margin-top: 0.15rem;
+      }
+      .greeting-btn {
+        background: rgba(255, 255, 255, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.35);
+        border-radius: 8px;
+        color: #fff;
+        font-size: 0.8125rem;
+        font-weight: 600;
+        padding: 0.45rem 0.875rem;
+        cursor: pointer;
+        white-space: nowrap;
+      }
+
+      /* ── Heading row ── */
+      .heading-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+      }
+      .heading {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--text-primary);
+      }
+      .quick-actions {
+        display: flex;
+        gap: 0.5rem;
+      }
+      .qa-btn {
+        background: var(--bg-surface);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 0.45rem 1rem;
+        font-size: 0.8125rem;
+        font-weight: 600;
+        color: var(--text-secondary);
+        cursor: pointer;
+        white-space: nowrap;
+      }
+      .qa-btn.primary {
+        background: linear-gradient(135deg, var(--teal), var(--primary));
+        border-color: transparent;
+        color: #fff;
+      }
+
+      /* ── Stat grid ── */
+      .stat-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1rem;
+      }
+      .stat-card {
+        background: var(--bg-surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 0.75rem 1rem 0.65rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.2rem;
+        box-shadow: var(--shadow);
+        cursor: pointer;
+        overflow: hidden;
+      }
+      .stat-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 0.05rem;
+      }
+      .stat-label {
+        font-size: 0.75rem;
+        font-weight: 500;
+        color: var(--text-placeholder);
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+      }
+      .stat-icon {
+        width: 24px;
+        height: 24px;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.8rem;
+      }
+      .stat-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        line-height: 1;
+        letter-spacing: -0.5px;
+      }
+      .stat-change {
+        font-size: 0.75rem;
+        font-weight: 500;
+      }
+      .stat-change.up {
+        color: var(--green);
+      }
+      .stat-change.down {
+        color: var(--red);
+      }
+      .stat-change.muted {
+        color: var(--text-placeholder);
+        font-size: 0.72rem;
+      }
+      .sparkline {
+        height: 20px;
+        display: flex;
+        align-items: flex-end;
+        gap: 2px;
+        margin-top: 0.15rem;
+      }
+      .spark-bar {
+        flex: 1;
+        border-radius: 2px 2px 0 0;
+        opacity: 0.45;
+        min-height: 3px;
+      }
+      .spark-bar.hi {
+        opacity: 1;
+      }
+
+      /* ── Bottom row ── */
+      .bottom-row {
+        display: flex;
+        gap: 1.25rem;
+        align-items: stretch;
+      }
+
+      /* ── Calendar card ── */
+      .calendar-card {
+        background: var(--bg-surface);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 1.25rem 1.5rem;
+        box-shadow: var(--shadow);
+        flex: 1 1 0;
+        min-width: 0;
+      }
+      .cal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+      }
+      .cal-title {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 700;
+        font-size: 0.9375rem;
+      }
+      .cal-filters {
+        display: flex;
+        gap: 0.25rem;
+        background: var(--bg-surface-subtle);
+        border-radius: 9px;
+        padding: 0.2rem;
+      }
+      .filter-btn {
+        background: none;
+        border: none;
+        padding: 0.3rem 0.75rem;
+        border-radius: 7px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        color: var(--text-muted);
+        cursor: pointer;
+      }
+      .filter-btn.active {
+        background: var(--bg-surface);
+        color: var(--teal);
+        font-weight: 600;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
+      .cal-nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 0.75rem;
+      }
+      .nav-btn {
+        background: var(--bg-surface-subtle);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        width: 2rem;
+        height: 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 1.1rem;
+        color: var(--text-muted);
+      }
+      .cal-month {
+        font-weight: 600;
+        font-size: 0.9375rem;
+      }
+      .cal-grid {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 2px;
+      }
+      .weekday {
+        text-align: center;
+        font-size: 0.6875rem;
+        font-weight: 600;
+        color: var(--text-placeholder);
+        padding: 0.25rem 0;
+        text-transform: uppercase;
+      }
+      .cal-day {
+        min-height: 3.5rem;
+        border-radius: 8px;
+        padding: 0.25rem 0.2rem;
+        position: relative;
+      }
+      .cal-day.has-jobs {
+        cursor: pointer;
+      }
+      .cal-day.has-jobs:hover {
+        background: var(--teal-soft);
+      }
+      .day-num {
+        font-size: 0.78rem;
+        color: var(--text-secondary);
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 1.4rem;
+        height: 1.4rem;
+        margin: 0 auto 0.15rem;
+      }
+      .cal-day.today .day-num {
+        background: var(--teal);
+        color: #fff;
+        border-radius: 50%;
+        font-weight: 700;
+      }
+      .job-pill {
+        display: flex;
+        align-items: center;
+        gap: 0.2rem;
+        border-radius: 4px;
+        padding: 0.1rem 0.25rem;
+        margin-bottom: 0.1rem;
+      }
+      .job-pill-dot {
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.8);
+        flex-shrink: 0;
+      }
+      .job-pill-text {
+        font-size: 0.65rem;
+        color: #fff;
+        font-weight: 500;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 58px;
+      }
+      .more-jobs {
+        font-size: 0.65rem;
+        color: var(--text-muted);
+        padding-left: 0.2rem;
+      }
+
+      /* ── Activity card ── */
+      .activity-card {
+        background: var(--bg-surface);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 1.25rem 1.5rem;
+        flex: 0 0 300px;
+        width: 300px;
+        box-shadow: var(--shadow);
+      }
+      .activity-title {
+        font-size: 0.9375rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin: 0 0 1rem;
+      }
+      .activity-list {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+      }
+      .activity-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.65rem 0.4rem;
+        border-bottom: 1px solid var(--border-faint);
+        cursor: pointer;
+        border-radius: 8px;
+      }
+      .activity-item:last-child {
+        border-bottom: none;
+      }
+      .activity-item:hover {
+        background: var(--bg-surface-subtle);
+      }
+      .activity-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
+        flex-shrink: 0;
+      }
+      .activity-text {
+        flex: 1;
+        font-size: 0.8125rem;
+        color: var(--text-secondary);
+        line-height: 1.3;
+      }
+      .activity-time {
+        font-size: 0.75rem;
+        color: var(--text-placeholder);
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+
+      /* ── Mini calendar (compact) ── */
+      .mini-cal-grid {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 1px;
+        margin-top: 0.5rem;
+      }
+      .mini-weekday {
+        text-align: center;
+        font-size: 0.6rem;
+        font-weight: 600;
+        color: var(--text-placeholder);
+        padding: 0.15rem 0;
+        text-transform: uppercase;
+      }
+      .mini-day {
+        aspect-ratio: 1;
+        border-radius: 6px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        padding: 0.15rem 0;
+        position: relative;
+        cursor: default;
+      }
+      .mini-day.has-jobs {
+        cursor: pointer;
+      }
+      .mini-day.has-jobs:hover {
+        background: var(--teal-soft);
+      }
+      .mini-day-num {
+        font-size: 0.68rem;
+        color: var(--text-secondary);
+        font-weight: 500;
+        line-height: 1.6;
+      }
+      .mini-day.today .mini-day-num {
+        background: var(--teal);
+        color: #fff;
+        border-radius: 50%;
+        width: 1.3rem;
+        height: 1.3rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+      }
+      .mini-dots {
+        display: flex;
+        gap: 2px;
+        justify-content: center;
+        margin-top: 1px;
+        flex-wrap: wrap;
+      }
+      .mini-dot {
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+
+      /* ── Donut chart ── */
+      .donut-wrap {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+        margin: 0.25rem 0 0.75rem;
+      }
+      .donut-center {
+        position: relative;
+        width: 160px;
+        height: 160px;
+        flex-shrink: 0;
+      }
+      .donut-ring {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      }
+      .donut-hole {
+        position: absolute;
+        inset: 34px;
+        background: var(--bg-surface);
+        border-radius: 50%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        box-shadow: inset 0 2px 6px rgba(0,0,0,0.06);
+      }
+      .donut-total {
+        font-size: 1.625rem;
+        font-weight: 800;
+        color: var(--text-primary);
+        line-height: 1;
+        letter-spacing: -0.5px;
+      }
+      .donut-lbl {
+        font-size: 0.6rem;
+        color: var(--text-placeholder);
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+        margin-top: 3px;
+      }
+      .donut-legend {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.4rem 0.75rem;
+        width: 100%;
+      }
+      .legend-row {
+        display: flex;
+        align-items: center;
+        gap: 0.45rem;
+        min-width: 0;
+      }
+      .legend-dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 3px;
+        flex-shrink: 0;
+      }
+      .legend-name {
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+        flex: 1;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .legend-count {
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: var(--text-primary);
+      }
+      .legend-pct {
+        font-size: 0.65rem;
+        color: var(--text-placeholder);
+        margin-left: 0.1rem;
+      }
+
+      /* ── Messages card ── */
+      .msg-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.65rem;
+        padding: 0.6rem 0.4rem;
+        border-bottom: 1px solid var(--border-faint);
+        cursor: pointer;
+        border-radius: 8px;
+        transition: background 0.12s;
+      }
+      .msg-item:last-child { border-bottom: none; }
+      .msg-item:hover { background: var(--bg-surface-subtle); }
+      .msg-avatar {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.65rem;
+        font-weight: 700;
+        color: #fff;
+        flex-shrink: 0;
+        margin-top: 1px;
+      }
+      .msg-body { flex: 1; min-width: 0; }
+      .msg-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        gap: 0.4rem;
+      }
+      .msg-sender {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .msg-time {
+        font-size: 0.68rem;
+        color: var(--text-placeholder);
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+      .msg-preview {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        margin-top: 0.1rem;
+      }
+      .msg-unread-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--teal);
+        flex-shrink: 0;
+        margin-top: 5px;
+      }
+
+      /* ── Live tracker ── */
+      .tracker-card {
+        background: var(--bg-surface);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 1.25rem 1.5rem;
+        flex: 0 0 300px;
+        box-shadow: var(--shadow);
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+      .tracker-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .tracker-title {
+        font-size: 0.9375rem;
+        font-weight: 700;
+        color: var(--text-primary);
+      }
+      .live-badge {
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+        background: #fef3c7;
+        color: #92400e;
+        font-size: 0.7rem;
+        font-weight: 700;
+        padding: 0.2rem 0.55rem;
+        border-radius: 20px;
+        border: 1px solid #fde68a;
+      }
+      .pulse-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #f59e0b;
+        animation: pulse 1.4s infinite;
+      }
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+          transform: scale(1);
+        }
+        50% {
+          opacity: 0.5;
+          transform: scale(1.3);
+        }
+      }
+      .tracker-job {
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 0.75rem 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        cursor: pointer;
+        transition: box-shadow 0.15s;
+        flex: 1;
+        justify-content: space-between;
+      }
+      .tracker-job:hover {
+        box-shadow: var(--shadow);
+      }
+      .tj-top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 0.5rem;
+      }
+      .tj-name {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: var(--text-primary);
+      }
+      .tj-addr {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        margin-top: 0.1rem;
+      }
+      .status-pill {
+        font-size: 0.7rem;
+        font-weight: 600;
+        padding: 0.15rem 0.55rem;
+        border-radius: 20px;
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+      .tj-meta {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .tj-cleaners {
+        display: flex;
+        gap: -0.25rem;
+      }
+      .tj-avatar {
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--teal), var(--primary));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.6rem;
+        font-weight: 700;
+        color: #fff;
+        border: 2px solid var(--bg-surface);
+        margin-left: -4px;
+      }
+      .tj-avatar:first-child {
+        margin-left: 0;
+      }
+      .tj-time {
+        font-size: 0.72rem;
+        color: var(--text-muted);
+      }
+      .prog-bar {
+        height: 4px;
+        background: var(--bg-surface-subtle);
+        border-radius: 2px;
+        overflow: hidden;
+      }
+      .prog-fill {
+        height: 100%;
+        border-radius: 2px;
+        transition: width 0.3s;
+      }
+
+      /* ── Sidebar collapse ── */
+      .collapse-btn {
+        margin-left: auto;
+        background: none;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        flex-shrink: 0;
+        transition: background 0.15s, color 0.15s;
+        line-height: 1;
+      }
+      .collapse-btn:hover {
+        background: var(--bg-surface-subtle);
+        color: var(--text-primary);
+      }
+      .topbar-left.collapsed {
+        width: 52px;
+        min-width: 52px;
+      }
+      .topbar-left.collapsed .topbar-name,
+      .topbar-left.collapsed .topbar-plan {
+        display: none;
+      }
+      .topbar-left.collapsed .collapse-btn {
+        margin-left: 0;
+      }
+      .sidebar {
+        transition: width 0.2s ease, min-width 0.2s ease;
+      }
+      .sidebar.collapsed {
+        width: 52px;
+        min-width: 52px;
+        overflow: hidden;
+      }
+      .sidebar.collapsed .nav-item {
+        padding: 0.6rem;
+        justify-content: center;
+        gap: 0;
+      }
+      .sidebar.collapsed .nav-label {
+        display: none;
+      }
+      .sidebar.collapsed .nav-badge {
+        display: none;
+      }
+      .sidebar.collapsed .user-info {
+        display: none;
+      }
+      .sidebar.collapsed .user-card {
+        justify-content: center;
+        padding: 0.5rem;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ═══════════════ TOP BAR ═══════════════ -->
+    <header class="topbar">
+      <!-- Left: brand, aligned with sidebar -->
+      <div class="topbar-left" id="topbar-left">
+        <div class="topbar-brand">
+          <div class="topbar-icon">🧹</div>
+          <div>
+            <div class="topbar-name">CleanApp</div>
+            <div class="topbar-plan">Pro Plan</div>
+          </div>
+        </div>
+        <button class="collapse-btn" id="collapse-btn" title="Collapse sidebar">‹</button>
+      </div>
+      <!-- Right: search + controls, aligned with main content -->
+      <div class="topbar-right">
+        <div class="topbar-search">
+          <span class="topbar-search-icon">🔍</span>
+          <input type="text" placeholder="Search jobs, clients, invoices..." />
+          <span class="topbar-search-kbd">⌘K</span>
+        </div>
+        <div class="topbar-btn" title="Toggle theme">☀️</div>
+        <div class="topbar-lang">🌐 EN ▾</div>
+        <div class="topbar-user">
+          <div class="topbar-avatar">AJ</div>
+          <span class="topbar-username">Alice Johnson</span>
+          <span class="topbar-chevron">▾</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- ═══════════════ APP BODY ═══════════════ -->
+    <div class="app-body">
+    <!-- ═══════════════ SIDEBAR ═══════════════ -->
+    <aside class="sidebar">
+      
+      <nav class="nav">
+        <a class="nav-item active"><span class="nav-icon">⊞</span><span class="nav-label"> Dashboard</span></a>
+        <a class="nav-item"><span class="nav-icon">👥</span><span class="nav-label"> Users</span></a>
+        <a class="nav-item"><span class="nav-icon">👤</span><span class="nav-label"> Clients</span></a>
+        <a class="nav-item"><span class="nav-icon">🧹</span><span class="nav-label"> Jobs</span></a>
+        <a class="nav-item"><span class="nav-icon">✨</span><span class="nav-label"> Services</span></a>
+        <a class="nav-item"><span class="nav-icon">📅</span><span class="nav-label"> Calendar</span></a>
+        <a class="nav-item"><span class="nav-icon">✉️</span><span class="nav-label"> Invoices</span></a>
+        <a class="nav-item"><span class="nav-icon">📁</span><span class="nav-label"> Documents</span></a>
+        <a class="nav-item">
+          <span class="nav-icon">💬</span><span class="nav-label"> Messages</span>
+          <span class="nav-badge">3</span>
+        </a>
+        <a class="nav-item"><span class="nav-icon">⚙️</span><span class="nav-label"> Settings</span></a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-card">
+          <div class="avatar">AJ</div>
+          <div class="user-info">
+            <div class="user-name">Alice Johnson</div>
+            <div class="user-role">Owner</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ═══════════════ MAIN CONTENT ═══════════════ -->
+    <main class="main">
+      <!-- Greeting card -->
+      <div class="greeting-card">
+        <div class="greeting-text">
+          <h2>Good morning, Alice! ☀️</h2>
+          <p id="greeting-date"></p>
+        </div>
+        <div class="greeting-stats">
+          <div class="greeting-stat">
+            <div class="stat-num">4</div>
+            <div class="stat-lbl">Today's Jobs</div>
+          </div>
+          <button class="greeting-btn">+ New Job</button>
+        </div>
+      </div>
+
+      <!-- Heading row -->
+      <div class="heading-row">
+        <h2 class="heading">Dashboard</h2>
+        <div class="quick-actions">
+          <button class="qa-btn">+ New Client</button>
+          <button class="qa-btn primary">+ New Invoice</button>
+        </div>
+      </div>
+
+      <!-- Stat cards -->
+      <div class="stat-grid">
+        <!-- Revenue -->
+        <div class="stat-card">
+          <div class="stat-card-header">
+            <span class="stat-label">Total Revenue</span>
+            <span
+              class="stat-icon"
+              style="background: var(--green-soft); color: var(--green)"
+              >💰</span
+            >
+          </div>
+          <div class="stat-value">$24,830</div>
+          <div class="stat-change up">▲ 12.4% vs last month</div>
+          <div class="sparkline">
+            <div
+              class="spark-bar"
+              style="height: 35%; background: var(--green)"
+            ></div>
+            <div
+              class="spark-bar"
+              style="height: 50%; background: var(--green)"
+            ></div>
+            <div
+              class="spark-bar"
+              style="height: 40%; background: var(--green)"
+            ></div>
+            <div
+              class="spark-bar"
+              style="height: 65%; background: var(--green)"
+            ></div>
+            <div
+              class="spark-bar"
+              style="height: 55%; background: var(--green)"
+            ></div>
+            <div
+              class="spark-bar"
+              style="height: 70%; background: var(--green)"
+            ></div>
+            <div
+              class="spark-bar"
+              style="height: 60%; background: var(--green)"
+            ></div>
+            <div
+              class="spark-bar"
+              style="height: 80%; background: var(--green)"
+            ></div>
+            <div
+              class="spark-bar"
+              style="height: 75%; background: var(--green)"
+            ></div>
+            <div
+              class="spark-bar hi"
+              style="height: 100%; background: var(--green)"
+            ></div>
+          </div>
+        </div>
+
+        <!-- Jobs Completed -->
+        <div class="stat-card">
+          <div class="stat-card-header">
+            <span class="stat-label">Jobs Completed</span>
+            <span
+              class="stat-icon"
+              style="background: var(--teal-soft); color: var(--teal)"
+              >✅</span
+            >
+          </div>
+          <div class="stat-value">138</div>
+          <div class="stat-change up">▲ 8% this month</div>
+          <div class="sparkline">
+            <div
+              class="spark-bar"
+              style="height: 40%; background: var(--teal)"
+            ></div>
+            <div
+              class="spark-bar"
+              style="height: 55%; background: var(--teal)"
+            ></div>
+            <div
+              class="spark-bar"
+              style="height: 45%; background: var(--teal)"
+            ></div>
+            <div
+              class="spark-bar"
+              style="height: 70%; background: var(--teal)"
+            ></div>
+            <div
+              class="spark-bar"
+              style="height: 60%; background: var(--teal)"
+            ></div>
+            <div
+              class="spark-bar"
+              style="height: 65%; background: var(--teal)"
+            ></div>
+            <div
+              class="spark-bar"
+              style="height: 75%; background: var(--teal)"
+            ></div>
+            <div
+              class="spark-bar"
+              style="height: 70%; background: var(--teal)"
+            ></div>
+            <div
+              class="spark-bar"
+              style="height: 85%; background: var(--teal)"
+            ></div>
+            <div
+              class="spark-bar hi"
+              style="height: 100%; background: var(--teal)"
+            ></div>
+          </div>
+        </div>
+
+        <!-- Active Customers -->
+        <div class="stat-card">
+          <div class="stat-card-header">
+            <span class="stat-label">Active Customers</span>
+            <span
+              class="stat-icon"
+              style="background: var(--primary-soft); color: var(--primary)"
+              >👥</span
+            >
+          </div>
+          <div class="stat-value">214</div>
+          <div class="stat-change up">▲ 7 new this week</div>
+          <div class="sparkline">
+            <div
+              class="spark-bar"
+              style="height: 50%; background: var(--primary)"
+            ></div>
+            <div
+              class="spark-bar"
+              style="height: 55%; background: var(--primary)"
+            ></div>
+            <div
+              class="spark-bar"
+              style="height: 60%; background: var(--primary)"
+            ></div>
+            <div
+              class="spark-bar"
+              style="height: 65%; background: var(--primary)"
+            ></div>
+            <div
+              class="spark-bar"
+              style="height: 70%; background: var(--primary)"
+            ></div>
+            <div
+              class="spark-bar"
+              style="height: 72%; background: var(--primary)"
+            ></div>
+            <div
+              class="spark-bar"
+              style="height: 78%; background: var(--primary)"
+            ></div>
+            <div
+              class="spark-bar"
+              style="height: 82%; background: var(--primary)"
+            ></div>
+            <div
+              class="spark-bar"
+              style="height: 90%; background: var(--primary)"
+            ></div>
+            <div
+              class="spark-bar hi"
+              style="height: 100%; background: var(--primary)"
+            ></div>
+          </div>
+        </div>
+
+        <!-- Unpaid Invoices -->
+        <div class="stat-card">
+          <div class="stat-card-header">
+            <span class="stat-label">Unpaid Invoices</span>
+            <span
+              class="stat-icon"
+              style="background: var(--yellow-soft); color: var(--yellow)"
+              >⚠️</span
+            >
+          </div>
+          <div class="stat-value">$3,210</div>
+          <div class="stat-change down">▼ 4 overdue</div>
+          <div class="sparkline">
+            <div
+              class="spark-bar"
+              style="height: 80%; background: var(--yellow)"
+            ></div>
+            <div
+              class="spark-bar"
+              style="height: 60%; background: var(--yellow)"
+            ></div>
+            <div
+              class="spark-bar"
+              style="height: 90%; background: var(--yellow)"
+            ></div>
+            <div
+              class="spark-bar"
+              style="height: 50%; background: var(--yellow)"
+            ></div>
+            <div
+              class="spark-bar"
+              style="height: 70%; background: var(--yellow)"
+            ></div>
+            <div
+              class="spark-bar"
+              style="height: 40%; background: var(--yellow)"
+            ></div>
+            <div
+              class="spark-bar"
+              style="height: 65%; background: var(--yellow)"
+            ></div>
+            <div
+              class="spark-bar"
+              style="height: 55%; background: var(--yellow)"
+            ></div>
+            <div
+              class="spark-bar"
+              style="height: 75%; background: var(--yellow)"
+            ></div>
+            <div
+              class="spark-bar hi"
+              style="height: 100%; background: var(--yellow)"
+            ></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom row: Mini Calendar + Donut Chart + Live Tracker -->
+      <div class="bottom-row">
+        <!-- ① Compact Mini Calendar -->
+        <div class="calendar-card" style="flex: 1 1 0; min-width: 0">
+          <div class="cal-header">
+            <div class="cal-title">📅 Calendar</div>
+            <div class="cal-filters">
+              <button class="filter-btn active">All</button>
+              <button class="filter-btn">Mine</button>
+            </div>
+          </div>
+          <div class="cal-nav">
+            <button class="nav-btn">‹</button>
+            <span class="cal-month">May 2026</span>
+            <button class="nav-btn">›</button>
+          </div>
+          <div class="mini-cal-grid">
+            <div class="mini-weekday">S</div>
+            <div class="mini-weekday">M</div>
+            <div class="mini-weekday">T</div>
+            <div class="mini-weekday">W</div>
+            <div class="mini-weekday">T</div>
+            <div class="mini-weekday">F</div>
+            <div class="mini-weekday">S</div>
+            <!-- empties -->
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div class="mini-day has-jobs">
+              <div class="mini-day-num">1</div>
+              <div class="mini-dots">
+                <span class="mini-dot" style="background: #3b82f6"></span>
+              </div>
+            </div>
+            <div class="mini-day"><div class="mini-day-num">2</div></div>
+            <div class="mini-day"><div class="mini-day-num">3</div></div>
+            <div class="mini-day has-jobs">
+              <div class="mini-day-num">4</div>
+              <div class="mini-dots">
+                <span class="mini-dot" style="background: #8b5cf6"></span>
+              </div>
+            </div>
+            <div class="mini-day"><div class="mini-day-num">5</div></div>
+            <div class="mini-day has-jobs">
+              <div class="mini-day-num">6</div>
+              <div class="mini-dots">
+                <span class="mini-dot" style="background: #10b981"></span>
+              </div>
+            </div>
+            <div class="mini-day"><div class="mini-day-num">7</div></div>
+            <div class="mini-day has-jobs">
+              <div class="mini-day-num">8</div>
+              <div class="mini-dots">
+                <span class="mini-dot" style="background: #3b82f6"></span>
+              </div>
+            </div>
+            <div class="mini-day"><div class="mini-day-num">9</div></div>
+            <div class="mini-day"><div class="mini-day-num">10</div></div>
+            <div class="mini-day has-jobs">
+              <div class="mini-day-num">11</div>
+              <div class="mini-dots">
+                <span class="mini-dot" style="background: #f59e0b"></span>
+              </div>
+            </div>
+            <div class="mini-day"><div class="mini-day-num">12</div></div>
+            <div class="mini-day today has-jobs">
+              <div class="mini-day-num">13</div>
+              <div class="mini-dots">
+                <span class="mini-dot" style="background: #3b82f6"></span
+                ><span class="mini-dot" style="background: #8b5cf6"></span
+                ><span class="mini-dot" style="background: #f59e0b"></span>
+              </div>
+            </div>
+            <div class="mini-day"><div class="mini-day-num">14</div></div>
+            <div class="mini-day has-jobs">
+              <div class="mini-day-num">15</div>
+              <div class="mini-dots">
+                <span class="mini-dot" style="background: #10b981"></span>
+              </div>
+            </div>
+            <div class="mini-day"><div class="mini-day-num">16</div></div>
+            <div class="mini-day"><div class="mini-day-num">17</div></div>
+            <div class="mini-day has-jobs">
+              <div class="mini-day-num">18</div>
+              <div class="mini-dots">
+                <span class="mini-dot" style="background: #3b82f6"></span>
+              </div>
+            </div>
+            <div class="mini-day"><div class="mini-day-num">19</div></div>
+            <div class="mini-day has-jobs">
+              <div class="mini-day-num">20</div>
+              <div class="mini-dots">
+                <span class="mini-dot" style="background: #3b82f6"></span>
+              </div>
+            </div>
+            <div class="mini-day"><div class="mini-day-num">21</div></div>
+            <div class="mini-day has-jobs">
+              <div class="mini-day-num">22</div>
+              <div class="mini-dots">
+                <span class="mini-dot" style="background: #8b5cf6"></span>
+              </div>
+            </div>
+            <div class="mini-day"><div class="mini-day-num">23</div></div>
+            <div class="mini-day"><div class="mini-day-num">24</div></div>
+            <div class="mini-day"><div class="mini-day-num">25</div></div>
+            <div class="mini-day has-jobs">
+              <div class="mini-day-num">26</div>
+              <div class="mini-dots">
+                <span class="mini-dot" style="background: #10b981"></span>
+              </div>
+            </div>
+            <div class="mini-day"><div class="mini-day-num">27</div></div>
+            <div class="mini-day has-jobs">
+              <div class="mini-day-num">28</div>
+              <div class="mini-dots">
+                <span class="mini-dot" style="background: #3b82f6"></span>
+              </div>
+            </div>
+            <div class="mini-day"><div class="mini-day-num">29</div></div>
+            <div class="mini-day"><div class="mini-day-num">30</div></div>
+            <div class="mini-day"><div class="mini-day-num">31</div></div>
+          </div>
+          <!-- Color legend -->
+          <div
+            style="
+              display: flex;
+              gap: 0.6rem;
+              flex-wrap: wrap;
+              margin-top: 0.75rem;
+              padding-top: 0.75rem;
+              border-top: 1px solid var(--border-faint);
+            "
+          >
+            <span
+              style="
+                display: flex;
+                align-items: center;
+                gap: 0.3rem;
+                font-size: 0.68rem;
+                color: var(--text-muted);
+              "
+              ><span
+                style="
+                  width: 8px;
+                  height: 8px;
+                  border-radius: 2px;
+                  background: #3b82f6;
+                  display: inline-block;
+                "
+              ></span
+              >Scheduled</span
+            >
+            <span
+              style="
+                display: flex;
+                align-items: center;
+                gap: 0.3rem;
+                font-size: 0.68rem;
+                color: var(--text-muted);
+              "
+              ><span
+                style="
+                  width: 8px;
+                  height: 8px;
+                  border-radius: 2px;
+                  background: #8b5cf6;
+                  display: inline-block;
+                "
+              ></span
+              >Confirmed</span
+            >
+            <span
+              style="
+                display: flex;
+                align-items: center;
+                gap: 0.3rem;
+                font-size: 0.68rem;
+                color: var(--text-muted);
+              "
+              ><span
+                style="
+                  width: 8px;
+                  height: 8px;
+                  border-radius: 2px;
+                  background: #f59e0b;
+                  display: inline-block;
+                "
+              ></span
+              >In Progress</span
+            >
+            <span
+              style="
+                display: flex;
+                align-items: center;
+                gap: 0.3rem;
+                font-size: 0.68rem;
+                color: var(--text-muted);
+              "
+              ><span
+                style="
+                  width: 8px;
+                  height: 8px;
+                  border-radius: 2px;
+                  background: #10b981;
+                  display: inline-block;
+                "
+              ></span
+              >Completed</span
+            >
+          </div>
+        </div>
+
+        <!-- ② Middle column: Jobs by Status + Messages -->
+        <div style="flex: 1 1 220px; min-width: 0; display: flex; flex-direction: column; gap: 1.25rem">
+
+          <!-- Jobs by Status Donut -->
+          <div class="calendar-card" style="overflow: hidden">
+            <div class="cal-title" style="margin-bottom: 0.75rem">📊 Jobs by Status</div>
+            <div class="donut-wrap" style="flex-direction: row; flex-wrap: nowrap; gap: 1rem; margin: 0 0 0.25rem">
+              <div class="donut-center" style="width: 110px; height: 110px; flex-shrink: 0">
+                <div class="donut-ring" style="background: conic-gradient(
+                  #10b981 0% 62.4%,
+                  #3b82f6 62.4% 82.8%,
+                  #8b5cf6 82.8% 91%,
+                  #f59e0b 91% 94.6%,
+                  #ef4444 94.6% 100%
+                )"></div>
+                <div class="donut-hole" style="inset: 24px">
+                  <div class="donut-total" style="font-size: 1.25rem">221</div>
+                  <div class="donut-lbl">Total</div>
+                </div>
+              </div>
+              <div class="donut-legend" style="grid-template-columns: 1fr; gap: 0.3rem">
+                <div class="legend-row"><span class="legend-dot" style="background:#10b981"></span><span class="legend-name">Completed</span><span class="legend-count">138</span><span class="legend-pct">62%</span></div>
+                <div class="legend-row"><span class="legend-dot" style="background:#3b82f6"></span><span class="legend-name">Scheduled</span><span class="legend-count">45</span><span class="legend-pct">20%</span></div>
+                <div class="legend-row"><span class="legend-dot" style="background:#8b5cf6"></span><span class="legend-name">Confirmed</span><span class="legend-count">18</span><span class="legend-pct">8%</span></div>
+                <div class="legend-row"><span class="legend-dot" style="background:#f59e0b"></span><span class="legend-name">In Progress</span><span class="legend-count">8</span><span class="legend-pct">4%</span></div>
+                <div class="legend-row"><span class="legend-dot" style="background:#ef4444"></span><span class="legend-name">Canceled</span><span class="legend-count">12</span><span class="legend-pct">5%</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Latest Messages -->
+          <div class="calendar-card" style="flex: 1; overflow: hidden; display: flex; flex-direction: column">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem">
+              <div class="cal-title">💬 Latest Messages</div>
+              <span style="background: var(--terra); color: #fff; font-size: 0.65rem; font-weight: 700; padding: 0.15rem 0.5rem; border-radius: 999px">3 new</span>
+            </div>
+            <div style="display: flex; flex-direction: column; flex: 1; overflow: hidden; justify-content: space-between">
+              <div class="msg-item">
+                <div class="msg-avatar" style="background: linear-gradient(135deg,var(--teal),var(--primary))">MG</div>
+                <div class="msg-body">
+                  <div class="msg-top"><span class="msg-sender">Maria Garcia</span><span class="msg-time">2m</span></div>
+                  <div class="msg-preview">Hi, can we reschedule Friday's clean...</div>
+                </div>
+                <div class="msg-unread-dot"></div>
+              </div>
+              <div class="msg-item">
+                <div class="msg-avatar" style="background: linear-gradient(135deg,#8b5cf6,#6366f1)">JP</div>
+                <div class="msg-body">
+                  <div class="msg-top"><span class="msg-sender">James Patel</span><span class="msg-time">18m</span></div>
+                  <div class="msg-preview">Invoice #0042 — I've sent payment...</div>
+                </div>
+                <div class="msg-unread-dot"></div>
+              </div>
+              <div class="msg-item">
+                <div class="msg-avatar" style="background: linear-gradient(135deg,#e8602c,#f59e0b)">SW</div>
+                <div class="msg-body">
+                  <div class="msg-top"><span class="msg-sender">Sarah Williams</span><span class="msg-time">1h</span></div>
+                  <div class="msg-preview">Thanks for the deep clean, looks great!</div>
+                </div>
+                <div class="msg-unread-dot"></div>
+              </div>
+              <div class="msg-item">
+                <div class="msg-avatar" style="background: linear-gradient(135deg,#10b981,#4a90d9)">TC</div>
+                <div class="msg-body">
+                  <div class="msg-top"><span class="msg-sender">Tom Chen</span><span class="msg-time">3h</span></div>
+                  <div class="msg-preview">Can you add oven cleaning to next visit?</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /.middle-col -->
+
+        <!-- ③ Live Job Tracker -->
+        <div class="tracker-card">
+          <div class="tracker-header">
+            <span class="tracker-title">🔄 Live Tracker</span>
+            <span class="live-badge"
+              ><span class="pulse-dot"></span> 3 Active</span
+            >
+          </div>
+
+          <!-- Job 1 -->
+          <div class="tracker-job">
+            <div class="tj-top">
+              <div>
+                <div class="tj-name">Office Deep Clean</div>
+                <div class="tj-addr">📍 42 Commerce Blvd, Suite 3</div>
+              </div>
+              <span
+                class="status-pill"
+                style="
+                  background: #fef3c7;
+                  color: #92400e;
+                  border: 1px solid #fde68a;
+                "
+                >In Progress</span
+              >
+            </div>
+            <div class="prog-bar">
+              <div
+                class="prog-fill"
+                style="
+                  width: 68%;
+                  background: linear-gradient(
+                    90deg,
+                    var(--teal),
+                    var(--primary)
+                  );
+                "
+              ></div>
+            </div>
+            <div class="tj-meta">
+              <div class="tj-cleaners">
+                <div class="tj-avatar">MB</div>
+                <div
+                  class="tj-avatar"
+                  style="background: linear-gradient(135deg, #8b5cf6, #6366f1)"
+                >
+                  KR
+                </div>
+              </div>
+              <span class="tj-time">⏱ Started 1h 22m ago · 68%</span>
+            </div>
+          </div>
+
+          <!-- Job 2 -->
+          <div class="tracker-job">
+            <div class="tj-top">
+              <div>
+                <div class="tj-name">Villa Rosa — Move-out</div>
+                <div class="tj-addr">📍 18 Sunset Dr, Unit 5A</div>
+              </div>
+              <span
+                class="status-pill"
+                style="
+                  background: #fef3c7;
+                  color: #92400e;
+                  border: 1px solid #fde68a;
+                "
+                >In Progress</span
+              >
+            </div>
+            <div class="prog-bar">
+              <div
+                class="prog-fill"
+                style="
+                  width: 40%;
+                  background: linear-gradient(
+                    90deg,
+                    var(--teal),
+                    var(--primary)
+                  );
+                "
+              ></div>
+            </div>
+            <div class="tj-meta">
+              <div class="tj-cleaners">
+                <div
+                  class="tj-avatar"
+                  style="background: linear-gradient(135deg, #e8602c, #f59e0b)"
+                >
+                  JP
+                </div>
+              </div>
+              <span class="tj-time">⏱ Started 48m ago · 40%</span>
+            </div>
+          </div>
+
+          <!-- Job 3 -->
+          <div class="tracker-job">
+            <div class="tj-top">
+              <div>
+                <div class="tj-name">Smith Residence</div>
+                <div class="tj-addr">📍 9 Maple Ave</div>
+              </div>
+              <span
+                class="status-pill"
+                style="
+                  background: #fef3c7;
+                  color: #92400e;
+                  border: 1px solid #fde68a;
+                "
+                >In Progress</span
+              >
+            </div>
+            <div class="prog-bar">
+              <div
+                class="prog-fill"
+                style="
+                  width: 85%;
+                  background: linear-gradient(
+                    90deg,
+                    var(--teal),
+                    var(--primary)
+                  );
+                "
+              ></div>
+            </div>
+            <div class="tj-meta">
+              <div class="tj-cleaners">
+                <div
+                  class="tj-avatar"
+                  style="background: linear-gradient(135deg, #10b981, #4a90d9)"
+                >
+                  LC
+                </div>
+                <div
+                  class="tj-avatar"
+                  style="background: linear-gradient(135deg, #8b5cf6, #6366f1)"
+                >
+                  AR
+                </div>
+                <div
+                  class="tj-avatar"
+                  style="background: linear-gradient(135deg, #e8602c, #f59e0b)"
+                >
+                  SN
+                </div>
+              </div>
+              <span class="tj-time">⏱ Started 2h 05m ago · 85%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+    </div><!-- /.app-body -->
+    <script>
+      const d = new Date();
+      const day = d.toLocaleDateString('en-US', { weekday: 'long' });
+      const date = d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+      document.getElementById('greeting-date').textContent = 'Today is ' + day + ', ' + date;
+
+      // Sidebar collapse
+      const collapseBtn = document.getElementById('collapse-btn');
+      const sidebar = document.querySelector('.sidebar');
+      const topbarLeft = document.getElementById('topbar-left');
+      collapseBtn.addEventListener('click', () => {
+        const isCollapsed = sidebar.classList.toggle('collapsed');
+        topbarLeft.classList.toggle('collapsed');
+        collapseBtn.textContent = isCollapsed ? '›' : '‹';
+      });
+    </script>
+  </body>
+</html>

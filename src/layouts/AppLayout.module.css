@@ -24,17 +24,22 @@
   width: 62px;
   min-width: 62px;
   overflow: visible;
+  padding-top: 0;
 }
 
 .sidebar.sidebarCollapsed .nav {
   overflow: visible;
   overflow-y: visible;
+  padding: 0.25rem 0.5rem;
 }
 
 .sidebar.sidebarCollapsed .sidebarBrand {
-  padding: 0 0 1.25rem;
+  height: 60px;
+  min-height: 60px;
+  padding: 0;
   justify-content: center;
   gap: 0;
+  margin-bottom: 0;
 }
 
 .sidebar.sidebarCollapsed .collapseBtn {
@@ -89,7 +94,7 @@
 
 .navItemIconOnly {
   justify-content: center;
-  padding: 0.65rem 0;
+  padding: 0.6rem;
 }
 
 /* ─── Brand ──────────────────────────────────────────────────── */
@@ -112,6 +117,7 @@
   justify-content: center;
   font-size: 18px;
   flex-shrink: 0;
+  margin-left: 14px;
 }
 
 .sidebarBrandName {
@@ -353,11 +359,70 @@
   border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: space-between;
   padding: 0 1.5rem;
   gap: 1rem;
   box-shadow: 0 1px 0 var(--border);
 }
+
+/* ─── Topbar search ───────────────────────────────────────── */
+.topbarLeft {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.topbarSearch {
+  width: 400px;
+  max-width: 42vw;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--bg-surface-subtle);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.4rem 1rem;
+  cursor: text;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.topbarSearch:focus-within {
+  border-color: var(--teal);
+  box-shadow: 0 0 0 3px rgba(0,201,170,0.12);
+}
+
+.searchIcon {
+  font-size: 0.825rem;
+  color: var(--text-placeholder);
+  flex-shrink: 0;
+  pointer-events: none;
+}
+
+.searchInput {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  min-width: 0;
+}
+
+.searchInput::placeholder {
+  color: var(--text-placeholder);
+}
+
+.searchShortcut {
+  font-size: 0.68rem;
+  color: var(--text-placeholder);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 0.1rem 0.35rem;
+  font-family: ui-monospace, monospace;
+  white-space: nowrap;
+  flex-shrink: 0;
+  pointer-events: none;}
 
 .hamburger {
   display: none;
@@ -375,25 +440,47 @@
   gap: 0.75rem;
 }
 
+/* ─── Right pill ──────────────────────────────────────────────── */
+.topbarPill {
+  display: flex;
+  align-items: center;
+  background: #F3F2EE;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.2rem 0.5rem;
+  gap: 0.2rem;
+}
+
+:global([data-theme="dark"]) .topbarPill {
+  background: #181D24;
+}
+
+.pillDivider {
+  width: 1px;
+  height: 20px;
+  background: var(--border);
+  flex-shrink: 0;
+  margin: 0 0.1rem;
+}
+
 /* ─── Theme / lang toggles ────────────────────────────────────── */
 .themeToggle {
-  width: 36px;
-  height: 36px;
-  background: var(--bg-surface-subtle);
-  border: 1px solid var(--border);
-  border-radius: 10px;
+  width: 34px;
+  height: 34px;
+  background: none;
+  border: none;
+  border-radius: 999px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1rem;
   line-height: 1;
   cursor: pointer;
-  transition: background 0.15s, border-color 0.15s;
+  transition: background 0.15s;
 }
 
 .themeToggle:hover {
   background: var(--bg-accent-subtle);
-  border-color: var(--accent);
 }
 
 .langToggle {
@@ -404,27 +491,28 @@
   background: var(--bg-surface-subtle);
 }
 
+.langSelector {
+  position: relative;
+}
+
 .langSelectorBtn {
   display: flex;
   align-items: center;
   gap: 0.3rem;
   padding: 0.3rem 0.55rem;
-  background: var(--bg-surface);
-  border: 1px solid var(--border-input);
-  border-radius: 8px;
+  background: none;
+  border: none;
+  border-radius: 999px;
   font-size: 0.78rem;
   font-weight: 600;
   color: var(--text-primary);
   cursor: pointer;
-  transition:
-    background 0.15s,
-    border-color 0.15s;
+  transition: background 0.15s;
   white-space: nowrap;
 }
 
 .langSelectorBtn:hover {
   background: var(--bg-accent-subtle);
-  border-color: var(--accent);
 }
 
 .langGlobe {
@@ -461,7 +549,7 @@
     0 8px 24px rgba(0, 0, 0, 0.12),
     0 2px 6px rgba(0, 0, 0, 0.06);
   overflow: hidden;
-  z-index: 200;
+  z-index: 300;
   animation: langDropIn 0.15s ease;
 }
 
@@ -523,12 +611,12 @@
   border: none;
   cursor: pointer;
   padding: 0.25rem 0.5rem;
-  border-radius: 10px;
+  border-radius: 999px;
   transition: background 0.15s;
 }
 
 .userMenuTrigger:hover {
-  background: var(--bg-surface-subtle);
+  background: var(--bg-accent-subtle);
 }
 
 .userChevron {

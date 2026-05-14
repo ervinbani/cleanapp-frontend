@@ -22,7 +22,6 @@ const subNavItems = [
     path: "/settings/roles",
     label: "Roles & Permissions",
     labelEs: "Roles y Permisos",
-    ownerOnly: false,
     restricted: true,
     ownerOnly: false,
   },

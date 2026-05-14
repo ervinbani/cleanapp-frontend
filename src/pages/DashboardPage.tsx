@@ -4,10 +4,11 @@ import styles from "./DashboardPage.module.css";
 import { customerService } from "../services/customerService";
 import { jobService } from "../services/jobService";
 import { invoiceService } from "../services/invoiceService";
+import { messageService } from "../services/messageService";
 import { useLang } from "../contexts/LangContext";
 import { useAuth } from "../contexts/AuthContext";
 import { useTrans } from "../i18n";
-import type { Customer, Invoice, Job } from "../types";
+import type { Customer, InternalMessage, Invoice, Job } from "../types";
 
 function Sparkline({ bars, color }: { bars: number[]; color: string }) {
   const max = Math.max(...bars, 1);
@@ -65,28 +66,20 @@ const STATUS_COLORS: Record<string, string> = {
   no_show: "#6b7280",
 };
 
-interface ActivityItem {
-  id: string;
-  icon: string;
-  color: string;
-  text: string;
-  time: Date;
-  onClick?: () => void;
-}
-
-function timeAgo(date: Date, lang: "en" | "es"): string {
+function timeAgo(date: Date, lang: "en" | "es" | "it"): string {
   const diff = Math.floor((Date.now() - date.getTime()) / 1000);
-  if (diff < 60) return lang === "en" ? "just now" : "ahora mismo";
+  if (diff < 60)
+    return lang === "en" ? "just now" : lang === "it" ? "proprio ora" : "ahora mismo";
   if (diff < 3600) {
     const m = Math.floor(diff / 60);
-    return lang === "en" ? `${m}m ago` : `hace ${m}m`;
+    return lang === "en" ? `${m}m ago` : lang === "it" ? `${m}m fa` : `hace ${m}m`;
   }
   if (diff < 86400) {
     const h = Math.floor(diff / 3600);
-    return lang === "en" ? `${h}h ago` : `hace ${h}h`;
+    return lang === "en" ? `${h}h ago` : lang === "it" ? `${h}h fa` : `hace ${h}h`;
   }
   const d = Math.floor(diff / 86400);
-  return lang === "en" ? `${d}d ago` : `hace ${d}d`;
+  return lang === "en" ? `${d}d ago` : lang === "it" ? `${d}g fa` : `hace ${d}d`;
 }
 
 function buildCalendarGrid(year: number, month: number) {
@@ -96,6 +89,46 @@ function buildCalendarGrid(year: number, month: number) {
   for (let i = 0; i < firstDay; i++) cells.push(null);
   for (let d = 1; d <= daysInMonth; d++) cells.push(d);
   return cells;
+}
+
+function calcProgress(job: Job): number {
+  if (job.status === "completed") return 100;
+  if (!job.scheduledEnd) return 50;
+  const start = new Date(job.scheduledStart).getTime();
+  const end = new Date(job.scheduledEnd).getTime();
+  const now = Date.now();
+  if (now >= end) return 95;
+  if (now <= start) return 0;
+  return Math.round(((now - start) / (end - start)) * 100);
+}
+
+function userInitials(
+  u: string | { firstName?: string; lastName?: string },
+): string {
+  if (typeof u === "string") return "?";
+  return (
+    ((u.firstName?.[0] ?? "") + (u.lastName?.[0] ?? "")).toUpperCase() || "?"
+  );
+}
+
+function senderName(msg: InternalMessage): string {
+  if (typeof msg.fromUserId === "string") return "Someone";
+  const u = msg.fromUserId as { firstName?: string; lastName?: string };
+  return `${u.firstName ?? ""} ${u.lastName ?? ""}`.trim() || "Someone";
+}
+
+function senderInitials(msg: InternalMessage): string {
+  if (typeof msg.fromUserId === "string") return "?";
+  const u = msg.fromUserId as { firstName?: string; lastName?: string };
+  return (
+    ((u.firstName?.[0] ?? "") + (u.lastName?.[0] ?? "")).toUpperCase() || "?"
+  );
+}
+
+function jobAddress(job: Job): string {
+  const a = job.propertyAddress;
+  if (!a) return "";
+  return [a.street, a.city, a.state].filter(Boolean).join(", ");
 }
 
 export default function DashboardPage() {
@@ -114,6 +147,7 @@ export default function DashboardPage() {
   });
   const [myJobsMode, setMyJobsMode] = useState(false);
   const [hoveredDay, setHoveredDay] = useState<number | null>(null);
+  const [messages, setMessages] = useState<InternalMessage[]>([]);
 
   useEffect(() => {
     customerService
@@ -140,6 +174,11 @@ export default function DashboardPage() {
       .getAll({ page: 1, limit: 50 })
       .then((res) => setRecentCustomers(res.data))
       .catch(() => setRecentCustomers([]));
+
+    messageService
+      .getInbox()
+      .then(setMessages)
+      .catch(() => setMessages([]));
   }, []);
 
   const displayedJobs = useMemo(() => {
@@ -174,74 +213,6 @@ export default function DashboardPage() {
     );
     return map;
   }, [displayedJobs, calendarDate]);
-
-  const activityItems = useMemo<ActivityItem[]>(() => {
-    const items: ActivityItem[] = [];
-
-    // Jobs → show last 5 by updatedAt
-    const sortedJobs = [...allJobs]
-      .sort(
-        (a, b) =>
-          new Date(b.updatedAt ?? b.scheduledStart).getTime() -
-          new Date(a.updatedAt ?? a.scheduledStart).getTime(),
-      )
-      .slice(0, 5);
-
-    sortedJobs.forEach((job) => {
-      const icon =
-        job.status === "completed"
-          ? "✅"
-          : job.status === "in_progress"
-            ? "🔄"
-            : job.status === "canceled"
-              ? "❌"
-              : "📅";
-      const color = STATUS_COLORS[job.status] ?? "#3b82f6";
-      items.push({
-        id: `job-${job._id}`,
-        icon,
-        color,
-        text: `Job "${job.title ?? job.status}" — ${job.status.replace("_", " ")}`,
-        time: new Date(job.updatedAt ?? job.scheduledStart),
-        onClick: () => navigate("/jobs"),
-      });
-    });
-
-    // Invoices — show 8 most recent
-    [...allInvoices]
-      .sort(
-        (a, b) =>
-          new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
-      )
-      .slice(0, 8)
-      .forEach((inv) => {
-        const isPaid = inv.status === "paid";
-        items.push({
-          id: `inv-${inv._id}`,
-          icon: isPaid ? "💰" : "📄",
-          color: isPaid ? "#10b981" : "#6b7280",
-          text: `Invoice #${inv.invoiceNumber} — ${inv.status}`,
-          time: new Date(inv.paidAt ?? inv.issuedDate ?? inv._id),
-          onClick: () => navigate("/invoices"),
-        });
-      });
-
-    // Customers
-    recentCustomers.forEach((c) => {
-      items.push({
-        id: `cus-${c._id}`,
-        icon: "👤",
-        color: "#8b5cf6",
-        text: `New client: ${c.firstName} ${c.lastName}`,
-        time: new Date(c.createdAt),
-        onClick: () => navigate("/customers"),
-      });
-    });
-
-    return items
-      .sort((a, b) => b.time.getTime() - a.time.getTime())
-      .slice(0, 8);
-  }, [allJobs, allInvoices, recentCustomers, navigate]);
 
   const calendarCells = useMemo(
     () =>
@@ -395,11 +366,126 @@ export default function DashboardPage() {
     });
   }, [allJobs]);
 
+  const inProgressJobs = useMemo(
+    () => allJobs.filter((j) => j.status === "in_progress").slice(0, 3),
+    [allJobs],
+  );
+
+  const recentMessages = useMemo(
+    () =>
+      [...messages]
+        .sort(
+          (a, b) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+        )
+        .slice(0, 4),
+    [messages],
+  );
+
+  const jobStatusData = useMemo(() => {
+    const statusDefs = [
+      { key: "completed", label: lang === "en" ? "Completed" : "Completados", color: "#10b981" },
+      { key: "scheduled", label: lang === "en" ? "Scheduled" : "Programados", color: "#3b82f6" },
+      { key: "confirmed", label: lang === "en" ? "Confirmed" : "Confirmados", color: "#8b5cf6" },
+      { key: "in_progress", label: lang === "en" ? "In Progress" : "En progreso", color: "#f59e0b" },
+      { key: "canceled", label: lang === "en" ? "Canceled" : "Cancelados", color: "#ef4444" },
+    ];
+    const total = allJobs.length || 1;
+    let cum = 0;
+    const segments = statusDefs.map((s) => {
+      const count = allJobs.filter((j) => j.status === s.key).length;
+      const pct = (count / total) * 100;
+      const stop = `${s.color} ${cum.toFixed(1)}% ${(cum + pct).toFixed(1)}%`;
+      cum += pct;
+      return { ...s, count, pct, stop };
+    });
+    const gradient = `conic-gradient(${segments.map((s) => s.stop).join(", ")})`;
+    return { segments, total: allJobs.length, gradient };
+  }, [allJobs, lang]);
+
+  const activityItems = useMemo(() => {
+    const items: {
+      id: string;
+      icon: string;
+      color: string;
+      text: string;
+      time: Date;
+      onClick: () => void;
+    }[] = [];
+
+    [...allJobs]
+      .sort(
+        (a, b) =>
+          new Date(b.updatedAt ?? b.scheduledStart).getTime() -
+          new Date(a.updatedAt ?? a.scheduledStart).getTime(),
+      )
+      .slice(0, 5)
+      .forEach((job) => {
+        const icon =
+          job.status === "completed"
+            ? "✅"
+            : job.status === "in_progress"
+              ? "🔄"
+              : job.status === "canceled"
+                ? "❌"
+                : "📅";
+        items.push({
+          id: `job-${job._id}`,
+          icon,
+          color: STATUS_COLORS[job.status] ?? "#3b82f6",
+          text: `Job "${job.title ?? job.status}" — ${job.status.replace("_", " ")}`,
+          time: new Date(job.updatedAt ?? job.scheduledStart),
+          onClick: () => navigate("/jobs"),
+        });
+      });
+
+    [...allInvoices]
+      .sort(
+        (a, b) =>
+          new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
+      )
+      .slice(0, 5)
+      .forEach((inv) => {
+        const isPaid = inv.status === "paid";
+        items.push({
+          id: `inv-${inv._id}`,
+          icon: isPaid ? "💰" : "📄",
+          color: isPaid ? "#10b981" : "#6b7280",
+          text: `Invoice #${inv.invoiceNumber} — ${inv.status}`,
+          time: new Date(inv.paidAt ?? inv.issuedDate ?? inv._id),
+          onClick: () => navigate("/invoices"),
+        });
+      });
+
+    recentCustomers.forEach((c) => {
+      items.push({
+        id: `cus-${c._id}`,
+        icon: "👤",
+        color: "#8b5cf6",
+        text: `New client: ${c.firstName} ${c.lastName}`,
+        time: new Date(c.createdAt),
+        onClick: () => navigate("/customers"),
+      });
+    });
+
+    return items
+      .sort((a, b) => b.time.getTime() - a.time.getTime())
+      .slice(0, 6);
+  }, [allJobs, allInvoices, recentCustomers, navigate]);
+
   const getGreeting = () => {
     const hour = new Date().getHours();
     if (hour < 12) return lang === "en" ? "Good morning" : "Buenos días";
     if (hour < 18) return lang === "en" ? "Good afternoon" : "Buenas tardes";
     return lang === "en" ? "Good evening" : "Buenas noches";
+  };
+
+  const getTodayLabel = () => {
+    const now = new Date();
+    const locale = lang === "es" ? "es-ES" : lang === "it" ? "it-IT" : "en-US";
+    const day = now.toLocaleDateString(locale, { weekday: "long" });
+    const date = now.toLocaleDateString(locale, { month: "long", day: "numeric", year: "numeric" });
+    return lang === "en" ? `Today is ${day}, ${date}` : `${day}, ${date}`;
   };
 
   return (
@@ -410,11 +496,7 @@ export default function DashboardPage() {
           <h2>
             {getGreeting()}, {user?.firstName}! ☀️
           </h2>
-          <p>
-            {lang === "en"
-              ? `You have ${todaysJobs.length} job${todaysJobs.length !== 1 ? "s" : ""} scheduled today`
-              : `Tienes ${todaysJobs.length} trabajo${todaysJobs.length !== 1 ? "s" : ""} programado${todaysJobs.length !== 1 ? "s" : ""} hoy`}
-          </p>
+          <p>{getTodayLabel()}</p>
         </div>
         <div className={styles.greetingStats}>
           <div className={styles.greetingStat}>
@@ -607,8 +689,10 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Calendar + Activity row */}
+      {/* Bottom row: Calendar + Jobs Status + Messages + Live Tracker */}
       <div className={styles.bottomRow}>
+
+        {/* ① Mini Calendar */}
         <div className={styles.calendarCard}>
           {/* Header */}
           <div className={styles.calendarHeader}>
@@ -695,7 +779,6 @@ export default function DashboardPage() {
                       +{dayJobs.length - 2}
                     </span>
                   )}
-                  {/* Tooltip on hover */}
                   {isHovered && dayJobs.length > 0 && (
                     <div className={styles.dayTooltip}>
                       {dayJobs.map((job) => (
@@ -729,39 +812,208 @@ export default function DashboardPage() {
           )}
         </div>
 
-        {/* Recent Activity */}
-        <div className={styles.activityCard}>
-          <h3 className={styles.activityTitle}>{labels.recentActivity}</h3>
-          {activityItems.length === 0 ? (
-            <p className={styles.noActivity}>{labels.noActivity}</p>
-          ) : (
-            <ul className={styles.activityList}>
-              {activityItems.map((item) => (
-                <li
-                  key={item.id}
-                  className={styles.activityItem}
-                  onClick={item.onClick}
-                  role={item.onClick ? "button" : undefined}
-                  tabIndex={item.onClick ? 0 : undefined}
-                  onKeyDown={(e) => e.key === "Enter" && item.onClick?.()}
-                >
-                  <span
-                    className={styles.activityIcon}
-                    style={{ background: `${item.color}18`, color: item.color }}
+        {/* ② Middle column: Jobs by Status donut + Latest Messages */}
+        <div className={styles.middleCol}>
+
+          {/* Jobs by Status – donut */}
+          <div className={styles.donutCard}>
+            <div className={styles.donutCardTitle}>
+              📊 {lang === "en" ? "Jobs by Status" : "Trabajos por Estado"}
+            </div>
+            <div className={styles.donutWrap}>
+              <div className={styles.donutCenter}>
+                <div
+                  className={styles.donutRing}
+                  style={{ background: jobStatusData.gradient }}
+                />
+                <div className={styles.donutHole}>
+                  <div className={styles.donutTotal}>{jobStatusData.total}</div>
+                  <div className={styles.donutLbl}>
+                    {lang === "en" ? "Total" : "Total"}
+                  </div>
+                </div>
+              </div>
+              <div className={styles.donutLegend}>
+                {jobStatusData.segments.map((s) => (
+                  <div key={s.key} className={styles.legendRow}>
+                    <span
+                      className={styles.legendDot}
+                      style={{ background: s.color }}
+                    />
+                    <span className={styles.legendName}>{s.label}</span>
+                    <span className={styles.legendCount}>{s.count}</span>
+                    <span className={styles.legendPct}>
+                      {s.pct.toFixed(0)}%
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Latest Messages */}
+          <div className={styles.messagesCard}>
+            <div className={styles.messagesHeader}>
+              <span className={styles.donutCardTitle}>
+                💬 {lang === "en" ? "Latest Messages" : "Últimos Mensajes"}
+              </span>
+              {messages.filter((m) => !m.isRead).length > 0 && (
+                <span className={styles.newBadge}>
+                  {messages.filter((m) => !m.isRead).length}{" "}
+                  {lang === "en" ? "new" : "nuevos"}
+                </span>
+              )}
+            </div>
+            {recentMessages.length === 0 ? (
+              <p className={styles.noActivity}>
+                {lang === "en" ? "No messages yet" : "Sin mensajes"}
+              </p>
+            ) : (
+              <div className={styles.msgList}>
+                {recentMessages.map((msg) => (
+                  <div
+                    key={msg._id}
+                    className={styles.msgItem}
+                    onClick={() => navigate("/messages")}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => e.key === "Enter" && navigate("/messages")}
                   >
-                    {item.icon}
-                  </span>
-                  <span className={styles.activityText}>{item.text}</span>
-                  <span className={styles.activityTime}>
-                    {timeAgo(item.time, lang)}
-                  </span>
-                </li>
-              ))}
-            </ul>
+                    <div
+                      className={styles.msgAvatar}
+                      style={{
+                        background:
+                          "linear-gradient(135deg,var(--teal),var(--primary))",
+                      }}
+                    >
+                      {senderInitials(msg)}
+                    </div>
+                    <div className={styles.msgBody}>
+                      <div className={styles.msgTop}>
+                        <span className={styles.msgSender}>
+                          {senderName(msg)}
+                        </span>
+                        <span className={styles.msgTime}>
+                          {timeAgo(new Date(msg.createdAt), lang)}
+                        </span>
+                      </div>
+                      <div className={styles.msgPreview}>{msg.body}</div>
+                    </div>
+                    {!msg.isRead && <div className={styles.msgUnread} />}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Divider */}
+            <div className={styles.activityDivider} />
+
+            {/* Recent Activity */}
+            <div className={styles.activitySection}>
+              <div className={styles.activitySectionTitle}>
+                🕒 {labels.recentActivity}
+              </div>
+              {activityItems.length === 0 ? (
+                <p className={styles.noActivity}>{labels.noActivity}</p>
+              ) : (
+                <ul className={styles.activityList}>
+                  {activityItems.map((item) => (
+                    <li
+                      key={item.id}
+                      className={styles.activityItem}
+                      onClick={item.onClick}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) => e.key === "Enter" && item.onClick()}
+                    >
+                      <span
+                        className={styles.activityIcon}
+                        style={{
+                          background: `${item.color}18`,
+                          color: item.color,
+                        }}
+                      >
+                        {item.icon}
+                      </span>
+                      <span className={styles.activityText}>{item.text}</span>
+                      <span className={styles.activityTime}>
+                        {timeAgo(item.time, lang)}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* ③ Live Job Tracker */}
+        <div className={styles.trackerCard}>
+          <div className={styles.trackerHeader}>
+            <span className={styles.trackerTitle}>
+              🔄 {lang === "en" ? "Live Tracker" : "Rastreador"}
+            </span>
+            <span className={styles.liveBadge}>
+              <span className={styles.pulseDot} />
+              {inProgressJobs.length} {lang === "en" ? "Active" : "Activos"}
+            </span>
+          </div>
+          {inProgressJobs.length === 0 ? (
+            <p className={styles.noActivity}>
+              {lang === "en"
+                ? "No active jobs right now"
+                : "Sin trabajos activos"}
+            </p>
+          ) : (
+            inProgressJobs.map((job) => {
+              const progress = calcProgress(job);
+              const addr = jobAddress(job);
+              return (
+                <div
+                  key={job._id}
+                  className={styles.trackerJob}
+                  onClick={() => navigate("/jobs")}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => e.key === "Enter" && navigate("/jobs")}
+                >
+                  <div className={styles.tjTop}>
+                    <div className={styles.tjInfo}>
+                      <div className={styles.tjName}>
+                        {job.title ?? "Job"}
+                      </div>
+                      {addr && (
+                        <div className={styles.tjAddr}>📍 {addr}</div>
+                      )}
+                    </div>
+                    <span className={styles.statusPill}>In Progress</span>
+                  </div>
+                  <div className={styles.progBar}>
+                    <div
+                      className={styles.progFill}
+                      style={{
+                        width: `${progress}%`,
+                        background:
+                          "linear-gradient(90deg,var(--teal),var(--primary))",
+                      }}
+                    />
+                  </div>
+                  <div className={styles.tjMeta}>
+                    <div className={styles.tjCleaners}>
+                      {job.assignedUsers.slice(0, 3).map((u, i) => (
+                        <div key={i} className={styles.tjAvatar}>
+                          {userInitials(u)}
+                        </div>
+                      ))}
+                    </div>
+                    <span className={styles.tjTime}>⏱ {progress}%</span>
+                  </div>
+                </div>
+              );
+            })
           )}
         </div>
       </div>
-      {/* end bottomRow */}
     </div>
   );
 }

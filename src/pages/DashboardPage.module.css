@@ -9,14 +9,14 @@
 .greetingCard {
   background: linear-gradient(135deg, var(--teal) 0%, var(--primary) 60%, #6366F1 100%);
   border-radius: 16px;
-  padding: 1.375rem 1.75rem;
+  padding: 0.7rem 1.5rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
   position: relative;
   overflow: hidden;
   flex-wrap: wrap;
-  gap: 1rem;
+  gap: 0.75rem;
 }
 
 .greetingCard::before {
@@ -40,7 +40,7 @@
 }
 
 .greetingText h2 {
-  font-size: 1.25rem;
+  font-size: 1rem;
   font-weight: 700;
   color: #ffffff;
   margin-bottom: 0.25rem;
@@ -63,14 +63,14 @@
 .greetingStat {
   background: rgba(255,255,255,0.15);
   backdrop-filter: blur(8px);
-  border-radius: 12px;
-  padding: 0.875rem 1.25rem;
+  border-radius: 10px;
+  padding: 0.45rem 0.9rem;
   text-align: center;
   border: 1px solid rgba(255,255,255,0.2);
 }
 
 .greetingStatNum {
-  font-size: 1.75rem;
+  font-size: 1.25rem;
   font-weight: 700;
   color: #ffffff;
   line-height: 1;
@@ -114,6 +114,20 @@
   color: var(--text-primary);
   margin: 0;
 }
+.topbar-search {
+        flex: 1;
+        max-width: 420px;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: var(--bg-surface-subtle);
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        padding: 0 1rem;
+        height: 32px;
+        cursor: text;
+        transition: border-color 0.15s, box-shadow 0.15s;
+      }
 
 /* ─── Quick Actions ──────────────────────────────────────────── */
 .quickActions {
@@ -260,11 +274,11 @@
   opacity: 1;
 }
 
-/* ─── Bottom row: Calendar + Activity ───────────────────────── */
+/* ─── Bottom row: Calendar + Middle col + Tracker ───────────── */
 .bottomRow {
   display: flex;
   gap: 1.25rem;
-  align-items: flex-start;
+  align-items: stretch;
 }
 
 /* ─── Calendar card ──────────────────────────────────────────── */
@@ -506,22 +520,249 @@
   margin: 0;
 }
 
-/* ─── Recent Activity ─────────────────────────────────────────── */
-.activityCard {
+/* ─── Middle column: Donut + Messages ───────────────────────── */
+.middleCol {
+  flex: 1 1 220px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* ─── Donut card ─────────────────────────────────────────────── */
+.donutCard {
   background: var(--bg-surface);
   border: 1px solid var(--border);
   border-radius: 14px;
   padding: 1.25rem 1.5rem;
-  flex: 0 0 300px;
-  width: 300px;
   box-shadow: var(--shadow);
 }
 
-.activityTitle {
+.donutCardTitle {
   font-size: 0.9375rem;
   font-weight: 700;
   color: var(--text-primary);
-  margin: 0 0 1rem;
+  margin-bottom: 1rem;
+}
+
+.donutWrap {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.donutCenter {
+  position: relative;
+  width: 110px;
+  height: 110px;
+  flex-shrink: 0;
+}
+
+.donutRing {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+}
+
+.donutHole {
+  position: absolute;
+  inset: 24px;
+  border-radius: 50%;
+  background: var(--bg-surface);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.donutTotal {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1;
+}
+
+.donutLbl {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.donutLegend {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.legendRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+}
+
+.legendDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.legendName {
+  flex: 1;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.legendCount {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 0.8rem;
+}
+
+.legendPct {
+  color: var(--text-placeholder);
+  font-size: 0.75rem;
+  min-width: 2.5rem;
+  text-align: right;
+}
+
+/* ─── Messages card ──────────────────────────────────────────── */
+.messagesCard {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1.25rem 1.5rem;
+  box-shadow: var(--shadow);
+  flex: 1;
+}
+
+.messagesHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.875rem;
+}
+
+.newBadge {
+  background: var(--teal);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  border-radius: 20px;
+  padding: 0.15rem 0.55rem;
+  white-space: nowrap;
+}
+
+.msgList {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.msgItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 0.35rem;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background 0.15s;
+  position: relative;
+}
+
+.msgItem:last-child {
+  border-bottom: none;
+}
+
+.msgItem:hover {
+  background: var(--bg-surface-subtle);
+}
+
+.msgAvatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.msgBody {
+  flex: 1;
+  min-width: 0;
+}
+
+.msgTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.15rem;
+}
+
+.msgSender {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.msgTime {
+  font-size: 0.71rem;
+  color: var(--text-placeholder);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.msgPreview {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.msgUnread {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--teal);
+  flex-shrink: 0;
+}
+
+/* ─── Activity section inside messagesCard ───────────────────── */
+.activityDivider {
+  height: 1px;
+  background: var(--border);
+  margin: 0.75rem 0 0.625rem;
+}
+
+.activitySection {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.activitySectionTitle {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
 }
 
 .activityList {
@@ -536,9 +777,9 @@
 .activityItem {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.65rem 0.4rem;
-  border-bottom: 1px solid var(--border-faint);
+  gap: 0.65rem;
+  padding: 0.5rem 0.35rem;
+  border-bottom: 1px solid var(--border);
   cursor: pointer;
   border-radius: 8px;
   transition: background 0.15s;
@@ -553,28 +794,189 @@
 }
 
 .activityIcon {
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   flex-shrink: 0;
 }
 
 .activityText {
   flex: 1;
-  font-size: 0.8125rem;
+  font-size: 0.785rem;
   color: var(--text-secondary);
   line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .activityTime {
-  font-size: 0.75rem;
+  font-size: 0.71rem;
   color: var(--text-placeholder);
   white-space: nowrap;
   flex-shrink: 0;
+}
+
+/* ─── Live Tracker card ──────────────────────────────────────── */
+.trackerCard {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1.25rem 1.5rem;
+  box-shadow: var(--shadow);
+  flex: 0 0 300px;
+  width: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  overflow: hidden;
+}
+
+.trackerHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.25rem;
+}
+
+.trackerTitle {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.liveBadge {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: var(--yellow-soft);
+  color: var(--yellow);
+  font-size: 0.72rem;
+  font-weight: 700;
+  border-radius: 20px;
+  padding: 0.2rem 0.6rem;
+}
+
+.pulseDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--yellow);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.75); }
+}
+
+.trackerJob {
+  background: var(--bg-surface-subtle);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.75rem 0.875rem;
+  cursor: pointer;
+  transition: box-shadow 0.15s, border-color 0.15s;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.trackerJob:hover {
+  border-color: var(--teal);
+  box-shadow: 0 0 0 2px rgba(0,201,170,0.1);
+}
+
+.tjTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.tjInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.tjName {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.tjAddr {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 0.15rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 160px;
+}
+
+.statusPill {
+  background: rgba(245,158,11,0.15);
+  color: #f59e0b;
+  font-size: 0.68rem;
+  font-weight: 700;
+  border-radius: 20px;
+  padding: 0.15rem 0.55rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.progBar {
+  height: 5px;
+  background: var(--border);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.progFill {
+  height: 100%;
+  border-radius: 99px;
+  transition: width 0.4s ease;
+}
+
+.tjMeta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.tjCleaners {
+  display: flex;
+}
+
+.tjAvatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--teal), var(--primary));
+  color: #fff;
+  font-size: 0.6rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--bg-surface);
+  margin-left: -6px;
+}
+
+.tjAvatar:first-child {
+  margin-left: 0;
+}
+
+.tjTime {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 500;
 }
 
 .noActivity {
@@ -585,9 +987,23 @@
 }
 
 /* ─── Responsive ─────────────────────────────────────────────── */
+@media (max-width: 1200px) {
+  .trackerCard {
+    flex: 0 0 260px;
+    width: 260px;
+  }
+}
+
 @media (max-width: 1100px) {
   .statGrid {
     grid-template-columns: repeat(2, 1fr);
+  }
+  .bottomRow {
+    flex-wrap: wrap;
+  }
+  .trackerCard {
+    flex: 1 1 100%;
+    width: 100%;
   }
 }
 
@@ -595,7 +1011,9 @@
   .bottomRow {
     flex-direction: column;
   }
-  .activityCard {
+  .calendarCard,
+  .middleCol,
+  .trackerCard {
     flex: unset;
     width: 100%;
   }

@@ -9,84 +9,21 @@ import styles from "./AppLayout.module.css";
 
 const navSections = [
   {
-    path: "/",
-    label: "Dashboard",
-    labelEs: "Inicio",
-    labelIt: "Dashboard",
-    icon: "⊞",
-    permission: null,
-  },
-  {
-    path: "/users",
-    label: "Users",
-    labelEs: "Usuarios",
-    labelIt: "Utenti",
-    icon: "👥",
-    permission: "users.read",
-  },
-  {
-    path: "/customers",
-    label: "Clients",
-    labelEs: "Clientes",
-    labelIt: "Clienti",
-    icon: "👤",
-    permission: "users.read",
-  },
-  {
-    path: "/jobs",
-    label: "Jobs",
-    labelEs: "Trabajos",
-    labelIt: "Lavori",
-    icon: "🧹",
-    permission: "jobs.read",
-  },
-  {
-    path: "/services",
-    label: "Services",
-    labelEs: "Servicios",
-    labelIt: "Servizi",
-    icon: "✨",
-    permission: "services.read",
-  },
-  {
-    path: "/calendar",
-    label: "Calendar",
-    labelEs: "Calendario",
-    labelIt: "Calendario",
-    icon: "📅",
-    permission: "jobs.read",
-  },
-  {
-    path: "/invoices",
-    label: "Invoices",
-    labelEs: "Facturas",
-    labelIt: "Fatture",
-    icon: "✉️",
-    permission: "invoices.read",
-  },
-  {
-    path: "/documents",
-    label: "Documents",
-    labelEs: "Documentos",
-    labelIt: "Documenti",
-    icon: "📁",
-    permission: null,
-  },
-  {
-    path: "/messages",
-    label: "Messages",
-    labelEs: "Mensajes",
-    labelIt: "Messaggi",
-    icon: "💬",
-    permission: null,
-  },
-  {
-    path: "/settings",
-    label: "Settings",
-    labelEs: "Configuración",
-    labelIt: "Impostazioni",
-    icon: "⚙️",
-    permission: "roles.read",
+    label: "",
+    labelEs: "",
+    labelIt: "",
+    items: [
+      { path: "/", label: "Dashboard", labelEs: "Inicio", labelIt: "Dashboard", icon: "⊞", permission: null },
+      { path: "/users", label: "Users", labelEs: "Usuarios", labelIt: "Utenti", icon: "👥", permission: "users.read" },
+      { path: "/customers", label: "Clients", labelEs: "Clientes", labelIt: "Clienti", icon: "👤", permission: "users.read" },
+      { path: "/jobs", label: "Jobs", labelEs: "Trabajos", labelIt: "Lavori", icon: "🧹", permission: "jobs.read" },
+      { path: "/services", label: "Services", labelEs: "Servicios", labelIt: "Servizi", icon: "✨", permission: "services.read" },
+      { path: "/calendar", label: "Calendar", labelEs: "Calendario", labelIt: "Calendario", icon: "📅", permission: "jobs.read" },
+      { path: "/invoices", label: "Invoices", labelEs: "Facturas", labelIt: "Fatture", icon: "✉️", permission: "invoices.read" },
+      { path: "/documents", label: "Documents", labelEs: "Documentos", labelIt: "Documenti", icon: "📁", permission: null },
+      { path: "/messages", label: "Messages", labelEs: "Mensajes", labelIt: "Messaggi", icon: "💬", permission: null },
+      { path: "/settings", label: "Settings", labelEs: "Configuración", labelIt: "Impostazioni", icon: "⚙️", permission: "roles.read" },
+    ],
   },
 ];
 
@@ -141,6 +78,8 @@ export default function AppLayout() {
     location.pathname.startsWith("/settings"),
   );
   const [unreadCount, setUnreadCount] = useState(0);
+  const [searchQuery, setSearchQuery] = useState("");
+  const searchRef = useRef<HTMLInputElement>(null);
 
   // ── user dropdown
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -178,6 +117,18 @@ export default function AppLayout() {
     fetch();
     const id = setInterval(fetch, 30_000);
     return () => clearInterval(id);
+  }, []);
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
+        searchRef.current?.focus();
+        searchRef.current?.select();
+      }
+    };
+    document.addEventListener("keydown", handler);
+    return () => document.removeEventListener("keydown", handler);
   }, []);
 
   // close dropdowns on outside click
@@ -492,21 +443,57 @@ export default function AppLayout() {
       <div className={styles.main}>
         {/* Top bar */}
         <header className={styles.topbar}>
-          <button
-            className={styles.hamburger}
-            onClick={() => setSidebarOpen((v) => !v)}
-            aria-label="Toggle menu"
-          >
-            ☰
-          </button>
+          <div className={styles.topbarLeft}>
+            <button
+              className={styles.hamburger}
+              onClick={() => setSidebarOpen((v) => !v)}
+              aria-label="Toggle menu"
+            >
+              ☰
+            </button>
+
+            {/* Search bar */}
+            <div
+              className={styles.topbarSearch}
+              onClick={() => searchRef.current?.focus()}
+            >
+              <span className={styles.searchIcon}>🔍</span>
+              <input
+                ref={searchRef}
+                className={styles.searchInput}
+                type="text"
+                placeholder={
+                  lang === "en"
+                    ? "Search jobs, clients, invoices..."
+                    : lang === "es"
+                      ? "Buscar trabajos, clientes..."
+                      : "Cerca lavori, clienti..."
+                }
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && searchQuery.trim()) {
+                    navigate(`/jobs?q=${encodeURIComponent(searchQuery.trim())}`);
+                    setSearchQuery("");
+                  }
+                  if (e.key === "Escape") {
+                    setSearchQuery("");
+                    searchRef.current?.blur();
+                  }
+                }}
+              />
+              <span className={styles.searchShortcut}>⌘K</span>
+            </div>
+          </div>
 
           <div className={styles.topbarRight}>
-            <button
-              className={styles.themeToggle}
-              onClick={toggleTheme}
-              aria-label="Toggle dark mode"
-              title={
-                theme === "dark"
+            <div className={styles.topbarPill}>
+              <button
+                className={styles.themeToggle}
+                onClick={toggleTheme}
+                aria-label="Toggle dark mode"
+                title={
+                  theme === "dark"
                   ? lang === "en"
                     ? "Light mode"
                     : lang === "es"
@@ -520,9 +507,9 @@ export default function AppLayout() {
               }
             >
               {theme === "dark" ? "☀️" : "🌙"}
-            </button>
-
-            <div className={styles.langSelector} ref={langRef}>
+              </button>
+              <span className={styles.pillDivider} />
+              <div className={styles.langSelector} ref={langRef}>
               <button
                 className={styles.langSelectorBtn}
                 onClick={() => setLangOpen((o) => !o)}
@@ -563,9 +550,9 @@ export default function AppLayout() {
                   ))}
                 </div>
               )}
-            </div>
-
-            <div className={styles.userMenu} ref={dropdownRef}>
+              </div>
+              <span className={styles.pillDivider} />
+              <div className={styles.userMenu} ref={dropdownRef}>
               <button
                 className={styles.userMenuTrigger}
                 onClick={() => setDropdownOpen((o) => !o)}
@@ -623,6 +610,7 @@ export default function AppLayout() {
                   </button>
                 </div>
               )}
+              </div>
             </div>
           </div>
         </header>
