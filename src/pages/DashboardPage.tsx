@@ -505,14 +505,7 @@ export default function DashboardPage() {
               {lang === "en" ? "Today's Jobs" : "Trabajos hoy"}
             </div>
           </div>
-          {canCreateJob && (
-            <button
-              className={styles.greetingBtn}
-              onClick={() => navigate("/jobs?new=1")}
-            >
-              + {lang === "en" ? "New Job" : "Nuevo trabajo"}
-            </button>
-          )}
+
         </div>
       </div>
 
@@ -525,6 +518,14 @@ export default function DashboardPage() {
               onClick={() => navigate("/customers?new=1")}
             >
               {labels.newClient}
+            </button>
+          )}
+          {canCreateJob && (
+            <button
+              className={styles.qaBtn}
+              onClick={() => navigate("/jobs?new=1")}
+            >
+              + {lang === "en" ? "New Job" : "Nuevo trabajo"}
             </button>
           )}
           {canCreateInvoice && (

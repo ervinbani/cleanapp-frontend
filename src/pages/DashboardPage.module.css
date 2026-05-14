@@ -279,6 +279,7 @@
   display: flex;
   gap: 1.25rem;
   align-items: stretch;
+  flex-wrap: wrap;
 }
 
 /* ─── Calendar card ──────────────────────────────────────────── */
@@ -288,8 +289,9 @@
   border-radius: 14px;
   padding: 1.25rem 1.5rem;
   box-shadow: var(--shadow);
-  flex: 1 1 0;
-  min-width: 0;
+  flex: 1 1 320px;
+  min-width: 320px;
+  overflow: hidden;
 }
 
 .calendarHeader {
@@ -394,11 +396,13 @@
 
 .calendarDay {
   min-height: 3.5rem;
+  min-width: 0;
   border-radius: 8px;
   padding: 0.25rem 0.2rem;
   position: relative;
   cursor: default;
   transition: background 0.1s;
+  overflow: hidden;
 }
 
 .calendarDay.hasJobs {
@@ -443,6 +447,9 @@
   cursor: pointer;
   opacity: 0.9;
   transition: opacity 0.1s;
+  overflow: hidden;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .jobPill:hover {
@@ -464,7 +471,9 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 58px;
+  max-width: calc(100% - 14px);
+  flex: 1;
+  min-width: 0;
 }
 
 .moreJobs {
@@ -1016,6 +1025,7 @@
   .trackerCard {
     flex: unset;
     width: 100%;
+    min-width: 0;
   }
   .greetingCard {
     flex-direction: column;
