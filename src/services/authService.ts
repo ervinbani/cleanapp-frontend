@@ -2,9 +2,11 @@ import apiClient from "./apiClient";
 import type {
   ApiResponse,
   AuthData,
+  AvailableLanguage,
   LoginCredentials,
   RegisterPayload,
   Tenant,
+  TenantLanguage,
   User,
 } from "../types";
 
@@ -91,5 +93,21 @@ export const updateTenant = async (
   >,
 ): Promise<Tenant> => {
   const res = await apiClient.put<ApiResponse<Tenant>>("/tenant", data);
+  return res.data.data;
+};
+
+export const getAvailableLanguages = async (): Promise<AvailableLanguage[]> => {
+  const res = await apiClient.get<ApiResponse<AvailableLanguage[]>>(
+    "/tenant/languages/available",
+  );
+  return res.data.data;
+};
+
+export const updateTenantLanguages = async (
+  languages: Pick<TenantLanguage, "lang" | "active" | "isDefault">[],
+): Promise<Tenant> => {
+  const res = await apiClient.put<ApiResponse<Tenant>>("/tenant/languages", {
+    languages,
+  });
   return res.data.data;
 };

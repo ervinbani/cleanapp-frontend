@@ -32,7 +32,7 @@ interface CustomerForm {
   lastName: string;
   email: string;
   phone: string;
-  preferredLanguage: "en" | "es" | "it";
+  preferredLanguage: "en" | "es" | "it" | "sq";
   status: CustomerStatus;
   source: CustomerSource;
   notes: string;
@@ -78,8 +78,8 @@ function customerToForm(c: Customer): CustomerForm {
 }
 
 interface CustomerModalProps {
-  customer?: Customer; // undefined = add mode
-  lang: "en" | "es" | "it";
+  customer?: Customer;
+  lang: "en" | "es" | "it" | "sq";
   onClose: () => void;
   onSaved: () => void;
 }
@@ -181,6 +181,38 @@ const ml = {
     placeholderZip: "20100",
     placeholderCountry: "IT",
   },
+  sq: {
+    titleAdd: "Shto Klient",
+    subtitleAdd: "Krijo nje klient te ri",
+    titleEdit: "Ndrysho Klientin",
+    subtitleEdit: "Perditeso te dhenat e klientit",
+    firstName: "Emri",
+    lastName: "Mbiemri",
+    email: "Email",
+    phone: "Telefoni",
+    prefLang: "Gjuha e preferuar",
+    status: "Statusi",
+    source: "Burimi",
+    notes: "Shenime interne",
+    addressSection: "Adresa",
+    street: "Rruga",
+    city: "Qyteti",
+    stateField: "Shteti / Provinca",
+    zipCode: "Kodi postar",
+    country: "Shteti",
+    cancel: "Anulo",
+    save: "Ruaj Klientin",
+    saveEdit: "Ruaj Ndryshimet",
+    saving: "Duke ruajtur…",
+    placeholderEmail: "klient@shembull.com",
+    placeholderPhone: "+355 42 123 456",
+    placeholderNotes: "Shenime interne…",
+    placeholderStreet: "Rruga 123",
+    placeholderCity: "Tirane",
+    placeholderState: "AL",
+    placeholderZip: "1001",
+    placeholderCountry: "AL",
+  },
 };
 
 function CustomerModal({
@@ -195,7 +227,7 @@ function CustomerModal({
   );
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
-  const lm = ml[lang];
+  const lm = ml[lang] ?? ml.en;
 
   const set = <K extends keyof CustomerForm>(k: K, v: CustomerForm[K]) =>
     setForm((f) => ({ ...f, [k]: v }));

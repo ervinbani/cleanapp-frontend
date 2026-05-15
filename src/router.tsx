@@ -16,6 +16,7 @@ import InvoicesPage from "./pages/InvoicesPage";
 import DocumentsPage from "./pages/DocumentsPage";
 import GeneralPage from "./pages/settings/GeneralPage";
 import RolesPermissionsPage from "./pages/settings/RolesPermissionsPage";
+import LanguagesPage from "./pages/settings/LanguagesPage";
 import MessagesPage from "./pages/MessagesPage";
 import UserDetailPage from "./pages/UserDetailPage";
 import CustomerDetailPage from "./pages/CustomerDetailPage";
@@ -58,6 +59,7 @@ const router = createBrowserRouter([
           },
           { path: "/settings/general", element: <GeneralPage /> },
           { path: "/settings/roles", element: <RolesPermissionsPage /> },
+          { path: "/settings/languages", element: <LanguagesPage /> },
         ],
       },
     ],
