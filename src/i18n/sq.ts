@@ -244,7 +244,8 @@ const sq: Translations = {
     sendModalSending: "Duke derguar…",
     sendToastSuccess: "Fatura u dergua te",
     btnWhatsApp: "Dergo me WhatsApp",
-    sendNoPhone: "Klienti nuk ka telefon — shtoni nje ne profilin e tij me pare.",
+    sendNoPhone:
+      "Klienti nuk ka telefon — shtoni nje ne profilin e tij me pare.",
     btnDownload: "Shkarko PDF",
     btnDelete: "Fshi",
   },

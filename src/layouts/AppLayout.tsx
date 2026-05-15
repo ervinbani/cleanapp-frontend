@@ -163,7 +163,9 @@ export default function AppLayout() {
   // ── lang dropdown
   const [langOpen, setLangOpen] = useState(false);
   const langRef = useRef<HTMLDivElement>(null);
-  const [activeLangs, setActiveLangs] = useState<{ code: string; flag: string; label: string }[]>([
+  const [activeLangs, setActiveLangs] = useState<
+    { code: string; flag: string; label: string }[]
+  >([
     { code: "en", flag: "🇬🇧", label: "English" },
     { code: "es", flag: "🇪🇸", label: "Español" },
   ]);

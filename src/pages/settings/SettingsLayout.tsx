@@ -68,7 +68,13 @@ export default function SettingsLayout() {
     <div className={styles.layout}>
       <aside className={styles.subNav}>
         <p className={styles.subNavTitle}>
-          {lang === "en" ? "Settings" : lang === "es" ? "Configuración" : lang === "sq" ? "Cilesimet" : "Impostazioni"}
+          {lang === "en"
+            ? "Settings"
+            : lang === "es"
+              ? "Configuración"
+              : lang === "sq"
+                ? "Cilesimet"
+                : "Impostazioni"}
         </p>
         {visibleItems.map((item) => (
           <NavLink
@@ -78,7 +84,13 @@ export default function SettingsLayout() {
               `${styles.subNavItem} ${isActive ? styles.subNavItemActive : ""}`
             }
           >
-            {lang === "en" ? item.label : lang === "es" ? item.labelEs : lang === "sq" ? item.labelSq : item.labelIt}
+            {lang === "en"
+              ? item.label
+              : lang === "es"
+                ? item.labelEs
+                : lang === "sq"
+                  ? item.labelSq
+                  : item.labelIt}
           </NavLink>
         ))}
       </aside>
