@@ -41,7 +41,7 @@ const EMPTY_FORM: AddUserForm = {
 };
 
 interface AddUserModalProps {
-  lang: "en" | "es" | "it";
+  lang: "en" | "es" | "it" | "sq";
   onClose: () => void;
   onSaved: () => void;
 }
@@ -108,8 +108,64 @@ function AddUserModal({ lang, onClose, onSaved }: AddUserModalProps) {
       placeholderEmail: "usuario@ejemplo.com",
       placeholderPhone: "+1 234 567 8900",
     },
+    it: {
+      title: "Aggiungi Utente",
+      subtitle: "Crea un nuovo membro del team",
+      firstName: "Nome",
+      lastName: "Cognome",
+      email: "Email",
+      emailHint: "Unico per azienda",
+      password: "Password",
+      passwordHint: "Verrà archiviata in modo sicuro",
+      role: "Ruolo",
+      prefLang: "Lingua preferita",
+      langHint: "Default EN",
+      phone: "Telefono",
+      tenantName: "Nome Azienda",
+      tenantNameHint: "Nome leggibile dell'azienda",
+      slug: "Slug",
+      slugHint: "Identificatore URL (generato automaticamente)",
+      placeholderTenant: "La Mia Impresa",
+      placeholderSlug: "la-mia-impresa",
+      activeUser: "Utente attivo",
+      cancel: "Annulla",
+      save: "Salva Utente",
+      saving: "Salvataggio…",
+      placeholderFirst: "Nome",
+      placeholderLast: "Cognome",
+      placeholderEmail: "utente@esempio.it",
+      placeholderPhone: "+39 02 1234 5678",
+    },
+    sq: {
+      title: "Shto Perdorues",
+      subtitle: "Krijo nje anetare te ri te ekipit",
+      firstName: "Emri",
+      lastName: "Mbiemri",
+      email: "Email",
+      emailHint: "Unik per kompani",
+      password: "Fjalekalimi",
+      passwordHint: "Do te ruhet ne menyre te sigurt",
+      role: "Roli",
+      prefLang: "Gjuha e preferuar",
+      langHint: "Default EN",
+      phone: "Telefoni",
+      tenantName: "Emri i Biznesit",
+      tenantNameHint: "Emri i lexueshem i kompanise",
+      slug: "Slug",
+      slugHint: "Identifikues URL (gjeneruar automatikisht)",
+      placeholderTenant: "Kompania Ime",
+      placeholderSlug: "kompania-ime",
+      activeUser: "Perdorues aktiv",
+      cancel: "Anulo",
+      save: "Ruaj Perdoruesin",
+      saving: "Duke ruajtur…",
+      placeholderFirst: "Emri",
+      placeholderLast: "Mbiemri",
+      placeholderEmail: "perdorues@shembull.com",
+      placeholderPhone: "+355 42 123 456",
+    },
   };
-  const ml2 = ml[lang];
+  const ml2 = ml[lang] ?? ml.en;
 
   const set = <K extends keyof AddUserForm>(k: K, v: AddUserForm[K]) =>
     setForm((f) => ({ ...f, [k]: v }));
@@ -324,7 +380,7 @@ interface EditUserForm {
 
 interface EditUserModalProps {
   user: User;
-  lang: "en" | "es" | "it";
+  lang: "en" | "es" | "it" | "sq";
   onClose: () => void;
   onSaved: () => void;
 }

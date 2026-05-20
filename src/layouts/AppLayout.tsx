@@ -4,7 +4,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { useLang } from "../contexts/LangContext";
 import { useTheme } from "../contexts/ThemeContext";
 import { messageService } from "../services/messageService";
-import { deleteTenant } from "../services/authService";
+import { deleteTenant, getTenant } from "../services/authService";
 import styles from "./AppLayout.module.css";
 
 const navSections = [
@@ -13,16 +13,16 @@ const navSections = [
     labelEs: "",
     labelIt: "",
     items: [
-      { path: "/", label: "Dashboard", labelEs: "Inicio", labelIt: "Dashboard", icon: "⊞", permission: null },
-      { path: "/users", label: "Users", labelEs: "Usuarios", labelIt: "Utenti", icon: "👥", permission: "users.read" },
-      { path: "/customers", label: "Clients", labelEs: "Clientes", labelIt: "Clienti", icon: "👤", permission: "users.read" },
-      { path: "/jobs", label: "Jobs", labelEs: "Trabajos", labelIt: "Lavori", icon: "🧹", permission: "jobs.read" },
-      { path: "/services", label: "Services", labelEs: "Servicios", labelIt: "Servizi", icon: "✨", permission: "services.read" },
-      { path: "/calendar", label: "Calendar", labelEs: "Calendario", labelIt: "Calendario", icon: "📅", permission: "jobs.read" },
-      { path: "/invoices", label: "Invoices", labelEs: "Facturas", labelIt: "Fatture", icon: "✉️", permission: "invoices.read" },
-      { path: "/documents", label: "Documents", labelEs: "Documentos", labelIt: "Documenti", icon: "📁", permission: null },
-      { path: "/messages", label: "Messages", labelEs: "Mensajes", labelIt: "Messaggi", icon: "💬", permission: null },
-      { path: "/settings", label: "Settings", labelEs: "Configuración", labelIt: "Impostazioni", icon: "⚙️", permission: "roles.read" },
+      { path: "/", label: "Dashboard", labelEs: "Inicio", labelIt: "Dashboard", labelSq: "Paneli", icon: "⊞", permission: null },
+      { path: "/users", label: "Users", labelEs: "Usuarios", labelIt: "Utenti", labelSq: "Perdoruesit", icon: "👥", permission: "users.read" },
+      { path: "/customers", label: "Clients", labelEs: "Clientes", labelIt: "Clienti", labelSq: "Klientet", icon: "👤", permission: "users.read" },
+      { path: "/jobs", label: "Jobs", labelEs: "Trabajos", labelIt: "Lavori", labelSq: "Punet", icon: "🧹", permission: "jobs.read" },
+      { path: "/services", label: "Services", labelEs: "Servicios", labelIt: "Servizi", labelSq: "Sherbimet", icon: "✨", permission: "services.read" },
+      { path: "/calendar", label: "Calendar", labelEs: "Calendario", labelIt: "Calendario", labelSq: "Kalendari", icon: "📅", permission: "jobs.read" },
+      { path: "/invoices", label: "Invoices", labelEs: "Facturas", labelIt: "Fatture", labelSq: "Faturat", icon: "✉️", permission: "invoices.read" },
+      { path: "/documents", label: "Documents", labelEs: "Documentos", labelIt: "Documenti", labelSq: "Dokumentet", icon: "📁", permission: null },
+      { path: "/messages", label: "Messages", labelEs: "Mensajes", labelIt: "Messaggi", labelSq: "Mesazhet", icon: "💬", permission: null },
+      { path: "/settings", label: "Settings", labelEs: "Configuración", labelIt: "Impostazioni", labelSq: "Cilesimet", icon: "⚙️", permission: "roles.read" },
     ],
   },
 ];
@@ -34,6 +34,7 @@ const settingsSubItems = [
     label: "General",
     labelEs: "General",
     labelIt: "Generale",
+    labelSq: "Gjenerale",
     restricted: false,
   },
   {
@@ -41,6 +42,7 @@ const settingsSubItems = [
     label: "Team",
     labelEs: "Equipo",
     labelIt: "Team",
+    labelSq: "Ekipi",
     restricted: false,
   },
   {
@@ -48,6 +50,7 @@ const settingsSubItems = [
     label: "Roles & Permissions",
     labelEs: "Roles y Permisos",
     labelIt: "Ruoli e Permessi",
+    labelSq: "Rolet dhe Lejet",
     restricted: true,
   },
   {
@@ -55,6 +58,7 @@ const settingsSubItems = [
     label: "Billing",
     labelEs: "Facturación",
     labelIt: "Fatturazione",
+    labelSq: "Faturimi",
     restricted: false,
   },
   {
@@ -62,6 +66,7 @@ const settingsSubItems = [
     label: "Languages",
     labelEs: "Idiomas",
     labelIt: "Lingue",
+    labelSq: "Gjuhet",
     restricted: false,
   },
 ];
@@ -88,6 +93,24 @@ export default function AppLayout() {
   // ── lang dropdown
   const [langOpen, setLangOpen] = useState(false);
   const langRef = useRef<HTMLDivElement>(null);
+  const [activeLangs, setActiveLangs] = useState<
+    { code: string; flag: string; label: string }[]
+  >([
+    { code: "en", flag: "🇬🇧", label: "English" },
+    { code: "es", flag: "🇪🇸", label: "Español" },
+  ]);
+
+  const LANG_META: Record<string, { flag: string; label: string }> = {
+    en: { flag: "🇬🇧", label: "English" },
+    es: { flag: "🇪🇸", label: "Español" },
+    it: { flag: "🇮🇹", label: "Italiano" },
+    sq: { flag: "🇦🇱", label: "Albanian" },
+    fr: { flag: "🇫🇷", label: "Français" },
+    de: { flag: "🇩🇪", label: "Deutsch" },
+    pt: { flag: "🇵🇹", label: "Português" },
+    pl: { flag: "🇵🇱", label: "Polski" },
+    ro: { flag: "🇷🇴", label: "Română" },
+  };
 
   // ── profile modal
   const [showProfile, setShowProfile] = useState(false);
@@ -129,6 +152,22 @@ export default function AppLayout() {
     };
     document.addEventListener("keydown", handler);
     return () => document.removeEventListener("keydown", handler);
+  }, []);
+
+  useEffect(() => {
+    getTenant()
+      .then((tenant) => {
+        const langs = (tenant.languages ?? [])
+          .filter((l) => l.active)
+          .map((l) => ({
+            code: l.lang,
+            flag: LANG_META[l.lang]?.flag ?? "🌐",
+            label: l.label ?? LANG_META[l.lang]?.label ?? l.lang.toUpperCase(),
+          }));
+        if (langs.length > 0) setActiveLangs(langs);
+      })
+      .catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // close dropdowns on outside click
@@ -295,7 +334,9 @@ export default function AppLayout() {
                           ? "Settings"
                           : lang === "es"
                             ? "Configuración"
-                            : "Impostazioni"
+                            : lang === "sq"
+                              ? "Cilesimet"
+                              : "Impostazioni"
                         : undefined
                     }
                   >
@@ -307,7 +348,9 @@ export default function AppLayout() {
                             ? item.label
                             : lang === "es"
                               ? item.labelEs
-                              : item.labelIt}
+                              : lang === "sq"
+                                ? item.labelSq
+                                : item.labelIt}
                         </span>
                         <span
                           className={`${styles.chevron} ${settingsOpen ? styles.chevronOpen : ""}`}
@@ -337,7 +380,9 @@ export default function AppLayout() {
                               ? sub.label
                               : lang === "es"
                                 ? sub.labelEs
-                                : sub.labelIt}
+                                : lang === "sq"
+                                  ? sub.labelSq
+                                  : sub.labelIt}
                           </NavLink>
                         ))}
                     </div>
@@ -362,7 +407,9 @@ export default function AppLayout() {
                               ? sub.label
                               : lang === "es"
                                 ? sub.labelEs
-                                : sub.labelIt}
+                                : lang === "sq"
+                                  ? sub.labelSq
+                                  : sub.labelIt}
                           </NavLink>
                         ))}
                     </div>
@@ -383,7 +430,9 @@ export default function AppLayout() {
                         ? item.label
                         : lang === "es"
                           ? item.labelEs
-                          : item.labelIt
+                          : lang === "sq"
+                            ? item.labelSq
+                            : item.labelIt
                       : undefined
                   }
                 >
@@ -395,8 +444,10 @@ export default function AppLayout() {
                           ? item.label
                           : lang === "es"
                             ? item.labelEs
-                            : item.labelIt}
-                        {(lang === "es" || lang === "it") && (
+                            : lang === "sq"
+                              ? item.labelSq
+                              : item.labelIt}
+                        {(lang === "es" || lang === "it" || lang === "sq") && (
                           <span className={styles.navLabelSub}>
                             {item.label}
                           </span>
@@ -526,18 +577,12 @@ export default function AppLayout() {
               </button>
               {langOpen && (
                 <div className={styles.langDropdown}>
-                  {(
-                    [
-                      { code: "en", flag: "🇬🇧", label: "English" },
-                      { code: "es", flag: "🇪🇸", label: "Español" },
-                      { code: "it", flag: "🇮🇹", label: "Italiano" },
-                    ] as const
-                  ).map(({ code, flag, label }) => (
+                  {activeLangs.map(({ code, flag, label }) => (
                     <button
                       key={code}
                       className={`${styles.langOption} ${lang === code ? styles.langOptionActive : ""}`}
                       onClick={() => {
-                        setLang(code);
+                        setLang(code as Parameters<typeof setLang>[0]);
                         setLangOpen(false);
                       }}
                     >

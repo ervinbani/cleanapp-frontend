@@ -1,4 +1,16 @@
-export type Language = "en" | "es" | "it";
+export type Language = "en" | "es" | "it" | "sq";
+
+export interface TenantLanguage {
+  lang: string;
+  label?: string;
+  active: boolean;
+  isDefault: boolean;
+}
+
+export interface AvailableLanguage {
+  lang: string;
+  label: string;
+}
 export type UserRole =
   | "owner"
   | "director"
@@ -46,6 +58,7 @@ export interface Tenant {
   businessType: string;
   defaultLanguage: Language;
   supportedLanguages: Language[];
+  languages: TenantLanguage[];
   timezone: string;
   contactEmail?: string;
   contactPhone?: string;

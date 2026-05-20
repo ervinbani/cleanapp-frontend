@@ -87,12 +87,64 @@ const ml = {
       "Todos los mensajes con este contacto serán eliminados permanentemente.",
     delete: "Eliminar",
   },
+  it: {
+    title: "Messaggi",
+    noConversations: "Nessun messaggio ancora.",
+    noThread: "Seleziona una conversazione per leggere i messaggi.",
+    reply: "Rispondi",
+    send: "Invia",
+    sending: "Invio in corso…",
+    newMessage: "Nuovo Messaggio",
+    to: "A",
+    subject: "Oggetto (facoltativo)",
+    body: "Messaggio",
+    cancel: "Annulla",
+    compose: "Scrivi",
+    unread: "non letti",
+    bodyPlaceholder: "Scrivi il tuo messaggio…",
+    subjectPlaceholder: "es. Lavoro domani",
+    selectUser: "Seleziona un destinatario",
+    deleteMsg: "Elimina messaggio",
+    confirmDelete: "Eliminare questo messaggio?",
+    confirmDeleteBody: "Questa azione non puo essere annullata.",
+    deleteConv: "Elimina conversazione",
+    confirmDeleteConv: "Eliminare questa conversazione?",
+    confirmDeleteConvBody:
+      "Tutti i messaggi con questo contatto verranno eliminati definitivamente.",
+    delete: "Elimina",
+  },
+  sq: {
+    title: "Mesazhet",
+    noConversations: "Asnje mesazh ende.",
+    noThread: "Zgjidhni nje bisede per te lexuar mesazhet.",
+    reply: "Pergjigju",
+    send: "Dergo",
+    sending: "Duke derguar…",
+    newMessage: "Mesazh i Ri",
+    to: "Per",
+    subject: "Subjekti (opsional)",
+    body: "Mesazhi",
+    cancel: "Anulo",
+    compose: "Shkruaj",
+    unread: "palexuar",
+    bodyPlaceholder: "Shkruani mesazhin tuaj…",
+    subjectPlaceholder: "p.sh. Pune neser",
+    selectUser: "Zgjidhni nje destinatar",
+    deleteMsg: "Fshi mesazhin",
+    confirmDelete: "Fshi kete mesazh?",
+    confirmDeleteBody: "Ky veprim nuk mund te zhbehet.",
+    deleteConv: "Fshi biseden",
+    confirmDeleteConv: "Fshi kete bisede?",
+    confirmDeleteConvBody:
+      "Te gjitha mesazhet me kete kontakt do te fshihen pergjithmone.",
+    delete: "Fshi",
+  },
 };
 
 // ─── ConfirmDeleteModal ───────────────────────────────────────────────────────
 
 interface ConfirmDeleteModalProps {
-  lang: "en" | "es";
+  lang: "en" | "es" | "it" | "sq";
   title?: string;
   body?: string;
   onConfirm: () => void;
@@ -106,7 +158,7 @@ function ConfirmDeleteModal({
   onConfirm,
   onCancel,
 }: ConfirmDeleteModalProps) {
-  const t = ml[lang];
+  const t = ml[lang] ?? ml.en;
   return (
     <div className={styles.modalOverlay} onClick={onCancel}>
       <div
@@ -133,7 +185,7 @@ function ConfirmDeleteModal({
 // ─── ComposeModal ─────────────────────────────────────────────────────────────
 
 interface ComposeModalProps {
-  lang: "en" | "es";
+  lang: "en" | "es" | "it" | "sq";
   users: User[];
   preselectedUserId?: string;
   onClose: () => void;
@@ -147,7 +199,7 @@ function ComposeModal({
   onClose,
   onSent,
 }: ComposeModalProps) {
-  const t = ml[lang];
+  const t = ml[lang] ?? ml.en;
   const [toUserId, setToUserId] = useState(preselectedUserId ?? "");
   const [subject, setSubject] = useState("");
   const [body, setBody] = useState("");
@@ -248,7 +300,7 @@ interface Conversation {
 export default function MessagesPage() {
   const { lang } = useLang();
   const { user: me } = useAuth();
-  const t = ml[lang];
+  const t = ml[lang] ?? ml.en;
 
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
