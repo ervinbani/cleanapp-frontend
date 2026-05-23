@@ -271,6 +271,48 @@ export interface AuthData {
   user: User;
 }
 
+// Products
+export type ProductUnit =
+  | "piece"
+  | "box"
+  | "liter"
+  | "kg"
+  | "gallon"
+  | "pack"
+  | "other";
+
+export interface ProductCategory {
+  _id: string;
+  tenantId: string;
+  name: { en: string; es: string };
+  description?: { en?: string; es?: string };
+  color?: string;
+  isActive: boolean;
+  createdAt: string;
+}
+
+export interface Product {
+  _id: string;
+  tenantId: string;
+  categoryId?: string | ProductCategory | null;
+  name: { en: string; es: string };
+  description?: { en?: string; es?: string };
+  sku?: string;
+  barcode?: string;
+  unit: ProductUnit;
+  unitPrice: number;
+  cost?: number;
+  stock?: {
+    tracked: boolean;
+    quantity: number;
+    lowStockAlert?: number;
+  };
+  taxable: boolean;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 // Roles & Permissions
 export type PermissionAction = "read" | "create" | "update" | "delete";
 export type PermissionResource =
@@ -280,7 +322,9 @@ export type PermissionResource =
   | "invoices"
   | "roles"
   | "permissions"
-  | "documents";
+  | "documents"
+  | "products"
+  | "productCategories";
 
 export interface Permission {
   _id: string;

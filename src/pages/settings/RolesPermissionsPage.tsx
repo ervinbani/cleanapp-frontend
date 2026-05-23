@@ -20,6 +20,8 @@ const RESOURCES: PermissionResource[] = [
   "roles",
   "permissions",
   "documents",
+  "products",
+  "productCategories",
 ];
 
 const ACTIONS: PermissionAction[] = ["create", "read", "update", "delete"];
@@ -32,6 +34,8 @@ const RESOURCE_LABELS: Record<PermissionResource, string> = {
   roles: "Roles",
   permissions: "Permissions",
   documents: "Documents",
+  products: "Products",
+  productCategories: "Product Categories",
 };
 
 const ACTION_LABELS: Record<PermissionAction, string> = {

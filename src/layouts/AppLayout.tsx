@@ -18,6 +18,7 @@ const navSections = [
       { path: "/customers", label: "Clients", labelEs: "Clientes", labelIt: "Clienti", labelSq: "Klientet", icon: "👤", permission: "users.read" },
       { path: "/jobs", label: "Jobs", labelEs: "Trabajos", labelIt: "Lavori", labelSq: "Punet", icon: "🧹", permission: "jobs.read" },
       { path: "/services", label: "Services", labelEs: "Servicios", labelIt: "Servizi", labelSq: "Sherbimet", icon: "✨", permission: "services.read" },
+      { path: "/products", label: "Products", labelEs: "Productos", labelIt: "Prodotti", labelSq: "Produktet", icon: "📦", permission: "products.read" },
       { path: "/calendar", label: "Calendar", labelEs: "Calendario", labelIt: "Calendario", labelSq: "Kalendari", icon: "📅", permission: "jobs.read" },
       { path: "/invoices", label: "Invoices", labelEs: "Facturas", labelIt: "Fatture", labelSq: "Faturat", icon: "✉️", permission: "invoices.read" },
       { path: "/documents", label: "Documents", labelEs: "Documentos", labelIt: "Documenti", labelSq: "Dokumentet", icon: "📁", permission: null },
@@ -27,6 +28,23 @@ const navSections = [
   },
 ];
 
+
+const productsSubItems = [
+  {
+    path: "/product-categories",
+    label: "Categories",
+    labelEs: "Categorías",
+    labelIt: "Categorie",
+    labelSq: "Kategoritë",
+  },
+  {
+    path: "/products",
+    label: "Products",
+    labelEs: "Productos",
+    labelIt: "Prodotti",
+    labelSq: "Produktet",
+  },
+];
 
 const settingsSubItems = [
   {
@@ -82,6 +100,16 @@ export default function AppLayout() {
   const [settingsOpen, setSettingsOpen] = useState(() =>
     location.pathname.startsWith("/settings"),
   );
+  const [productsOpen, setProductsOpen] = useState(() =>
+    location.pathname.startsWith("/product"),
+  );
+
+  // Keep products accordion in sync with navigation
+  useEffect(() => {
+    if (location.pathname.startsWith("/product")) {
+      setProductsOpen(true);
+    }
+  }, [location.pathname]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
   const searchRef = useRef<HTMLInputElement>(null);
@@ -276,6 +304,7 @@ export default function AppLayout() {
   };
 
   const isSettingsArea = location.pathname.startsWith("/settings");
+  const isProductsArea = location.pathname.startsWith("/product");
 
   const handleLogout = () => {
     logout();
@@ -321,7 +350,94 @@ export default function AppLayout() {
                   </span>
                 )}
                 {visibleItems.map((item) =>
-              item.path === "/settings" ? (
+              item.path === "/products" ? (
+                <div key="products" className={styles.settingsGroup}>
+                  <button
+                    className={`${styles.settingsToggle} ${isProductsArea ? styles.navItemActive : ""} ${sidebarCollapsed ? styles.navItemIconOnly : ""}`}
+                    onClick={() => {
+                      navigate("/products");
+                      setProductsOpen(true);
+                    }}
+                    title={
+                      sidebarCollapsed
+                        ? lang === "en"
+                          ? "Products"
+                          : lang === "es"
+                            ? "Productos"
+                            : lang === "sq"
+                              ? "Produktet"
+                              : "Prodotti"
+                        : undefined
+                    }
+                  >
+                    <span className={styles.navIcon}>{item.icon}</span>
+                    {!sidebarCollapsed && (
+                      <>
+                        <span className={styles.navLabel}>
+                          {lang === "en"
+                            ? item.label
+                            : lang === "es"
+                              ? item.labelEs
+                              : lang === "sq"
+                                ? item.labelSq
+                                : item.labelIt}
+                        </span>
+                        <span
+                          className={`${styles.chevron} ${productsOpen ? styles.chevronOpen : ""}`}
+                        >
+                          ›
+                        </span>
+                      </>
+                    )}
+                  </button>
+                  {/* expanded: accordion */}
+                  {!sidebarCollapsed && productsOpen && (
+                    <div className={styles.subMenu}>
+                      {productsSubItems.map((sub) => (
+                        <NavLink
+                          key={sub.path}
+                          to={sub.path}
+                          className={({ isActive }) =>
+                            `${styles.subMenuItem} ${isActive ? styles.subMenuItemActive : ""}`
+                          }
+                          onClick={() => setSidebarOpen(false)}
+                        >
+                          {lang === "en"
+                            ? sub.label
+                            : lang === "es"
+                              ? sub.labelEs
+                              : lang === "sq"
+                                ? sub.labelSq
+                                : sub.labelIt}
+                        </NavLink>
+                      ))}
+                    </div>
+                  )}
+                  {/* collapsed: hover flyout */}
+                  {sidebarCollapsed && (
+                    <div className={styles.subMenuFlyout}>
+                      {productsSubItems.map((sub) => (
+                        <NavLink
+                          key={sub.path}
+                          to={sub.path}
+                          className={({ isActive }) =>
+                            `${styles.subMenuItem} ${isActive ? styles.subMenuItemActive : ""}`
+                          }
+                          onClick={() => setSidebarOpen(false)}
+                        >
+                          {lang === "en"
+                            ? sub.label
+                            : lang === "es"
+                              ? sub.labelEs
+                              : lang === "sq"
+                                ? sub.labelSq
+                                : sub.labelIt}
+                        </NavLink>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ) : item.path === "/settings" ? (
                 <div key="settings" className={styles.settingsGroup}>
                   <button
                     className={`${styles.settingsToggle} ${isSettingsArea ? styles.navItemActive : ""} ${sidebarCollapsed ? styles.navItemIconOnly : ""}`}

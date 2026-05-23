@@ -26,6 +26,10 @@ import JobDetailPage from "./pages/JobDetailPage";
 import ServiceDetailPage from "./pages/ServiceDetailPage";
 import InvoiceDetailPage from "./pages/InvoiceDetailPage";
 import CalendarPage from "./pages/CalendarPage";
+import ProductCategoriesPage from "./pages/ProductCategoriesPage";
+import ProductCategoryDetailPage from "./pages/ProductCategoryDetailPage";
+import ProductsPage from "./pages/ProductsPage";
+import ProductDetailPage from "./pages/ProductDetailPage";
 
 const router = createBrowserRouter([
   // Public routes
@@ -55,6 +59,10 @@ const router = createBrowserRouter([
           { path: "/documents", element: <DocumentsPage /> },
           { path: "/services", element: <ServicesPage /> },
           { path: "/services/:id", element: <ServiceDetailPage /> },
+          { path: "/product-categories", element: <ProductCategoriesPage /> },
+          { path: "/product-categories/:id", element: <ProductCategoryDetailPage /> },
+          { path: "/products", element: <ProductsPage /> },
+          { path: "/products/:id", element: <ProductDetailPage /> },
           { path: "/calendar", element: <CalendarPage /> },
           { path: "/messages", element: <MessagesPage /> },
           {
