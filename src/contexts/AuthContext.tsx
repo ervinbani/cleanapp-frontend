@@ -111,13 +111,14 @@ const ROLE_PERMISSIONS: Record<UserRole, string[]> = {
   ],
   staff: [
     "jobs.read",
+    "jobs.punch",
     "services.read",
     "invoices.read",
     "documents.read",
     "products.read",
     "productCategories.read",
   ],
-  worker: ["jobs.read"],
+  worker: ["jobs.read", "jobs.punch"],
 };
 
 interface AuthContextValue {

@@ -46,4 +46,29 @@ export const jobService = {
   remove: async (id: string): Promise<void> => {
     await apiClient.delete(`/jobs/${id}`);
   },
+
+  punchIn: async (id: string): Promise<Job> => {
+    const res = await apiClient.post<{ success: boolean; data: Job }>(
+      `/jobs/${id}/punch-in`,
+    );
+    return res.data.data ?? (res.data as unknown as Job);
+  },
+
+  punchOut: async (id: string): Promise<Job> => {
+    const res = await apiClient.post<{ success: boolean; data: Job }>(
+      `/jobs/${id}/punch-out`,
+    );
+    return res.data.data ?? (res.data as unknown as Job);
+  },
+
+  addTimeEntry: async (
+    id: string,
+    payload: { userId: string; clockIn: string; durationMinutes: number },
+  ): Promise<Job> => {
+    const res = await apiClient.post<{ success: boolean; data: Job }>(
+      `/jobs/${id}/time-entries`,
+      payload,
+    );
+    return res.data.data ?? (res.data as unknown as Job);
+  },
 };

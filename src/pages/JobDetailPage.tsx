@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useLang } from "../contexts/LangContext";
 import { useAuth } from "../contexts/AuthContext";
 import { jobService } from "../services/jobService";
 import apiClient from "../services/apiClient";
-import type { Job, JobStatus, Customer, Service, User } from "../types";
+import type { Job, JobStatus, Customer, Service, User, TimeEntry } from "../types";
 import styles from "./JobDetailPage.module.css";
 
 // ─── Constants ────────────────────────────────────────────────────
@@ -82,6 +82,28 @@ const T = {
     none: "—",
     errorSave: "Error saving job.",
     savedOk: "Changes saved.",
+    sectionTimeTracking: "Time Tracking",
+    punchInBtn: "▶ Start Work",
+    punchOutBtn: "⏹ End Session",
+    punching: "Processing\u2026",
+    currentSession: "Current session",
+    totalToday: "Total today",
+    noEntries: "No entries recorded yet.",
+    entryIn: "In",
+    entryOut: "Out",
+    entryDuration: "Duration",
+    punchErrAlready: "Already clocked in.",
+    punchErrNot: "Not clocked in.",
+    punchErrGeneric: "Error. Please try again.",
+    minAbbr: "min",
+    hrAbbr: "h",
+    addManualEntry: "+ Add time manually",
+    manualDate: "Date",
+    manualHours: "Hours",
+    manualUser: "Worker",
+    addEntry: "Add",
+    adding: "Adding…",
+    addEntryErr: "Error adding entry. Please try again.",
     selectCustomer: "— Select customer —",
     selectService: "— None —",
     requiredFields: "Customer and Scheduled Start are required.",
@@ -142,6 +164,28 @@ const T = {
     none: "—",
     errorSave: "Error al guardar el trabajo.",
     savedOk: "Cambios guardados.",
+    sectionTimeTracking: "Control de tiempo",
+    punchInBtn: "▶ Iniciar trabajo",
+    punchOutBtn: "⏹ Fin de sesión",
+    punching: "Procesando…",
+    currentSession: "Sesión actual",
+    totalToday: "Total hoy",
+    noEntries: "Sin registros aún.",
+    entryIn: "Entrada",
+    entryOut: "Salida",
+    entryDuration: "Duración",
+    punchErrAlready: "Ya registrado.",
+    punchErrNot: "No registrado.",
+    punchErrGeneric: "Error. Inténtalo de nuevo.",
+    minAbbr: "min",
+    hrAbbr: "h",
+    addManualEntry: "+ Agregar tiempo manualmente",
+    manualDate: "Fecha",
+    manualHours: "Horas",
+    manualUser: "Trabajador",
+    addEntry: "Agregar",
+    adding: "Agregando…",
+    addEntryErr: "Error al agregar registro. Inténtalo de nuevo.",
     selectCustomer: "— Seleccionar cliente —",
     selectService: "— Ninguno —",
     requiredFields: "Cliente e inicio programado son obligatorios.",
@@ -202,6 +246,28 @@ const T = {
     none: "—",
     errorSave: "Errore nel salvataggio del lavoro.",
     savedOk: "Modifiche salvate.",
+    sectionTimeTracking: "Ore lavorate",
+    punchInBtn: "▶ Inizia Lavoro",
+    punchOutBtn: "⏹ Fine Sessione",
+    punching: "Elaborazione…",
+    currentSession: "Sessione corrente",
+    totalToday: "Totale oggi",
+    noEntries: "Nessuna registrazione.",
+    entryIn: "Entrata",
+    entryOut: "Uscita",
+    entryDuration: "Durata",
+    punchErrAlready: "Già in servizio.",
+    punchErrNot: "Non in servizio.",
+    punchErrGeneric: "Errore. Riprova.",
+    minAbbr: "min",
+    hrAbbr: "h",
+    addManualEntry: "+ Aggiungi ore manualmente",
+    manualDate: "Data",
+    manualHours: "Ore",
+    manualUser: "Lavoratore",
+    addEntry: "Aggiungi",
+    adding: "Aggiunta…",
+    addEntryErr: "Errore durante l'aggiunta. Riprova.",
     selectCustomer: "— Seleziona cliente —",
     selectService: "— Nessuno —",
     requiredFields: "Cliente e inizio programmato sono obbligatori.",
@@ -356,7 +422,7 @@ export default function JobDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { lang } = useLang();
-  const { hasRole } = useAuth();
+  const { hasRole, user } = useAuth();
   const l = T[lang] ?? T.en;
 
   const [job, setJob] = useState<Job | null>(null);
@@ -377,6 +443,22 @@ export default function JobDetailPage() {
 
   // Checklist toggle (view mode)
   const [checklistState, setChecklistState] = useState<boolean[]>([]);
+
+  // Punch-in / punch-out
+  const [punching, setPunching] = useState(false);
+  const [punchError, setPunchError] = useState("");
+  const [elapsed, setElapsed] = useState(0); // seconds since clockIn
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Manual time entry
+  const [showManualForm, setShowManualForm] = useState(false);
+  const [manualUserId, setManualUserId] = useState("");
+  const [manualDate, setManualDate] = useState(
+    new Date().toISOString().slice(0, 10),
+  );
+  const [manualHours, setManualHours] = useState("");
+  const [addingEntry, setAddingEntry] = useState(false);
+  const [addEntryError, setAddEntryError] = useState("");
 
   const canWrite = hasRole(
     "owner",
@@ -524,6 +606,128 @@ export default function JobDetailPage() {
       setChecklistState(checklistState);
     }
   };
+
+  // ── Punch-in / Punch-out ──────────────────────────────────────
+  const getUserId = (u: string | User): string =>
+    typeof u === "object" ? ((u as User & { _id?: string })._id ?? (u as User).id) : u;
+
+  const myOpenEntry = job
+    ? (job.timeEntries ?? []).find(
+        (e) =>
+          getUserId(e.userId as string | User) ===
+            (user?._id ?? user?.id) && !e.clockOut,
+      )
+    : undefined;
+
+  const isClockedIn = !!myOpenEntry;
+
+  const isAssigned = job
+    ? job.assignedUsers.some(
+        (u) => getUserId(u) === (user?._id ?? user?.id),
+      )
+    : false;
+
+  // Live timer while clocked in
+  useEffect(() => {
+    if (timerRef.current) clearInterval(timerRef.current);
+    if (isClockedIn && myOpenEntry?.clockIn) {
+      const update = () =>
+        setElapsed(
+          Math.floor((Date.now() - new Date(myOpenEntry.clockIn).getTime()) / 1000),
+        );
+      update();
+      timerRef.current = setInterval(update, 1000);
+    } else {
+      setElapsed(0);
+    }
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, [isClockedIn, myOpenEntry?.clockIn]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const formatElapsed = (seconds: number) => {
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = seconds % 60;
+    if (h > 0) return `${h}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+    return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+  };
+
+  const formatDuration = (minutes: number | null | undefined) => {
+    if (!minutes) return "0 " + l.minAbbr;
+    if (minutes < 60) return `${minutes} ${l.minAbbr}`;
+    const h = Math.floor(minutes / 60);
+    const m = minutes % 60;
+    return m > 0 ? `${h}${l.hrAbbr} ${m}${l.minAbbr}` : `${h}${l.hrAbbr}`;
+  };
+
+  const totalMinutesToday = (job?.timeEntries ?? [])
+    .filter((e) => {
+      const uid = getUserId(e.userId as string | User);
+      return uid === (user?._id ?? user?.id) && e.duration != null;
+    })
+    .reduce((sum, e) => sum + (e.duration ?? 0), 0);
+
+  const handlePunchIn = async () => {
+    if (!job) return;
+    setPunching(true);
+    setPunchError("");
+    try {
+      const updated = await jobService.punchIn(job._id);
+      setJob(updated);
+    } catch (err: unknown) {
+      const status = (err as { response?: { status?: number } })?.response?.status;
+      setPunchError(
+        status === 409 ? l.punchErrAlready : l.punchErrGeneric,
+      );
+    } finally {
+      setPunching(false);
+    }
+  };
+
+  const handlePunchOut = async () => {
+    if (!job) return;
+    setPunching(true);
+    setPunchError("");
+    try {
+      const updated = await jobService.punchOut(job._id);
+      setJob(updated);
+    } catch (err: unknown) {
+      const status = (err as { response?: { status?: number } })?.response?.status;
+      setPunchError(
+        status === 409 ? l.punchErrNot : l.punchErrGeneric,
+      );
+    } finally {
+      setPunching(false);
+    }
+  };
+
+  const handleAddEntry = async () => {
+    if (!job) return;
+    const uid = canWrite
+      ? manualUserId
+      : (user?._id ?? user?.id ?? "");
+    if (!uid || !manualDate || !manualHours || Number(manualHours) <= 0) return;
+    setAddingEntry(true);
+    setAddEntryError("");
+    try {
+      const clockIn = new Date(`${manualDate}T08:00:00`).toISOString();
+      const updated = await jobService.addTimeEntry(job._id, {
+        userId: uid,
+        clockIn,
+        durationMinutes: Math.round(Number(manualHours) * 60),
+      });
+      setJob(updated);
+      setShowManualForm(false);
+      setManualHours("");
+      setManualUserId("");
+    } catch {
+      setAddEntryError(l.addEntryErr);
+    } finally {
+      setAddingEntry(false);
+    }
+  };
+
 
   // ── Loading / error ───────────────────────────────────────────
   if (loading) {
@@ -1006,6 +1210,165 @@ export default function JobDetailPage() {
               </div>
             ) : (
               <p className={styles.emptySection}>{l.noAssigned}</p>
+            )}
+          </section>
+
+          {/* ── Time Tracking ────────────────────────────────── */}
+          <section className={styles.section}>
+            <h3 className={styles.sectionTitle}>{l.sectionTimeTracking}</h3>
+
+            {/* Punch panel — visible to assigned users */}
+            {isAssigned && (
+              <div className={`${styles.punchPanel} ${isClockedIn ? styles.punchPanelActive : ""}`}>
+                <div className={styles.punchInfo}>
+                  {isClockedIn ? (
+                    <>
+                      <span className={styles.punchLiveDot} />
+                      <span className={styles.punchTimer}>{formatElapsed(elapsed)}</span>
+                      <span className={styles.punchLabel}>{l.currentSession}</span>
+                    </>
+                  ) : (
+                    <span className={styles.punchLabel}>
+                      {totalMinutesToday > 0
+                        ? `${l.totalToday}: ${formatDuration(totalMinutesToday)}`
+                        : l.noEntries}
+                    </span>
+                  )}
+                </div>
+                <button
+                  className={isClockedIn ? styles.btnPunchOut : styles.btnPunchIn}
+                  onClick={isClockedIn ? handlePunchOut : handlePunchIn}
+                  disabled={punching || job.status === "completed" || job.status === "canceled"}
+                >
+                  {punching ? l.punching : isClockedIn ? l.punchOutBtn : l.punchInBtn}
+                </button>
+                {punchError && <p className={styles.punchError}>{punchError}</p>}
+              </div>
+            )}
+
+            {/* Entries table — visible to managers/owners */}
+            {canWrite && (job.timeEntries ?? []).length > 0 && (
+              <div className={styles.entriesTable}>
+                <div className={`${styles.entryRow} ${styles.entryHead}`}>
+                  <span>{l.assignedTo}</span>
+                  <span>{l.entryIn}</span>
+                  <span>{l.entryOut}</span>
+                  <span className={styles.right}>{l.entryDuration}</span>
+                </div>
+                {(job.timeEntries ?? []).map((entry: TimeEntry, i: number) => {
+                  const u = entry.userId;
+                  const name =
+                    typeof u === "object"
+                      ? `${(u as User).firstName} ${(u as User).lastName}`
+                      : String(u).slice(-6);
+                  return (
+                    <div key={entry._id ?? i} className={styles.entryRow}>
+                      <span>{name}</span>
+                      <span>{formatDate(entry.clockIn)}</span>
+                      <span>{entry.clockOut ? formatDate(entry.clockOut) : <span className={styles.liveBadge}>live</span>}</span>
+                      <span className={styles.right}>{formatDuration(entry.duration)}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {canWrite && (job.timeEntries ?? []).length === 0 && (
+              <p className={styles.emptySection}>{l.noEntries}</p>
+            )}
+
+            {/* Manual time entry — visible to managers/owners and staff (not workers) */}
+            {(canWrite || hasRole("staff")) && (
+              <div className={styles.manualEntrySection}>
+                {!showManualForm ? (
+                  <button
+                    className={styles.btnAddTime}
+                    onClick={() => {
+                      setManualUserId(assignedUsers[0]?.id ?? "");
+                      setManualDate(new Date().toISOString().slice(0, 10));
+                      setManualHours("");
+                      setAddEntryError("");
+                      setShowManualForm(true);
+                    }}
+                    disabled={
+                      job.status === "completed" || job.status === "canceled"
+                    }
+                  >
+                    {l.addManualEntry}
+                  </button>
+                ) : (
+                  <div className={styles.manualForm}>
+                    {canWrite && (
+                      <div className={styles.manualField}>
+                        <label className={styles.manualLabel}>
+                          {l.manualUser}
+                        </label>
+                        <select
+                          className={styles.manualInput}
+                          value={manualUserId}
+                          onChange={(e) => setManualUserId(e.target.value)}
+                        >
+                          <option value="">—</option>
+                          {assignedUsers.map((u) => (
+                            <option key={u.id} value={u.id}>
+                              {u.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
+                    <div className={styles.manualField}>
+                      <label className={styles.manualLabel}>
+                        {l.manualDate}
+                      </label>
+                      <input
+                        type="date"
+                        className={styles.manualInput}
+                        value={manualDate}
+                        onChange={(e) => setManualDate(e.target.value)}
+                      />
+                    </div>
+                    <div className={styles.manualField}>
+                      <label className={styles.manualLabel}>
+                        {l.manualHours}
+                      </label>
+                      <input
+                        type="number"
+                        min="0.25"
+                        step="0.25"
+                        placeholder="e.g. 2"
+                        className={styles.manualInput}
+                        value={manualHours}
+                        onChange={(e) => setManualHours(e.target.value)}
+                      />
+                    </div>
+                    <div className={styles.manualActions}>
+                      <button
+                        className={styles.btnManualCancel}
+                        onClick={() => setShowManualForm(false)}
+                        disabled={addingEntry}
+                      >
+                        {l.cancel}
+                      </button>
+                      <button
+                        className={styles.btnManualAdd}
+                        onClick={handleAddEntry}
+                        disabled={
+                          addingEntry ||
+                          !manualHours ||
+                          Number(manualHours) <= 0 ||
+                          (canWrite && !manualUserId)
+                        }
+                      >
+                        {addingEntry ? l.adding : l.addEntry}
+                      </button>
+                    </div>
+                    {addEntryError && (
+                      <p className={styles.punchError}>{addEntryError}</p>
+                    )}
+                  </div>
+                )}
+              </div>
             )}
           </section>
 

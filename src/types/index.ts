@@ -123,6 +123,14 @@ export interface Service {
   updatedAt: string;
 }
 
+export interface TimeEntry {
+  _id?: string;
+  userId: string | User;
+  clockIn: string;
+  clockOut?: string | null;
+  duration?: number | null; // minutes
+}
+
 export interface Job {
   _id: string;
   tenantId: string;
@@ -150,6 +158,7 @@ export interface Job {
   overtimeHours?: number;
   timeDuration?: number;
   invoiceId?: string;
+  timeEntries?: TimeEntry[];
   createdAt: string;
   updatedAt: string;
 }

@@ -530,3 +530,270 @@
   opacity: 0.6;
   cursor: not-allowed;
 }
+
+/* ─── Time Tracking / Punch ───────────────────────────────────── */
+.punchPanel {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.9rem 1.1rem;
+  border-radius: 12px;
+  background: var(--bg-surface-subtle, #f3f4f6);
+  border: 1.5px solid var(--border-light);
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.punchPanelActive {
+  border-color: #10b981;
+  background: #ecfdf5;
+}
+
+.punchInfo {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-width: 0;
+}
+
+.punchLiveDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #10b981;
+  animation: pulseDot 1.4s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+@keyframes pulseDot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.4; transform: scale(0.8); }
+}
+
+.punchTimer {
+  font-size: 1.35rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: #065f46;
+  letter-spacing: 0.04em;
+}
+
+.punchLabel {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+.btnPunchIn {
+  padding: 0.55rem 1.4rem;
+  border: none;
+  border-radius: 10px;
+  background: #10b981;
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.btnPunchIn:hover:not(:disabled) {
+  background: #059669;
+}
+
+.btnPunchIn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btnPunchOut {
+  padding: 0.55rem 1.4rem;
+  border: none;
+  border-radius: 10px;
+  background: #ef4444;
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.btnPunchOut:hover:not(:disabled) {
+  background: #dc2626;
+}
+
+.btnPunchOut:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.punchError {
+  width: 100%;
+  margin: 0;
+  font-size: 0.8rem;
+  color: #dc2626;
+}
+
+/* ─── Time entries table ──────────────────────────────────────── */
+.entriesTable {
+  width: 100%;
+  overflow-x: auto;
+  margin-top: 0.25rem;
+}
+
+.entryRow {
+  display: grid;
+  grid-template-columns: 1.5fr 1.5fr 1.5fr 0.7fr;
+  gap: 0.5rem 1rem;
+  padding: 0.45rem 0;
+  border-bottom: 1px solid var(--border-faint);
+  font-size: 0.82rem;
+  color: var(--text-primary);
+  align-items: center;
+}
+
+.entryRow:last-child {
+  border-bottom: none;
+}
+
+.entryHead {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  padding-bottom: 0.3rem;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.right {
+  text-align: right;
+}
+
+.liveBadge {
+  display: inline-block;
+  padding: 0.1rem 0.45rem;
+  border-radius: 20px;
+  background: #d1fae5;
+  color: #065f46;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* ─── Manual time entry ──────────────────────────────────────── */
+.manualEntrySection {
+  margin-top: 0.75rem;
+}
+
+.btnAddTime {
+  background: none;
+  border: 1px dashed var(--border-light);
+  border-radius: 6px;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  padding: 0.35rem 0.85rem;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.btnAddTime:hover:not(:disabled) {
+  border-color: #059669;
+  color: #059669;
+}
+
+.btnAddTime:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.manualForm {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem 1rem;
+  align-items: flex-end;
+  padding: 0.75rem;
+  background: var(--bg-subtle, #f9fafb);
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  margin-top: 0.25rem;
+}
+
+.manualField {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 110px;
+}
+
+.manualLabel {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+.manualInput {
+  font-size: 0.85rem;
+  padding: 0.35rem 0.55rem;
+  border: 1px solid var(--border-light);
+  border-radius: 6px;
+  background: var(--bg-card, #fff);
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.manualInput:focus {
+  border-color: #059669;
+}
+
+.manualActions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  margin-top: auto;
+}
+
+.btnManualCancel {
+  background: none;
+  border: 1px solid var(--border-light);
+  border-radius: 6px;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  padding: 0.35rem 0.75rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btnManualCancel:hover:not(:disabled) {
+  background: var(--bg-subtle, #f3f4f6);
+}
+
+.btnManualAdd {
+  background: #059669;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 0.35rem 0.85rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btnManualAdd:hover:not(:disabled) {
+  background: #047857;
+}
+
+.btnManualAdd:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+

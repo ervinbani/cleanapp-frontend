@@ -1174,8 +1174,8 @@ function JobModal({ job, lang, onClose, onSaved }: JobModalProps) {
 // ─────────────────────────────────────────────────────────────────────────────
 export default function JobsPage() {
   const { lang } = useLang();
-  const { hasPermission, hasRole } = useAuth();
-  const isWorker = hasRole("worker", "cleaner");
+  const { hasPermission, hasRole, user } = useAuth();
+  const isWorker = hasRole("worker", "cleaner", "staff");
   const l = useTrans("jobs");
 
   const [jobs, setJobs] = useState<Job[]>([]);
@@ -1252,7 +1252,9 @@ export default function JobsPage() {
         limit: PAGE_LIMIT,
         search: search.trim() || undefined,
         status: apiStatus || undefined,
-        assignedUserId: filterUserId || undefined,
+        assignedUserId: isWorker
+          ? (user?._id ?? user?.id ?? undefined)
+          : filterUserId || undefined,
         dateFrom,
         dateTo,
       });
