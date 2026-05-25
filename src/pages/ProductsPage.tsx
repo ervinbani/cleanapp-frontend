@@ -4,9 +4,7 @@ import { useLang } from "../contexts/LangContext";
 import { useTrans } from "../i18n";
 import { useAuth } from "../contexts/AuthContext";
 import { productService } from "../services/productService";
-import {
-  productCategoryService,
-} from "../services/productCategoryService";
+import { productCategoryService } from "../services/productCategoryService";
 import type { Product, ProductCategory } from "../types";
 import styles from "./ProductsPage.module.css";
 
@@ -61,7 +59,7 @@ function productToForm(p: Product): ProductForm {
   const catId =
     p.categoryId && typeof p.categoryId === "object"
       ? (p.categoryId as ProductCategory)._id
-      : (p.categoryId as string) ?? "";
+      : ((p.categoryId as string) ?? "");
   return {
     nameEn: p.name?.en ?? "",
     nameEs: p.name?.es ?? "",
@@ -513,11 +511,15 @@ export default function ProductsPage() {
     if (!p.categoryId) return "—";
     if (typeof p.categoryId === "object") {
       const cat = p.categoryId as ProductCategory;
-      return (lang === "es" ? cat.name?.es : cat.name?.en) || cat.name?.en || "—";
+      return (
+        (lang === "es" ? cat.name?.es : cat.name?.en) || cat.name?.en || "—"
+      );
     }
     const found = categories.find((c) => c._id === p.categoryId);
     return found
-      ? (lang === "es" ? found.name?.es : found.name?.en) || found.name?.en || "—"
+      ? (lang === "es" ? found.name?.es : found.name?.en) ||
+          found.name?.en ||
+          "—"
       : "—";
   };
 
@@ -532,8 +534,7 @@ export default function ProductsPage() {
     if (!p.stock?.tracked) return l.stockNotTracked;
     const qty = p.stock.quantity ?? 0;
     const low = p.stock.lowStockAlert;
-    if (low != null && qty <= low)
-      return `⚠ ${qty} (${l.lowStock})`;
+    if (low != null && qty <= low) return `⚠ ${qty} (${l.lowStock})`;
     return String(qty);
   };
 
@@ -581,7 +582,10 @@ export default function ProductsPage() {
         <select
           className={styles.filterSelect}
           value={colCategory}
-          onChange={(e) => { setColCategory(e.target.value); setPage(1); }}
+          onChange={(e) => {
+            setColCategory(e.target.value);
+            setPage(1);
+          }}
         >
           <option value="">{l.filterCategory}</option>
           {categories.map((c) => (
@@ -665,7 +669,9 @@ export default function ProductsPage() {
                       {p.categoryId ? (
                         <span
                           className={styles.catBadge}
-                          style={catColor ? { background: catColor } : undefined}
+                          style={
+                            catColor ? { background: catColor } : undefined
+                          }
                         >
                           {getCategoryName(p)}
                         </span>
@@ -675,13 +681,9 @@ export default function ProductsPage() {
                     </td>
                     <td>{l.unitLabels[p.unit] ?? p.unit}</td>
                     <td className={styles.priceCell}>
-                      {p.unitPrice != null
-                        ? `${p.unitPrice.toFixed(2)}`
-                        : "—"}
+                      {p.unitPrice != null ? `${p.unitPrice.toFixed(2)}` : "—"}
                     </td>
-                    <td className={styles.stockCell}>
-                      {getStockDisplay(p)}
-                    </td>
+                    <td className={styles.stockCell}>{getStockDisplay(p)}</td>
                     <td>
                       <span
                         className={`${styles.badge} ${p.isActive ? styles.badge_active : styles.badge_inactive}`}

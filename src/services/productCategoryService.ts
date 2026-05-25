@@ -25,19 +25,20 @@ export const productCategoryService = {
   },
 
   getById: async (id: string): Promise<ProductCategory> => {
-    const res = await apiClient.get<{ success: boolean; data: ProductCategory }>(
-      `/product-categories/${id}`,
-    );
+    const res = await apiClient.get<{
+      success: boolean;
+      data: ProductCategory;
+    }>(`/product-categories/${id}`);
     return res.data.data;
   },
 
   create: async (
     payload: Partial<ProductCategory>,
   ): Promise<ProductCategory> => {
-    const res = await apiClient.post<{ success: boolean; data: ProductCategory }>(
-      "/product-categories",
-      payload,
-    );
+    const res = await apiClient.post<{
+      success: boolean;
+      data: ProductCategory;
+    }>("/product-categories", payload);
     return res.data.data;
   },
 
@@ -45,10 +46,10 @@ export const productCategoryService = {
     id: string,
     payload: Partial<ProductCategory>,
   ): Promise<ProductCategory> => {
-    const res = await apiClient.put<{ success: boolean; data: ProductCategory }>(
-      `/product-categories/${id}`,
-      payload,
-    );
+    const res = await apiClient.put<{
+      success: boolean;
+      data: ProductCategory;
+    }>(`/product-categories/${id}`, payload);
     return res.data.data;
   },
 

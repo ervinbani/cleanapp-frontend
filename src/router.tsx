@@ -60,7 +60,10 @@ const router = createBrowserRouter([
           { path: "/services", element: <ServicesPage /> },
           { path: "/services/:id", element: <ServiceDetailPage /> },
           { path: "/product-categories", element: <ProductCategoriesPage /> },
-          { path: "/product-categories/:id", element: <ProductCategoryDetailPage /> },
+          {
+            path: "/product-categories/:id",
+            element: <ProductCategoryDetailPage />,
+          },
           { path: "/products", element: <ProductsPage /> },
           { path: "/products/:id", element: <ProductDetailPage /> },
           { path: "/calendar", element: <CalendarPage /> },

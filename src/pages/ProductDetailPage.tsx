@@ -250,7 +250,7 @@ export default function ProductDetailPage() {
     const catId =
       p.categoryId && typeof p.categoryId === "object"
         ? (p.categoryId as ProductCategory)._id
-        : (p.categoryId as string) ?? "";
+        : ((p.categoryId as string) ?? "");
     setNameEn(p.name?.en ?? "");
     setNameEs(p.name?.es ?? "");
     setDescEn(p.description?.en ?? "");
@@ -263,9 +263,7 @@ export default function ProductDetailPage() {
     setCost(p.cost != null ? String(p.cost) : "");
     setTaxable(p.taxable ?? true);
     setStockTracked(p.stock?.tracked ?? false);
-    setStockQuantity(
-      p.stock?.quantity != null ? String(p.stock.quantity) : "",
-    );
+    setStockQuantity(p.stock?.quantity != null ? String(p.stock.quantity) : "");
     setStockLowAlert(
       p.stock?.lowStockAlert != null ? String(p.stock.lowStockAlert) : "",
     );
@@ -334,11 +332,15 @@ export default function ProductDetailPage() {
     if (!p.categoryId) return l.noCategory;
     if (typeof p.categoryId === "object") {
       const cat = p.categoryId as ProductCategory;
-      return (lang === "es" ? cat.name?.es : cat.name?.en) || cat.name?.en || "—";
+      return (
+        (lang === "es" ? cat.name?.es : cat.name?.en) || cat.name?.en || "—"
+      );
     }
     const found = categories.find((c) => c._id === p.categoryId);
     return found
-      ? (lang === "es" ? found.name?.es : found.name?.en) || found.name?.en || "—"
+      ? (lang === "es" ? found.name?.es : found.name?.en) ||
+          found.name?.en ||
+          "—"
       : "—";
   };
 
@@ -355,7 +357,10 @@ export default function ProductDetailPage() {
     <div className={styles.page}>
       {/* Breadcrumb */}
       <div className={styles.breadcrumb}>
-        <button className={styles.backLink} onClick={() => navigate("/products")}>
+        <button
+          className={styles.backLink}
+          onClick={() => navigate("/products")}
+        >
           {l.back}
         </button>
       </div>

@@ -183,7 +183,10 @@ export default function ProductCategoryDetailPage() {
   };
 
   const handleSave = async () => {
-    if (!nameEn.trim()) { setSaveError(t.required); return; }
+    if (!nameEn.trim()) {
+      setSaveError(t.required);
+      return;
+    }
     if (!id) return;
     setSaving(true);
     setSaveError("");
@@ -221,7 +224,10 @@ export default function ProductCategoryDetailPage() {
     <div className={styles.page}>
       {/* Breadcrumb */}
       <div className={styles.breadcrumb}>
-        <button className={styles.backLink} onClick={() => navigate("/product-categories")}>
+        <button
+          className={styles.backLink}
+          onClick={() => navigate("/product-categories")}
+        >
           {t.back}
         </button>
       </div>
@@ -258,42 +264,88 @@ export default function ProductCategoryDetailPage() {
           <div className={styles.formGrid}>
             <div className={styles.formGroup}>
               <label className={styles.label}>{t.nameEn}</label>
-              <input className={styles.input} value={nameEn} onChange={(e) => setNameEn(e.target.value)} />
+              <input
+                className={styles.input}
+                value={nameEn}
+                onChange={(e) => setNameEn(e.target.value)}
+              />
             </div>
             <div className={styles.formGroup}>
               <label className={styles.label}>{t.nameEs}</label>
-              <input className={styles.input} value={nameEs} onChange={(e) => setNameEs(e.target.value)} />
+              <input
+                className={styles.input}
+                value={nameEs}
+                onChange={(e) => setNameEs(e.target.value)}
+              />
             </div>
             <div className={styles.formGroup}>
               <label className={styles.label}>{t.descriptionEn}</label>
-              <textarea className={styles.textarea} rows={3} value={descriptionEn} onChange={(e) => setDescriptionEn(e.target.value)} />
+              <textarea
+                className={styles.textarea}
+                rows={3}
+                value={descriptionEn}
+                onChange={(e) => setDescriptionEn(e.target.value)}
+              />
             </div>
             <div className={styles.formGroup}>
               <label className={styles.label}>{t.descriptionEs}</label>
-              <textarea className={styles.textarea} rows={3} value={descriptionEs} onChange={(e) => setDescriptionEs(e.target.value)} />
+              <textarea
+                className={styles.textarea}
+                rows={3}
+                value={descriptionEs}
+                onChange={(e) => setDescriptionEs(e.target.value)}
+              />
             </div>
             <div className={styles.formGroup}>
               <label className={styles.label}>{t.color}</label>
               <div className={styles.colorRow}>
-                <input type="color" className={styles.colorPicker} value={color || "#00C9AA"} onChange={(e) => setColor(e.target.value)} />
-                <input className={styles.input} value={color} onChange={(e) => setColor(e.target.value)} placeholder="#00C9AA" />
+                <input
+                  type="color"
+                  className={styles.colorPicker}
+                  value={color || "#00C9AA"}
+                  onChange={(e) => setColor(e.target.value)}
+                />
+                <input
+                  className={styles.input}
+                  value={color}
+                  onChange={(e) => setColor(e.target.value)}
+                  placeholder="#00C9AA"
+                />
               </div>
             </div>
             <div className={styles.formGroup}>
               <label className={styles.label}>{t.isActive}</label>
               <div className={styles.toggleRow}>
                 <label className={styles.toggleSwitch}>
-                  <input type="checkbox" checked={isActive} onChange={(e) => setIsActive(e.target.checked)} />
+                  <input
+                    type="checkbox"
+                    checked={isActive}
+                    onChange={(e) => setIsActive(e.target.checked)}
+                  />
                   <span className={styles.toggleSlider} />
                 </label>
-                <span className={styles.toggleLabel}>{isActive ? t.active : t.inactive}</span>
+                <span className={styles.toggleLabel}>
+                  {isActive ? t.active : t.inactive}
+                </span>
               </div>
             </div>
           </div>
           {saveError && <p className={styles.formError}>{saveError}</p>}
           <div className={styles.formActions}>
-            <button className={styles.btnCancel} onClick={() => setEditing(false)} disabled={saving}>{t.cancel}</button>
-            <button className={styles.btnSave} onClick={handleSave} disabled={saving}>{saving ? t.saving : t.save}</button>
+            <button
+              className={styles.btnCancel}
+              onClick={() => setEditing(false)}
+              disabled={saving}
+            >
+              {t.cancel}
+            </button>
+            <button
+              className={styles.btnSave}
+              onClick={handleSave}
+              disabled={saving}
+            >
+              {saving ? t.saving : t.save}
+            </button>
           </div>
         </div>
       ) : (
@@ -310,21 +362,43 @@ export default function ProductCategoryDetailPage() {
                 label={t.color}
                 value={
                   category.color ? (
-                    <span style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                      <span style={{ display: "inline-block", width: 16, height: 16, borderRadius: "50%", background: category.color }} />
+                    <span
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "0.5rem",
+                      }}
+                    >
+                      <span
+                        style={{
+                          display: "inline-block",
+                          width: 16,
+                          height: 16,
+                          borderRadius: "50%",
+                          background: category.color,
+                        }}
+                      />
                       {category.color}
                     </span>
-                  ) : "—"
+                  ) : (
+                    "—"
+                  )
                 }
               />
-              <Field label={t.isActive} value={category.isActive ? t.active : t.inactive} />
+              <Field
+                label={t.isActive}
+                value={category.isActive ? t.active : t.inactive}
+              />
             </div>
           </div>
 
           <div className={styles.card}>
             <h2 className={styles.sectionTitle}>{t.sectionActivity}</h2>
             <div className={styles.fieldGrid}>
-              <Field label={t.createdAt} value={formatDate(category.createdAt)} />
+              <Field
+                label={t.createdAt}
+                value={formatDate(category.createdAt)}
+              />
             </div>
           </div>
         </>

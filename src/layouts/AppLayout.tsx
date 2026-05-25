@@ -13,21 +13,108 @@ const navSections = [
     labelEs: "",
     labelIt: "",
     items: [
-      { path: "/", label: "Dashboard", labelEs: "Inicio", labelIt: "Dashboard", labelSq: "Paneli", icon: "⊞", permission: null },
-      { path: "/users", label: "Users", labelEs: "Usuarios", labelIt: "Utenti", labelSq: "Perdoruesit", icon: "👥", permission: "users.read" },
-      { path: "/customers", label: "Clients", labelEs: "Clientes", labelIt: "Clienti", labelSq: "Klientet", icon: "👤", permission: "users.read" },
-      { path: "/jobs", label: "Jobs", labelEs: "Trabajos", labelIt: "Lavori", labelSq: "Punet", icon: "🧹", permission: "jobs.read" },
-      { path: "/services", label: "Services", labelEs: "Servicios", labelIt: "Servizi", labelSq: "Sherbimet", icon: "✨", permission: "services.read" },
-      { path: "/products", label: "Products", labelEs: "Productos", labelIt: "Prodotti", labelSq: "Produktet", icon: "📦", permission: "products.read" },
-      { path: "/calendar", label: "Calendar", labelEs: "Calendario", labelIt: "Calendario", labelSq: "Kalendari", icon: "📅", permission: "jobs.read" },
-      { path: "/invoices", label: "Invoices", labelEs: "Facturas", labelIt: "Fatture", labelSq: "Faturat", icon: "✉️", permission: "invoices.read" },
-      { path: "/documents", label: "Documents", labelEs: "Documentos", labelIt: "Documenti", labelSq: "Dokumentet", icon: "📁", permission: null },
-      { path: "/messages", label: "Messages", labelEs: "Mensajes", labelIt: "Messaggi", labelSq: "Mesazhet", icon: "💬", permission: null },
-      { path: "/settings", label: "Settings", labelEs: "Configuración", labelIt: "Impostazioni", labelSq: "Cilesimet", icon: "⚙️", permission: "roles.read" },
+      {
+        path: "/",
+        label: "Dashboard",
+        labelEs: "Inicio",
+        labelIt: "Dashboard",
+        labelSq: "Paneli",
+        icon: "⊞",
+        permission: null,
+      },
+      {
+        path: "/users",
+        label: "Users",
+        labelEs: "Usuarios",
+        labelIt: "Utenti",
+        labelSq: "Perdoruesit",
+        icon: "👥",
+        permission: "users.read",
+      },
+      {
+        path: "/customers",
+        label: "Clients",
+        labelEs: "Clientes",
+        labelIt: "Clienti",
+        labelSq: "Klientet",
+        icon: "👤",
+        permission: "users.read",
+      },
+      {
+        path: "/jobs",
+        label: "Jobs",
+        labelEs: "Trabajos",
+        labelIt: "Lavori",
+        labelSq: "Punet",
+        icon: "🧹",
+        permission: "jobs.read",
+      },
+      {
+        path: "/services",
+        label: "Services",
+        labelEs: "Servicios",
+        labelIt: "Servizi",
+        labelSq: "Sherbimet",
+        icon: "✨",
+        permission: "services.read",
+      },
+      {
+        path: "/products",
+        label: "Products",
+        labelEs: "Productos",
+        labelIt: "Prodotti",
+        labelSq: "Produktet",
+        icon: "📦",
+        permission: "products.read",
+      },
+      {
+        path: "/calendar",
+        label: "Calendar",
+        labelEs: "Calendario",
+        labelIt: "Calendario",
+        labelSq: "Kalendari",
+        icon: "📅",
+        permission: "jobs.read",
+      },
+      {
+        path: "/invoices",
+        label: "Invoices",
+        labelEs: "Facturas",
+        labelIt: "Fatture",
+        labelSq: "Faturat",
+        icon: "✉️",
+        permission: "invoices.read",
+      },
+      {
+        path: "/documents",
+        label: "Documents",
+        labelEs: "Documentos",
+        labelIt: "Documenti",
+        labelSq: "Dokumentet",
+        icon: "📁",
+        permission: null,
+      },
+      {
+        path: "/messages",
+        label: "Messages",
+        labelEs: "Mensajes",
+        labelIt: "Messaggi",
+        labelSq: "Mesazhet",
+        icon: "💬",
+        permission: null,
+      },
+      {
+        path: "/settings",
+        label: "Settings",
+        labelEs: "Configuración",
+        labelIt: "Impostazioni",
+        labelSq: "Cilesimet",
+        icon: "⚙️",
+        permission: "roles.read",
+      },
     ],
   },
 ];
-
 
 const productsSubItems = [
   {
@@ -103,13 +190,6 @@ export default function AppLayout() {
   const [productsOpen, setProductsOpen] = useState(() =>
     location.pathname.startsWith("/product"),
   );
-
-  // Keep products accordion in sync with navigation
-  useEffect(() => {
-    if (location.pathname.startsWith("/product")) {
-      setProductsOpen(true);
-    }
-  }, [location.pathname]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
   const searchRef = useRef<HTMLInputElement>(null);
@@ -350,232 +430,238 @@ export default function AppLayout() {
                   </span>
                 )}
                 {visibleItems.map((item) =>
-              item.path === "/products" ? (
-                <div key="products" className={styles.settingsGroup}>
-                  <button
-                    className={`${styles.settingsToggle} ${isProductsArea ? styles.navItemActive : ""} ${sidebarCollapsed ? styles.navItemIconOnly : ""}`}
-                    onClick={() => {
-                      navigate("/products");
-                      setProductsOpen(true);
-                    }}
-                    title={
-                      sidebarCollapsed
-                        ? lang === "en"
-                          ? "Products"
-                          : lang === "es"
-                            ? "Productos"
-                            : lang === "sq"
-                              ? "Produktet"
-                              : "Prodotti"
-                        : undefined
-                    }
-                  >
-                    <span className={styles.navIcon}>{item.icon}</span>
-                    {!sidebarCollapsed && (
-                      <>
-                        <span className={styles.navLabel}>
-                          {lang === "en"
-                            ? item.label
-                            : lang === "es"
-                              ? item.labelEs
-                              : lang === "sq"
-                                ? item.labelSq
-                                : item.labelIt}
-                        </span>
-                        <span
-                          className={`${styles.chevron} ${productsOpen ? styles.chevronOpen : ""}`}
-                        >
-                          ›
-                        </span>
-                      </>
-                    )}
-                  </button>
-                  {/* expanded: accordion */}
-                  {!sidebarCollapsed && productsOpen && (
-                    <div className={styles.subMenu}>
-                      {productsSubItems.map((sub) => (
-                        <NavLink
-                          key={sub.path}
-                          to={sub.path}
-                          className={({ isActive }) =>
-                            `${styles.subMenuItem} ${isActive ? styles.subMenuItemActive : ""}`
-                          }
-                          onClick={() => setSidebarOpen(false)}
-                        >
-                          {lang === "en"
-                            ? sub.label
-                            : lang === "es"
-                              ? sub.labelEs
-                              : lang === "sq"
-                                ? sub.labelSq
-                                : sub.labelIt}
-                        </NavLink>
-                      ))}
-                    </div>
-                  )}
-                  {/* collapsed: hover flyout */}
-                  {sidebarCollapsed && (
-                    <div className={styles.subMenuFlyout}>
-                      {productsSubItems.map((sub) => (
-                        <NavLink
-                          key={sub.path}
-                          to={sub.path}
-                          className={({ isActive }) =>
-                            `${styles.subMenuItem} ${isActive ? styles.subMenuItemActive : ""}`
-                          }
-                          onClick={() => setSidebarOpen(false)}
-                        >
-                          {lang === "en"
-                            ? sub.label
-                            : lang === "es"
-                              ? sub.labelEs
-                              : lang === "sq"
-                                ? sub.labelSq
-                                : sub.labelIt}
-                        </NavLink>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              ) : item.path === "/settings" ? (
-                <div key="settings" className={styles.settingsGroup}>
-                  <button
-                    className={`${styles.settingsToggle} ${isSettingsArea ? styles.navItemActive : ""} ${sidebarCollapsed ? styles.navItemIconOnly : ""}`}
-                    onClick={() =>
-                      !sidebarCollapsed && setSettingsOpen((o) => !o)
-                    }
-                    title={
-                      sidebarCollapsed
-                        ? lang === "en"
-                          ? "Settings"
-                          : lang === "es"
-                            ? "Configuración"
-                            : lang === "sq"
-                              ? "Cilesimet"
-                              : "Impostazioni"
-                        : undefined
-                    }
-                  >
-                    <span className={styles.navIcon}>{item.icon}</span>
-                    {!sidebarCollapsed && (
-                      <>
-                        <span className={styles.navLabel}>
-                          {lang === "en"
-                            ? item.label
-                            : lang === "es"
-                              ? item.labelEs
-                              : lang === "sq"
-                                ? item.labelSq
-                                : item.labelIt}
-                        </span>
-                        <span
-                          className={`${styles.chevron} ${settingsOpen ? styles.chevronOpen : ""}`}
-                        >
-                          ›
-                        </span>
-                      </>
-                    )}
-                  </button>
-                  {/* expanded: normal accordion */}
-                  {!sidebarCollapsed && settingsOpen && (
-                    <div className={styles.subMenu}>
-                      {settingsSubItems
-                        .filter(
-                          (s) => !s.restricted || hasRole("owner", "director"),
-                        )
-                        .map((sub) => (
-                          <NavLink
-                            key={sub.path}
-                            to={sub.path}
-                            className={({ isActive }) =>
-                              `${styles.subMenuItem} ${isActive ? styles.subMenuItemActive : ""}`
-                            }
-                            onClick={() => setSidebarOpen(false)}
-                          >
-                            {lang === "en"
-                              ? sub.label
+                  item.path === "/products" ? (
+                    <div key="products" className={styles.settingsGroup}>
+                      <button
+                        className={`${styles.settingsToggle} ${isProductsArea ? styles.navItemActive : ""} ${sidebarCollapsed ? styles.navItemIconOnly : ""}`}
+                        onClick={() => {
+                          if (!isProductsArea) navigate("/products");
+                          if (!sidebarCollapsed) setProductsOpen((o) => !o);
+                        }}
+                        title={
+                          sidebarCollapsed
+                            ? lang === "en"
+                              ? "Products"
                               : lang === "es"
-                                ? sub.labelEs
+                                ? "Productos"
                                 : lang === "sq"
-                                  ? sub.labelSq
-                                  : sub.labelIt}
-                          </NavLink>
-                        ))}
-                    </div>
-                  )}
-                  {/* collapsed: hover flyout */}
-                  {sidebarCollapsed && (
-                    <div className={styles.subMenuFlyout}>
-                      {settingsSubItems
-                        .filter(
-                          (s) => !s.restricted || hasRole("owner", "director"),
-                        )
-                        .map((sub) => (
-                          <NavLink
-                            key={sub.path}
-                            to={sub.path}
-                            className={({ isActive }) =>
-                              `${styles.subMenuItem} ${isActive ? styles.subMenuItemActive : ""}`
-                            }
-                            onClick={() => setSidebarOpen(false)}
-                          >
-                            {lang === "en"
-                              ? sub.label
-                              : lang === "es"
-                                ? sub.labelEs
-                                : lang === "sq"
-                                  ? sub.labelSq
-                                  : sub.labelIt}
-                          </NavLink>
-                        ))}
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <NavLink
-                  key={item.path}
-                  to={item.path}
-                  end={item.path === "/"}
-                  className={({ isActive }) =>
-                    `${styles.navItem} ${isActive ? styles.navItemActive : ""} ${sidebarCollapsed ? styles.navItemIconOnly : ""}`
-                  }
-                  onClick={() => setSidebarOpen(false)}
-                  title={
-                    sidebarCollapsed
-                      ? lang === "en"
-                        ? item.label
-                        : lang === "es"
-                          ? item.labelEs
-                          : lang === "sq"
-                            ? item.labelSq
-                            : item.labelIt
-                      : undefined
-                  }
-                >
-                  <span className={styles.navIcon}>{item.icon}</span>
-                  {!sidebarCollapsed && (
-                    <>
-                      <span className={styles.navLabel}>
-                        {lang === "en"
-                          ? item.label
-                          : lang === "es"
-                            ? item.labelEs
-                            : lang === "sq"
-                              ? item.labelSq
-                              : item.labelIt}
-                        {(lang === "es" || lang === "it" || lang === "sq") && (
-                          <span className={styles.navLabelSub}>
-                            {item.label}
-                          </span>
+                                  ? "Produktet"
+                                  : "Prodotti"
+                            : undefined
+                        }
+                      >
+                        <span className={styles.navIcon}>{item.icon}</span>
+                        {!sidebarCollapsed && (
+                          <>
+                            <span className={styles.navLabel}>
+                              {lang === "en"
+                                ? item.label
+                                : lang === "es"
+                                  ? item.labelEs
+                                  : lang === "sq"
+                                    ? item.labelSq
+                                    : item.labelIt}
+                            </span>
+                            <span
+                              className={`${styles.chevron} ${productsOpen ? styles.chevronOpen : ""}`}
+                            >
+                              ›
+                            </span>
+                          </>
                         )}
-                      </span>
-                      {item.path === "/messages" && unreadCount > 0 && (
-                        <span className={styles.navBadge}>{unreadCount}</span>
+                      </button>
+                      {/* expanded: accordion */}
+                      {!sidebarCollapsed && productsOpen && (
+                        <div className={styles.subMenu}>
+                          {productsSubItems.map((sub) => (
+                            <NavLink
+                              key={sub.path}
+                              to={sub.path}
+                              className={({ isActive }) =>
+                                `${styles.subMenuItem} ${isActive ? styles.subMenuItemActive : ""}`
+                              }
+                              onClick={() => setSidebarOpen(false)}
+                            >
+                              {lang === "en"
+                                ? sub.label
+                                : lang === "es"
+                                  ? sub.labelEs
+                                  : lang === "sq"
+                                    ? sub.labelSq
+                                    : sub.labelIt}
+                            </NavLink>
+                          ))}
+                        </div>
                       )}
-                    </>
-                  )}
-                </NavLink>
-              ),
+                      {/* collapsed: hover flyout */}
+                      {sidebarCollapsed && (
+                        <div className={styles.subMenuFlyout}>
+                          {productsSubItems.map((sub) => (
+                            <NavLink
+                              key={sub.path}
+                              to={sub.path}
+                              className={({ isActive }) =>
+                                `${styles.subMenuItem} ${isActive ? styles.subMenuItemActive : ""}`
+                              }
+                              onClick={() => setSidebarOpen(false)}
+                            >
+                              {lang === "en"
+                                ? sub.label
+                                : lang === "es"
+                                  ? sub.labelEs
+                                  : lang === "sq"
+                                    ? sub.labelSq
+                                    : sub.labelIt}
+                            </NavLink>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ) : item.path === "/settings" ? (
+                    <div key="settings" className={styles.settingsGroup}>
+                      <button
+                        className={`${styles.settingsToggle} ${isSettingsArea ? styles.navItemActive : ""} ${sidebarCollapsed ? styles.navItemIconOnly : ""}`}
+                        onClick={() =>
+                          !sidebarCollapsed && setSettingsOpen((o) => !o)
+                        }
+                        title={
+                          sidebarCollapsed
+                            ? lang === "en"
+                              ? "Settings"
+                              : lang === "es"
+                                ? "Configuración"
+                                : lang === "sq"
+                                  ? "Cilesimet"
+                                  : "Impostazioni"
+                            : undefined
+                        }
+                      >
+                        <span className={styles.navIcon}>{item.icon}</span>
+                        {!sidebarCollapsed && (
+                          <>
+                            <span className={styles.navLabel}>
+                              {lang === "en"
+                                ? item.label
+                                : lang === "es"
+                                  ? item.labelEs
+                                  : lang === "sq"
+                                    ? item.labelSq
+                                    : item.labelIt}
+                            </span>
+                            <span
+                              className={`${styles.chevron} ${settingsOpen ? styles.chevronOpen : ""}`}
+                            >
+                              ›
+                            </span>
+                          </>
+                        )}
+                      </button>
+                      {/* expanded: normal accordion */}
+                      {!sidebarCollapsed && settingsOpen && (
+                        <div className={styles.subMenu}>
+                          {settingsSubItems
+                            .filter(
+                              (s) =>
+                                !s.restricted || hasRole("owner", "director"),
+                            )
+                            .map((sub) => (
+                              <NavLink
+                                key={sub.path}
+                                to={sub.path}
+                                className={({ isActive }) =>
+                                  `${styles.subMenuItem} ${isActive ? styles.subMenuItemActive : ""}`
+                                }
+                                onClick={() => setSidebarOpen(false)}
+                              >
+                                {lang === "en"
+                                  ? sub.label
+                                  : lang === "es"
+                                    ? sub.labelEs
+                                    : lang === "sq"
+                                      ? sub.labelSq
+                                      : sub.labelIt}
+                              </NavLink>
+                            ))}
+                        </div>
+                      )}
+                      {/* collapsed: hover flyout */}
+                      {sidebarCollapsed && (
+                        <div className={styles.subMenuFlyout}>
+                          {settingsSubItems
+                            .filter(
+                              (s) =>
+                                !s.restricted || hasRole("owner", "director"),
+                            )
+                            .map((sub) => (
+                              <NavLink
+                                key={sub.path}
+                                to={sub.path}
+                                className={({ isActive }) =>
+                                  `${styles.subMenuItem} ${isActive ? styles.subMenuItemActive : ""}`
+                                }
+                                onClick={() => setSidebarOpen(false)}
+                              >
+                                {lang === "en"
+                                  ? sub.label
+                                  : lang === "es"
+                                    ? sub.labelEs
+                                    : lang === "sq"
+                                      ? sub.labelSq
+                                      : sub.labelIt}
+                              </NavLink>
+                            ))}
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <NavLink
+                      key={item.path}
+                      to={item.path}
+                      end={item.path === "/"}
+                      className={({ isActive }) =>
+                        `${styles.navItem} ${isActive ? styles.navItemActive : ""} ${sidebarCollapsed ? styles.navItemIconOnly : ""}`
+                      }
+                      onClick={() => setSidebarOpen(false)}
+                      title={
+                        sidebarCollapsed
+                          ? lang === "en"
+                            ? item.label
+                            : lang === "es"
+                              ? item.labelEs
+                              : lang === "sq"
+                                ? item.labelSq
+                                : item.labelIt
+                          : undefined
+                      }
+                    >
+                      <span className={styles.navIcon}>{item.icon}</span>
+                      {!sidebarCollapsed && (
+                        <>
+                          <span className={styles.navLabel}>
+                            {lang === "en"
+                              ? item.label
+                              : lang === "es"
+                                ? item.labelEs
+                                : lang === "sq"
+                                  ? item.labelSq
+                                  : item.labelIt}
+                            {(lang === "es" ||
+                              lang === "it" ||
+                              lang === "sq") && (
+                              <span className={styles.navLabelSub}>
+                                {item.label}
+                              </span>
+                            )}
+                          </span>
+                          {item.path === "/messages" && unreadCount > 0 && (
+                            <span className={styles.navBadge}>
+                              {unreadCount}
+                            </span>
+                          )}
+                        </>
+                      )}
+                    </NavLink>
+                  ),
                 )}
               </div>
             );
@@ -640,7 +726,9 @@ export default function AppLayout() {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && searchQuery.trim()) {
-                    navigate(`/jobs?q=${encodeURIComponent(searchQuery.trim())}`);
+                    navigate(
+                      `/jobs?q=${encodeURIComponent(searchQuery.trim())}`,
+                    );
                     setSearchQuery("");
                   }
                   if (e.key === "Escape") {
@@ -661,116 +749,119 @@ export default function AppLayout() {
                 aria-label="Toggle dark mode"
                 title={
                   theme === "dark"
-                  ? lang === "en"
-                    ? "Light mode"
-                    : lang === "es"
-                      ? "Modo claro"
-                      : "Modalità chiara"
-                  : lang === "en"
-                    ? "Dark mode"
-                    : lang === "es"
-                      ? "Modo oscuro"
-                      : "Modalità scura"
-              }
-            >
-              {theme === "dark" ? "☀️" : "🌙"}
+                    ? lang === "en"
+                      ? "Light mode"
+                      : lang === "es"
+                        ? "Modo claro"
+                        : "Modalità chiara"
+                    : lang === "en"
+                      ? "Dark mode"
+                      : lang === "es"
+                        ? "Modo oscuro"
+                        : "Modalità scura"
+                }
+              >
+                {theme === "dark" ? "☀️" : "🌙"}
               </button>
               <span className={styles.pillDivider} />
               <div className={styles.langSelector} ref={langRef}>
-              <button
-                className={styles.langSelectorBtn}
-                onClick={() => setLangOpen((o) => !o)}
-                aria-expanded={langOpen}
-                aria-label="Select language"
-              >
-                <span className={styles.langGlobe}>🌐</span>
-                <span className={styles.langCode}>{lang.toUpperCase()}</span>
-                <span
-                  className={`${styles.langChevron} ${langOpen ? styles.langChevronOpen : ""}`}
+                <button
+                  className={styles.langSelectorBtn}
+                  onClick={() => setLangOpen((o) => !o)}
+                  aria-expanded={langOpen}
+                  aria-label="Select language"
                 >
-                  ‹
-                </span>
-              </button>
-              {langOpen && (
-                <div className={styles.langDropdown}>
-                  {activeLangs.map(({ code, flag, label }) => (
-                    <button
-                      key={code}
-                      className={`${styles.langOption} ${lang === code ? styles.langOptionActive : ""}`}
-                      onClick={() => {
-                        setLang(code as Parameters<typeof setLang>[0]);
-                        setLangOpen(false);
-                      }}
-                    >
-                      <span>{flag}</span>
-                      <span>{label}</span>
-                      {lang === code && (
-                        <span className={styles.langCheck}>✓</span>
-                      )}
-                    </button>
-                  ))}
-                </div>
-              )}
+                  <span className={styles.langGlobe}>🌐</span>
+                  <span className={styles.langCode}>{lang.toUpperCase()}</span>
+                  <span
+                    className={`${styles.langChevron} ${langOpen ? styles.langChevronOpen : ""}`}
+                  >
+                    ‹
+                  </span>
+                </button>
+                {langOpen && (
+                  <div className={styles.langDropdown}>
+                    {activeLangs.map(({ code, flag, label }) => (
+                      <button
+                        key={code}
+                        className={`${styles.langOption} ${lang === code ? styles.langOptionActive : ""}`}
+                        onClick={() => {
+                          setLang(code as Parameters<typeof setLang>[0]);
+                          setLangOpen(false);
+                        }}
+                      >
+                        <span>{flag}</span>
+                        <span>{label}</span>
+                        {lang === code && (
+                          <span className={styles.langCheck}>✓</span>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
               <span className={styles.pillDivider} />
               <div className={styles.userMenu} ref={dropdownRef}>
-              <button
-                className={styles.userMenuTrigger}
-                onClick={() => setDropdownOpen((o) => !o)}
-                aria-expanded={dropdownOpen}
-              >
-                <div className={styles.avatar}>
-                  {user?.firstName?.[0]}
-                  {user?.lastName?.[0]}
-                </div>
-                <span className={styles.userName}>
-                  {user?.firstName} {user?.lastName}
-                </span>
-                <span className={styles.userChevron}>
-                  {dropdownOpen ? "▴" : "▾"}
-                </span>
-              </button>
-
-              {dropdownOpen && (
-                <div className={styles.userDropdown}>
-                  <div className={styles.userDropdownHeader}>
-                    <div className={styles.avatarLarge}>
-                      {user?.firstName?.[0]}
-                      {user?.lastName?.[0]}
-                    </div>
-                    <div>
-                      <p className={styles.dropdownName}>
-                        {user?.firstName} {user?.lastName}
-                      </p>
-                      <p className={styles.dropdownRole}>{user?.role}</p>
-                    </div>
+                <button
+                  className={styles.userMenuTrigger}
+                  onClick={() => setDropdownOpen((o) => !o)}
+                  aria-expanded={dropdownOpen}
+                >
+                  <div className={styles.avatar}>
+                    {user?.firstName?.[0]}
+                    {user?.lastName?.[0]}
                   </div>
-                  <hr className={styles.dropdownDivider} />
-                  <button className={styles.dropdownItem} onClick={openProfile}>
-                    👤{" "}
-                    {lang === "en"
-                      ? "My Profile"
-                      : lang === "es"
-                        ? "Mi Perfil"
-                        : "Il mio profilo"}
-                  </button>
-                  <hr className={styles.dropdownDivider} />
-                  <button
-                    className={styles.dropdownItem}
-                    onClick={() => {
-                      setDropdownOpen(false);
-                      handleLogout();
-                    }}
-                  >
-                    ⏻{" "}
-                    {lang === "en"
-                      ? "Logout"
-                      : lang === "es"
-                        ? "Cerrar sesión"
-                        : "Esci"}
-                  </button>
-                </div>
-              )}
+                  <span className={styles.userName}>
+                    {user?.firstName} {user?.lastName}
+                  </span>
+                  <span className={styles.userChevron}>
+                    {dropdownOpen ? "▴" : "▾"}
+                  </span>
+                </button>
+
+                {dropdownOpen && (
+                  <div className={styles.userDropdown}>
+                    <div className={styles.userDropdownHeader}>
+                      <div className={styles.avatarLarge}>
+                        {user?.firstName?.[0]}
+                        {user?.lastName?.[0]}
+                      </div>
+                      <div>
+                        <p className={styles.dropdownName}>
+                          {user?.firstName} {user?.lastName}
+                        </p>
+                        <p className={styles.dropdownRole}>{user?.role}</p>
+                      </div>
+                    </div>
+                    <hr className={styles.dropdownDivider} />
+                    <button
+                      className={styles.dropdownItem}
+                      onClick={openProfile}
+                    >
+                      👤{" "}
+                      {lang === "en"
+                        ? "My Profile"
+                        : lang === "es"
+                          ? "Mi Perfil"
+                          : "Il mio profilo"}
+                    </button>
+                    <hr className={styles.dropdownDivider} />
+                    <button
+                      className={styles.dropdownItem}
+                      onClick={() => {
+                        setDropdownOpen(false);
+                        handleLogout();
+                      }}
+                    >
+                      ⏻{" "}
+                      {lang === "en"
+                        ? "Logout"
+                        : lang === "es"
+                          ? "Cerrar sesión"
+                          : "Esci"}
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </div>
