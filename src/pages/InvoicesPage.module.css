@@ -948,13 +948,129 @@
   transition:
     border-color 0.15s,
     color 0.15s;
-  margin-bottom: 1rem;
 }
 
 .btnAddItem:hover {
   border-color: #3b82f6;
   color: #3b82f6;
 }
+
+.addItemRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.btnAddFromProducts {
+  background: none;
+  border: 1px dashed var(--border-input);
+  border-radius: 8px;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  padding: 0.4rem 0.9rem;
+  cursor: pointer;
+  transition:
+    border-color 0.15s,
+    color 0.15s;
+}
+
+.btnAddFromProducts:hover {
+  border-color: #10b981;
+  color: #10b981;
+}
+
+/* ─── Product Picker Modal ────────────────────────────────────── */
+.productPickerModal {
+  background: var(--bg-surface);
+  border-radius: 14px;
+  width: 100%;
+  max-width: 460px;
+  max-height: 80vh;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.productPickerBody {
+  padding: 0.75rem 1.5rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  overflow: hidden;
+  flex: 1;
+  min-height: 0;
+}
+
+.productPickerSearch {
+  padding: 0.5rem 0.75rem;
+  border: 1.5px solid var(--border-input, #d1d5db);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  background: var(--bg-input, #fff);
+  outline: none;
+  width: 100%;
+  box-sizing: border-box;
+  transition: border-color 0.15s;
+  flex-shrink: 0;
+}
+
+.productPickerSearch:focus {
+  border-color: var(--accent, #2563eb);
+}
+
+.productPickerEmpty {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  font-style: italic;
+  margin: 0;
+  padding: 0.5rem 0;
+}
+
+.productList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+}
+
+.productRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.6rem 0.75rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.12s;
+  gap: 0.75rem;
+}
+
+.productRow:hover {
+  background: var(--bg-surface-subtle, #f3f4f6);
+}
+
+.productRowName {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.productRowMeta {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
 
 /* ─── Totals ──────────────────────────────────────────────────── */
 .totalsWrap {

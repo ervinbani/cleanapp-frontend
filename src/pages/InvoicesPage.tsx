@@ -4,8 +4,9 @@ import { useLang } from "../contexts/LangContext";
 import { useTrans } from "../i18n";
 import { useAuth } from "../contexts/AuthContext";
 import { invoiceService } from "../services/invoiceService";
+import { productService } from "../services/productService";
 import apiClient from "../services/apiClient";
-import type { Invoice, InvoiceStatus, Customer, Tenant } from "../types";
+import type { Invoice, InvoiceStatus, Customer, Tenant, Product } from "../types";
 import { getTenant } from "../services/authService";
 import { jobService } from "../services/jobService";
 import RichTextEditor from "../components/RichTextEditor";
@@ -601,6 +602,11 @@ const formT = {
     unitPrice: "Unit Price",
     lineTotal: "Total",
     addItem: "+ Add Item",
+    addFromProducts: "+ From Products",
+    productPickerTitle: "Add from Products",
+    searchProducts: "Search products…",
+    noProducts: "No products found.",
+    loadingProducts: "Loading products…",
     cancel: "Cancel",
     save: "Save",
     update: "Update",
@@ -676,6 +682,11 @@ const formT = {
     unitPrice: "Precio Unit.",
     lineTotal: "Total",
     addItem: "+ Agregar Artículo",
+    addFromProducts: "+ Desde Productos",
+    productPickerTitle: "Agregar desde Productos",
+    searchProducts: "Buscar productos…",
+    noProducts: "Sin productos.",
+    loadingProducts: "Cargando productos…",
     cancel: "Cancelar",
     save: "Guardar",
     update: "Actualizar",
@@ -751,6 +762,11 @@ const formT = {
     unitPrice: "Prezzo unit.",
     lineTotal: "Totale",
     addItem: "+ Aggiungi voce",
+    addFromProducts: "+ Da Prodotti",
+    productPickerTitle: "Aggiungi da Prodotti",
+    searchProducts: "Cerca prodotti…",
+    noProducts: "Nessun prodotto trovato.",
+    loadingProducts: "Caricamento prodotti…",
     cancel: "Annulla",
     save: "Salva",
     update: "Aggiorna",
@@ -1013,6 +1029,38 @@ function InvoiceFormSection({
   );
   const [jobs, setJobs] = useState<DropdownJob[]>([]);
   const [loadingJobs, setLoadingJobs] = useState(false);
+  const [showProductPicker, setShowProductPicker] = useState(false);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loadingProducts, setLoadingProducts] = useState(false);
+  const [productSearch, setProductSearch] = useState("");
+
+  useEffect(() => {
+    if (!showProductPicker || products.length > 0) return;
+    setLoadingProducts(true);
+    productService
+      .getAll({ limit: 200 })
+      .then((res) => setProducts(res.data ?? []))
+      .catch(() => {})
+      .finally(() => setLoadingProducts(false));
+  }, [showProductPicker]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const addProductAsItem = (product: Product) => {
+    const name =
+      product.name[lang as keyof typeof product.name] ||
+      product.name.en ||
+      "";
+    const newItem: ItemForm = {
+      description: name,
+      serviceType: `product:${product._id}`,
+      quantity: "1",
+      unit: product.unit,
+      unitPrice: String(product.unitPrice),
+      priceUnit: "per_job",
+    };
+    setForm((prev) => ({ ...prev, items: [...prev.items, newItem] }));
+    setShowProductPicker(false);
+    setProductSearch("");
+  };
 
   useEffect(() => {
     apiClient
@@ -1858,9 +1906,92 @@ function InvoiceFormSection({
               </button>
             </div>
           ))}
-          <button type="button" className={styles.btnAddItem} onClick={addItem}>
-            {l.addItem}
-          </button>
+          <div className={styles.addItemRow}>
+            <button type="button" className={styles.btnAddItem} onClick={addItem}>
+              {l.addItem}
+            </button>
+            <button
+              type="button"
+              className={styles.btnAddFromProducts}
+              onClick={() => setShowProductPicker(true)}
+            >
+              {l.addFromProducts}
+            </button>
+          </div>
+
+          {/* Product Picker Modal */}
+          {showProductPicker && (
+            <div
+              className={styles.modalOverlay}
+              onClick={(e) => {
+                if (e.target === e.currentTarget) {
+                  setShowProductPicker(false);
+                  setProductSearch("");
+                }
+              }}
+            >
+              <div className={styles.productPickerModal}>
+                <div className={styles.sendModalHeader}>
+                  <div>
+                    <p className={styles.sendModalTitle}>{l.productPickerTitle}</p>
+                  </div>
+                  <button
+                    type="button"
+                    className={styles.sendModalClose}
+                    onClick={() => {
+                      setShowProductPicker(false);
+                      setProductSearch("");
+                    }}
+                  >
+                    ✕
+                  </button>
+                </div>
+                <div className={styles.productPickerBody}>
+                  <input
+                    className={styles.productPickerSearch}
+                    placeholder={l.searchProducts}
+                    value={productSearch}
+                    onChange={(e) => setProductSearch(e.target.value)}
+                    autoFocus
+                  />
+                  {loadingProducts ? (
+                    <p className={styles.productPickerEmpty}>{l.loadingProducts}</p>
+                  ) : (() => {
+                    const filtered = products.filter((p) => {
+                      const name =
+                        p.name[lang as keyof typeof p.name] || p.name.en || "";
+                      return name.toLowerCase().includes(productSearch.toLowerCase());
+                    });
+                    return filtered.length === 0 ? (
+                      <p className={styles.productPickerEmpty}>{l.noProducts}</p>
+                    ) : (
+                      <ul className={styles.productList}>
+                        {filtered.map((p) => {
+                          const name =
+                            p.name[lang as keyof typeof p.name] || p.name.en || "";
+                          return (
+                            <li
+                              key={p._id}
+                              className={styles.productRow}
+                              onClick={() => addProductAsItem(p)}
+                            >
+                              <span className={styles.productRowName}>{name}</span>
+                              <span className={styles.productRowMeta}>
+                                {p.unit} · {new Intl.NumberFormat(undefined, {
+                                  style: "currency",
+                                  currency: form.currency || "USD",
+                                }).format(p.unitPrice)}
+                              </span>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    );
+                  })()}
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Discount Type + Value */}
           <div className={styles.formRow}>
