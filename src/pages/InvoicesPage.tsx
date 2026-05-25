@@ -6,7 +6,13 @@ import { useAuth } from "../contexts/AuthContext";
 import { invoiceService } from "../services/invoiceService";
 import { productService } from "../services/productService";
 import apiClient from "../services/apiClient";
-import type { Invoice, InvoiceStatus, Customer, Tenant, Product } from "../types";
+import type {
+  Invoice,
+  InvoiceStatus,
+  Customer,
+  Tenant,
+  Product,
+} from "../types";
 import { getTenant } from "../services/authService";
 import { jobService } from "../services/jobService";
 import RichTextEditor from "../components/RichTextEditor";
@@ -1046,9 +1052,7 @@ function InvoiceFormSection({
 
   const addProductAsItem = (product: Product) => {
     const name =
-      product.name[lang as keyof typeof product.name] ||
-      product.name.en ||
-      "";
+      product.name[lang as keyof typeof product.name] || product.name.en || "";
     const newItem: ItemForm = {
       description: name,
       serviceType: `product:${product._id}`,
@@ -1907,7 +1911,11 @@ function InvoiceFormSection({
             </div>
           ))}
           <div className={styles.addItemRow}>
-            <button type="button" className={styles.btnAddItem} onClick={addItem}>
+            <button
+              type="button"
+              className={styles.btnAddItem}
+              onClick={addItem}
+            >
               {l.addItem}
             </button>
             <button
@@ -1933,7 +1941,9 @@ function InvoiceFormSection({
               <div className={styles.productPickerModal}>
                 <div className={styles.sendModalHeader}>
                   <div>
-                    <p className={styles.sendModalTitle}>{l.productPickerTitle}</p>
+                    <p className={styles.sendModalTitle}>
+                      {l.productPickerTitle}
+                    </p>
                   </div>
                   <button
                     type="button"
@@ -1955,39 +1965,54 @@ function InvoiceFormSection({
                     autoFocus
                   />
                   {loadingProducts ? (
-                    <p className={styles.productPickerEmpty}>{l.loadingProducts}</p>
-                  ) : (() => {
-                    const filtered = products.filter((p) => {
-                      const name =
-                        p.name[lang as keyof typeof p.name] || p.name.en || "";
-                      return name.toLowerCase().includes(productSearch.toLowerCase());
-                    });
-                    return filtered.length === 0 ? (
-                      <p className={styles.productPickerEmpty}>{l.noProducts}</p>
-                    ) : (
-                      <ul className={styles.productList}>
-                        {filtered.map((p) => {
-                          const name =
-                            p.name[lang as keyof typeof p.name] || p.name.en || "";
-                          return (
-                            <li
-                              key={p._id}
-                              className={styles.productRow}
-                              onClick={() => addProductAsItem(p)}
-                            >
-                              <span className={styles.productRowName}>{name}</span>
-                              <span className={styles.productRowMeta}>
-                                {p.unit} · {new Intl.NumberFormat(undefined, {
-                                  style: "currency",
-                                  currency: form.currency || "USD",
-                                }).format(p.unitPrice)}
-                              </span>
-                            </li>
-                          );
-                        })}
-                      </ul>
-                    );
-                  })()}
+                    <p className={styles.productPickerEmpty}>
+                      {l.loadingProducts}
+                    </p>
+                  ) : (
+                    (() => {
+                      const filtered = products.filter((p) => {
+                        const name =
+                          p.name[lang as keyof typeof p.name] ||
+                          p.name.en ||
+                          "";
+                        return name
+                          .toLowerCase()
+                          .includes(productSearch.toLowerCase());
+                      });
+                      return filtered.length === 0 ? (
+                        <p className={styles.productPickerEmpty}>
+                          {l.noProducts}
+                        </p>
+                      ) : (
+                        <ul className={styles.productList}>
+                          {filtered.map((p) => {
+                            const name =
+                              p.name[lang as keyof typeof p.name] ||
+                              p.name.en ||
+                              "";
+                            return (
+                              <li
+                                key={p._id}
+                                className={styles.productRow}
+                                onClick={() => addProductAsItem(p)}
+                              >
+                                <span className={styles.productRowName}>
+                                  {name}
+                                </span>
+                                <span className={styles.productRowMeta}>
+                                  {p.unit} ·{" "}
+                                  {new Intl.NumberFormat(undefined, {
+                                    style: "currency",
+                                    currency: form.currency || "USD",
+                                  }).format(p.unitPrice)}
+                                </span>
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      );
+                    })()
+                  )}
                 </div>
               </div>
             </div>
