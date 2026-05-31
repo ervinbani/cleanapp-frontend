@@ -4,7 +4,14 @@ import { useLang } from "../contexts/LangContext";
 import { useAuth } from "../contexts/AuthContext";
 import { jobService } from "../services/jobService";
 import apiClient from "../services/apiClient";
-import type { Job, JobStatus, Customer, Service, User, TimeEntry } from "../types";
+import type {
+  Job,
+  JobStatus,
+  Customer,
+  Service,
+  User,
+  TimeEntry,
+} from "../types";
 import styles from "./JobDetailPage.module.css";
 
 // ─── Constants ────────────────────────────────────────────────────
@@ -609,22 +616,22 @@ export default function JobDetailPage() {
 
   // ── Punch-in / Punch-out ──────────────────────────────────────
   const getUserId = (u: string | User): string =>
-    typeof u === "object" ? ((u as User & { _id?: string })._id ?? (u as User).id) : u;
+    typeof u === "object"
+      ? ((u as User & { _id?: string })._id ?? (u as User).id)
+      : u;
 
   const myOpenEntry = job
     ? (job.timeEntries ?? []).find(
         (e) =>
-          getUserId(e.userId as string | User) ===
-            (user?._id ?? user?.id) && !e.clockOut,
+          getUserId(e.userId as string | User) === (user?._id ?? user?.id) &&
+          !e.clockOut,
       )
     : undefined;
 
   const isClockedIn = !!myOpenEntry;
 
   const isAssigned = job
-    ? job.assignedUsers.some(
-        (u) => getUserId(u) === (user?._id ?? user?.id),
-      )
+    ? job.assignedUsers.some((u) => getUserId(u) === (user?._id ?? user?.id))
     : false;
 
   // Live timer while clocked in
@@ -633,7 +640,9 @@ export default function JobDetailPage() {
     if (isClockedIn && myOpenEntry?.clockIn) {
       const update = () =>
         setElapsed(
-          Math.floor((Date.now() - new Date(myOpenEntry.clockIn).getTime()) / 1000),
+          Math.floor(
+            (Date.now() - new Date(myOpenEntry.clockIn).getTime()) / 1000,
+          ),
         );
       update();
       timerRef.current = setInterval(update, 1000);
@@ -649,7 +658,8 @@ export default function JobDetailPage() {
     const h = Math.floor(seconds / 3600);
     const m = Math.floor((seconds % 3600) / 60);
     const s = seconds % 60;
-    if (h > 0) return `${h}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+    if (h > 0)
+      return `${h}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
     return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
   };
 
@@ -676,10 +686,9 @@ export default function JobDetailPage() {
       const updated = await jobService.punchIn(job._id);
       setJob(updated);
     } catch (err: unknown) {
-      const status = (err as { response?: { status?: number } })?.response?.status;
-      setPunchError(
-        status === 409 ? l.punchErrAlready : l.punchErrGeneric,
-      );
+      const status = (err as { response?: { status?: number } })?.response
+        ?.status;
+      setPunchError(status === 409 ? l.punchErrAlready : l.punchErrGeneric);
     } finally {
       setPunching(false);
     }
@@ -693,10 +702,9 @@ export default function JobDetailPage() {
       const updated = await jobService.punchOut(job._id);
       setJob(updated);
     } catch (err: unknown) {
-      const status = (err as { response?: { status?: number } })?.response?.status;
-      setPunchError(
-        status === 409 ? l.punchErrNot : l.punchErrGeneric,
-      );
+      const status = (err as { response?: { status?: number } })?.response
+        ?.status;
+      setPunchError(status === 409 ? l.punchErrNot : l.punchErrGeneric);
     } finally {
       setPunching(false);
     }
@@ -704,9 +712,7 @@ export default function JobDetailPage() {
 
   const handleAddEntry = async () => {
     if (!job) return;
-    const uid = canWrite
-      ? manualUserId
-      : (user?._id ?? user?.id ?? "");
+    const uid = canWrite ? manualUserId : (user?._id ?? user?.id ?? "");
     if (!uid || !manualDate || !manualHours || Number(manualHours) <= 0) return;
     setAddingEntry(true);
     setAddEntryError("");
@@ -727,7 +733,6 @@ export default function JobDetailPage() {
       setAddingEntry(false);
     }
   };
-
 
   // ── Loading / error ───────────────────────────────────────────
   if (loading) {
@@ -1219,13 +1224,19 @@ export default function JobDetailPage() {
 
             {/* Punch panel — visible to assigned users */}
             {isAssigned && (
-              <div className={`${styles.punchPanel} ${isClockedIn ? styles.punchPanelActive : ""}`}>
+              <div
+                className={`${styles.punchPanel} ${isClockedIn ? styles.punchPanelActive : ""}`}
+              >
                 <div className={styles.punchInfo}>
                   {isClockedIn ? (
                     <>
                       <span className={styles.punchLiveDot} />
-                      <span className={styles.punchTimer}>{formatElapsed(elapsed)}</span>
-                      <span className={styles.punchLabel}>{l.currentSession}</span>
+                      <span className={styles.punchTimer}>
+                        {formatElapsed(elapsed)}
+                      </span>
+                      <span className={styles.punchLabel}>
+                        {l.currentSession}
+                      </span>
                     </>
                   ) : (
                     <span className={styles.punchLabel}>
@@ -1236,13 +1247,25 @@ export default function JobDetailPage() {
                   )}
                 </div>
                 <button
-                  className={isClockedIn ? styles.btnPunchOut : styles.btnPunchIn}
+                  className={
+                    isClockedIn ? styles.btnPunchOut : styles.btnPunchIn
+                  }
                   onClick={isClockedIn ? handlePunchOut : handlePunchIn}
-                  disabled={punching || job.status === "completed" || job.status === "canceled"}
+                  disabled={
+                    punching ||
+                    job.status === "completed" ||
+                    job.status === "canceled"
+                  }
                 >
-                  {punching ? l.punching : isClockedIn ? l.punchOutBtn : l.punchInBtn}
+                  {punching
+                    ? l.punching
+                    : isClockedIn
+                      ? l.punchOutBtn
+                      : l.punchInBtn}
                 </button>
-                {punchError && <p className={styles.punchError}>{punchError}</p>}
+                {punchError && (
+                  <p className={styles.punchError}>{punchError}</p>
+                )}
               </div>
             )}
 
@@ -1265,8 +1288,16 @@ export default function JobDetailPage() {
                     <div key={entry._id ?? i} className={styles.entryRow}>
                       <span>{name}</span>
                       <span>{formatDate(entry.clockIn)}</span>
-                      <span>{entry.clockOut ? formatDate(entry.clockOut) : <span className={styles.liveBadge}>live</span>}</span>
-                      <span className={styles.right}>{formatDuration(entry.duration)}</span>
+                      <span>
+                        {entry.clockOut ? (
+                          formatDate(entry.clockOut)
+                        ) : (
+                          <span className={styles.liveBadge}>live</span>
+                        )}
+                      </span>
+                      <span className={styles.right}>
+                        {formatDuration(entry.duration)}
+                      </span>
                     </div>
                   );
                 })}

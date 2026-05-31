@@ -542,7 +542,9 @@
   border: 1.5px solid var(--border-light);
   margin-bottom: 1rem;
   flex-wrap: wrap;
-  transition: border-color 0.2s, background 0.2s;
+  transition:
+    border-color 0.2s,
+    background 0.2s;
 }
 
 .punchPanelActive {
@@ -568,8 +570,15 @@
 }
 
 @keyframes pulseDot {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50%       { opacity: 0.4; transform: scale(0.8); }
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(0.8);
+  }
 }
 
 .punchTimer {
@@ -699,7 +708,9 @@
   font-size: 0.82rem;
   padding: 0.35rem 0.85rem;
   cursor: pointer;
-  transition: border-color 0.15s, color 0.15s;
+  transition:
+    border-color 0.15s,
+    color 0.15s;
 }
 
 .btnAddTime:hover:not(:disabled) {
@@ -796,4 +807,3 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
-

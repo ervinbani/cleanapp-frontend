@@ -39,8 +39,12 @@ export const jobService = {
   },
 
   update: async (id: string, payload: Partial<Job>): Promise<Job> => {
-    const res = await apiClient.put<Job>(`/jobs/${id}`, payload);
-    return res.data;
+    const res = await apiClient.put<{ success: boolean; data: Job } | Job>(
+      `/jobs/${id}`,
+      payload,
+    );
+    const d = res.data as { success?: boolean; data?: Job };
+    return d.success !== undefined && d.data ? d.data : (res.data as Job);
   },
 
   remove: async (id: string): Promise<void> => {
