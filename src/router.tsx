@@ -30,6 +30,7 @@ import ProductCategoriesPage from "./pages/ProductCategoriesPage";
 import ProductCategoryDetailPage from "./pages/ProductCategoryDetailPage";
 import ProductsPage from "./pages/ProductsPage";
 import ProductDetailPage from "./pages/ProductDetailPage";
+import TimesheetsPage from "./pages/TimesheetsPage";
 
 const router = createBrowserRouter([
   // Public routes
@@ -67,6 +68,7 @@ const router = createBrowserRouter([
           { path: "/products", element: <ProductsPage /> },
           { path: "/products/:id", element: <ProductDetailPage /> },
           { path: "/calendar", element: <CalendarPage /> },
+          { path: "/timesheets", element: <TimesheetsPage /> },
           { path: "/messages", element: <MessagesPage /> },
           {
             path: "/settings",

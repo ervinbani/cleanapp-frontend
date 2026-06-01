@@ -77,6 +77,15 @@ const navSections = [
         permission: "jobs.read",
       },
       {
+        path: "/timesheets",
+        label: "Timesheets",
+        labelEs: "Horas trabajadas",
+        labelIt: "Presenze",
+        labelSq: "Oraret",
+        icon: "⏱",
+        permission: "jobs.read",
+      },
+      {
         path: "/invoices",
         label: "Invoices",
         labelEs: "Facturas",
