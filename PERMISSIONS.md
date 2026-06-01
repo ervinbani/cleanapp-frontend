@@ -17,6 +17,10 @@
 
 | Endpoint | worker | staff | manager_hr | manager_operations | director | owner |
 |---|:---:|:---:|:---:|:---:|:---:|:---:|
+| **TIMESHEETS** | | | | | | |
+| GET /api/timesheets | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| PATCH /api/timesheets/:jobId/:entryId | ✗ | ✗ | ✅ | ✅ | ✅ | ✅ |
+| DELETE /api/timesheets/:jobId/:entryId | ✗ | ✗ | ✗ | ✅ | ✅ | ✅ |
 | **USERS** | | | | | | |
 | GET /api/users | ✗ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | POST /api/users | ✗ | ✗ | ✅ | ✅ | ✅ | ✅ |

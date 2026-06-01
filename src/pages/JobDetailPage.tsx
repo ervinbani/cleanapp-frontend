@@ -429,7 +429,7 @@ export default function JobDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { lang } = useLang();
-  const { hasRole, user } = useAuth();
+  const { hasRole, hasPermission, user } = useAuth();
   const l = T[lang] ?? T.en;
 
   const [job, setJob] = useState<Job | null>(null);
@@ -467,12 +467,7 @@ export default function JobDetailPage() {
   const [addingEntry, setAddingEntry] = useState(false);
   const [addEntryError, setAddEntryError] = useState("");
 
-  const canWrite = hasRole(
-    "owner",
-    "director",
-    "manager_operations",
-    "manager_hr",
-  );
+  const canWrite = hasPermission("jobs", "update");
 
   // ── Load job ──────────────────────────────────────────────────
   useEffect(() => {
@@ -1325,7 +1320,8 @@ export default function JobDetailPage() {
                       setShowManualForm(true);
                     }}
                     disabled={
-                      job.status === "completed" || job.status === "canceled"
+                      !canWrite &&
+                      (job.status === "completed" || job.status === "canceled")
                     }
                   >
                     {l.addManualEntry}

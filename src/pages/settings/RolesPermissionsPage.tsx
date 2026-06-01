@@ -15,6 +15,7 @@ import styles from "./RolesPermissionsPage.module.css";
 const RESOURCES: PermissionResource[] = [
   "users",
   "jobs",
+  "timesheets",
   "services",
   "invoices",
   "roles",
@@ -29,6 +30,7 @@ const ACTIONS: PermissionAction[] = ["create", "read", "update", "delete"];
 const RESOURCE_LABELS: Record<PermissionResource, string> = {
   users: "Users",
   jobs: "Jobs",
+  timesheets: "Timesheets",
   services: "Services",
   invoices: "Invoices",
   roles: "Roles",

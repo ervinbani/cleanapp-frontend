@@ -92,7 +92,7 @@ type DateMode = "week" | "month" | "custom";
 
 // ─── Component ────────────────────────────────────────────────────────────────
 export default function TimesheetsPage() {
-  const { hasRole } = useAuth();
+  const { hasRole, hasPermission } = useAuth();
   const { lang } = useLang();
   const navigate = useNavigate();
   const t = useTrans("timesheets");
@@ -112,13 +112,8 @@ export default function TimesheetsPage() {
     "manager_operations",
     "manager_hr",
   );
-  const canEdit = hasRole(
-    "owner",
-    "director",
-    "manager_operations",
-    "manager_hr",
-  );
-  const canDelete = hasRole("owner", "director", "manager_operations");
+  const canEdit = hasPermission("timesheets", "update");
+  const canDelete = hasPermission("timesheets", "delete");
 
   // ── Date range ────────────────────────────────────────────────────────────
   const [dateMode, setDateMode] = useState<DateMode>("week");

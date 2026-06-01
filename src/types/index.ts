@@ -341,6 +341,7 @@ export type PermissionAction = "read" | "create" | "update" | "delete";
 export type PermissionResource =
   | "users"
   | "jobs"
+  | "timesheets"
   | "services"
   | "invoices"
   | "roles"
