@@ -191,7 +191,7 @@ export default function TimesheetsPage() {
         const title =
           job.title ||
           (typeof job.serviceId === "object" && job.serviceId
-            ? (
+            ? ((
                 job.serviceId as {
                   name?: { en?: string; it?: string; es?: string };
                 }
@@ -201,7 +201,7 @@ export default function TimesheetsPage() {
                   name?: { en?: string };
                 }
               ).name?.en ??
-              "—"
+              "—")
             : "—");
 
         result.push({
@@ -215,8 +215,7 @@ export default function TimesheetsPage() {
       }
     }
     result.sort(
-      (a, b) =>
-        new Date(b.clockIn).getTime() - new Date(a.clockIn).getTime(),
+      (a, b) => new Date(b.clockIn).getTime() - new Date(a.clockIn).getTime(),
     );
     return result;
   }, [jobs, selectedUserId, lang]);
@@ -325,9 +324,7 @@ export default function TimesheetsPage() {
                       {formatTime(row.clockIn, locale)}
                     </td>
                     <td className={styles.timeCell}>
-                      {row.clockOut
-                        ? formatTime(row.clockOut, locale)
-                        : "—"}
+                      {row.clockOut ? formatTime(row.clockOut, locale) : "—"}
                     </td>
                     <td className={styles.hoursCell}>
                       {row.isOpen ? "—" : minutesToHHMM(row.minutes)}
