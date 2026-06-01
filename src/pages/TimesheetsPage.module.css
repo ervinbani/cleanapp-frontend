@@ -261,3 +261,257 @@
   color: var(--accent);
   font-variant-numeric: tabular-nums;
 }
+
+/* ─── User cell ───────────────────────────────────────────────── */
+.userCell {
+  white-space: nowrap;
+  color: var(--text-muted);
+  font-size: 0.84rem;
+}
+
+/* ─── Actions cell ────────────────────────────────────────────── */
+.actionsCell {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+/* ─── Edit button ─────────────────────────────────────────────── */
+.btnEdit {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.3rem 0.65rem;
+  border-radius: 6px;
+  border: 1px solid #93c5fd;
+  font-size: 0.78rem;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  background: #eff6ff;
+  color: #1d4ed8;
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+
+.btnEdit:hover {
+  background: #dbeafe;
+}
+
+/* ─── Delete button ───────────────────────────────────────────── */
+.btnDelete {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.3rem 0.65rem;
+  border-radius: 6px;
+  border: 1px solid #fca5a5;
+  font-size: 0.78rem;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  background: var(--bg-surface);
+  color: #ef4444;
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+
+.btnDelete:hover {
+  background: #fef2f2;
+}
+
+/* ─── Delete confirm inline ───────────────────────────────────── */
+.deleteConfirmWrap {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  flex-wrap: wrap;
+}
+
+.deleteConfirmText {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.btnConfirmYes {
+  padding: 0.28rem 0.6rem;
+  border-radius: 6px;
+  border: 1px solid #fca5a5;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: #fee2e2;
+  color: #991b1b;
+  transition: background 0.15s;
+}
+
+.btnConfirmYes:hover:not(:disabled) {
+  background: #fecaca;
+}
+
+.btnConfirmYes:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.btnConfirmNo {
+  padding: 0.28rem 0.6rem;
+  border-radius: 6px;
+  border: 1px solid var(--border-input);
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  transition: background 0.15s;
+}
+
+.btnConfirmNo:hover {
+  background: var(--bg-surface-subtle);
+}
+
+.inlineError {
+  font-size: 0.75rem;
+  color: #ef4444;
+  white-space: nowrap;
+}
+
+/* ─── Edit modal ──────────────────────────────────────────────── */
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+}
+
+.modal {
+  background: var(--bg-surface);
+  border-radius: 12px;
+  padding: 1.75rem;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+}
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+}
+
+.modalTitle {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.modalClose {
+  background: none;
+  border: none;
+  font-size: 1.3rem;
+  line-height: 1;
+  color: var(--text-placeholder);
+  cursor: pointer;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  transition:
+    color 0.15s,
+    background 0.15s;
+}
+
+.modalClose:hover {
+  color: var(--text-secondary);
+  background: var(--bg-surface-subtle);
+}
+
+.modalBody {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.formLabel {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.formInput {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border-input);
+  border-radius: 8px;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  background: var(--bg-surface);
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.formInput:focus {
+  border-color: var(--accent);
+}
+
+.modalError {
+  font-size: 0.82rem;
+  color: #ef4444;
+  margin: 0;
+}
+
+.modalFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
+}
+
+.btnModalCancel {
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-input);
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btnModalCancel:hover {
+  background: var(--bg-surface-subtle);
+}
+
+.btnModalSave {
+  padding: 0.5rem 1.1rem;
+  border-radius: 8px;
+  border: none;
+  background: var(--accent);
+  color: var(--bg-surface);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btnModalSave:hover:not(:disabled) {
+  background: var(--accent-hover);
+}
+
+.btnModalSave:disabled {
+  opacity: 0.5;
+  cursor: default;
+}

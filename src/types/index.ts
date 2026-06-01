@@ -131,6 +131,20 @@ export interface TimeEntry {
   duration?: number | null; // minutes
 }
 
+/** Flat entry returned by GET /api/timesheets */
+export interface TimesheetEntry {
+  jobId: string;
+  jobTitle: string;
+  scheduledStart: string;
+  status: string;
+  entryId: string;
+  userId: string;
+  userName: string;
+  clockIn: string;
+  clockOut: string | null;
+  duration: number | null; // minutes
+}
+
 export interface Job {
   _id: string;
   tenantId: string;

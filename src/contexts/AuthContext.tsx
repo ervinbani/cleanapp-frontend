@@ -26,6 +26,7 @@ const ROLE_PERMISSIONS: Record<UserRole, string[]> = {
     "users.create",
     "users.update",
     "users.delete",
+    "timesheets.read",
     "jobs.read",
     "jobs.create",
     "jobs.update",
@@ -60,6 +61,7 @@ const ROLE_PERMISSIONS: Record<UserRole, string[]> = {
   director: [
     "users.read",
     "users.update",
+    "timesheets.read",
     "jobs.read",
     "jobs.create",
     "jobs.update",
@@ -85,6 +87,7 @@ const ROLE_PERMISSIONS: Record<UserRole, string[]> = {
     "productCategories.delete",
   ],
   manager_operations: [
+    "timesheets.read",
     "jobs.read",
     "jobs.create",
     "jobs.update",
@@ -107,9 +110,11 @@ const ROLE_PERMISSIONS: Record<UserRole, string[]> = {
     "users.create",
     "users.update",
     "users.delete",
+    "timesheets.read",
     "documents.read",
   ],
   staff: [
+    "timesheets.read",
     "jobs.read",
     "jobs.punch",
     "services.read",
@@ -118,7 +123,7 @@ const ROLE_PERMISSIONS: Record<UserRole, string[]> = {
     "products.read",
     "productCategories.read",
   ],
-  worker: ["jobs.read", "jobs.punch"],
+  worker: ["timesheets.read", "jobs.read", "jobs.punch"],
 };
 
 interface AuthContextValue {

@@ -3,9 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { useLang } from "../contexts/LangContext";
 import { useTrans } from "../i18n";
-import { jobService } from "../services/jobService";
+import { timesheetService } from "../services/timesheetService";
+import type { TimesheetPatchPayload } from "../services/timesheetService";
 import apiClient from "../services/apiClient";
-import type { Job, TimeEntry, User } from "../types";
+import type { TimesheetEntry, User } from "../types";
 import styles from "./TimesheetsPage.module.css";
 
 // ─── Date helpers (same pattern as JobsPage) ──────────────────────────────────
@@ -61,19 +62,20 @@ function formatDate(iso: string, locale: string): string {
   });
 }
 
-function calcMinutes(entry: TimeEntry): number {
-  if (entry.duration != null) return entry.duration;
-  if (!entry.clockOut) return 0;
-  return Math.round(
-    (new Date(entry.clockOut).getTime() - new Date(entry.clockIn).getTime()) /
-      60000,
-  );
-}
-
 function minutesToHHMM(minutes: number): string {
   const h = Math.floor(minutes / 60);
   const m = minutes % 60;
   return `${h}h ${m.toString().padStart(2, "0")}m`;
+}
+
+/** Convert ISO string to datetime-local input value (YYYY-MM-DDTHH:MM) */
+function isoToLocal(iso: string): string {
+  return iso.slice(0, 16);
+}
+
+/** Convert datetime-local value to ISO string */
+function localToIso(val: string): string {
+  return new Date(val).toISOString();
 }
 
 function getUserId(u: User): string {
@@ -81,15 +83,6 @@ function getUserId(u: User): string {
 }
 
 // ─── Types ────────────────────────────────────────────────────────────────────
-interface TimesheetRow {
-  jobId: string;
-  jobTitle: string;
-  clockIn: string;
-  clockOut: string | null;
-  minutes: number;
-  isOpen: boolean;
-}
-
 interface UsersResponse {
   success: boolean;
   data: User[];
@@ -99,7 +92,7 @@ type DateMode = "week" | "month" | "custom";
 
 // ─── Component ────────────────────────────────────────────────────────────────
 export default function TimesheetsPage() {
-  const { user: me, hasRole } = useAuth();
+  const { hasRole } = useAuth();
   const { lang } = useLang();
   const navigate = useNavigate();
   const t = useTrans("timesheets");
@@ -119,6 +112,13 @@ export default function TimesheetsPage() {
     "manager_operations",
     "manager_hr",
   );
+  const canEdit = hasRole(
+    "owner",
+    "director",
+    "manager_operations",
+    "manager_hr",
+  );
+  const canDelete = hasRole("owner", "director", "manager_operations");
 
   // ── Date range ────────────────────────────────────────────────────────────
   const [dateMode, setDateMode] = useState<DateMode>("week");
@@ -140,90 +140,116 @@ export default function TimesheetsPage() {
     return getWeekRange();
   }, [dateMode, customFrom, customTo]);
 
-  // ── User selection ────────────────────────────────────────────────────────
+  // ── User selection (managers only) ────────────────────────────────────────
   const [users, setUsers] = useState<User[]>([]);
   const [selectedUserId, setSelectedUserId] = useState<string>("");
 
   useEffect(() => {
-    if (!isManager) {
-      if (me) setSelectedUserId(getUserId(me));
-      return;
-    }
+    if (!isManager) return;
     apiClient
       .get<UsersResponse>("/users", { params: { limit: 200 } })
       .then((res) => setUsers(res.data?.data ?? []))
       .catch(() => {});
-  }, [isManager, me]);
+  }, [isManager]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // ── Jobs fetch ────────────────────────────────────────────────────────────
-  const [jobs, setJobs] = useState<Job[]>([]);
+  // ── Timesheets fetch ──────────────────────────────────────────────────────
+  const [entries, setEntries] = useState<TimesheetEntry[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  useEffect(() => {
+  const load = () => {
     setLoading(true);
     setError("");
-    jobService
+    timesheetService
       .getAll({
-        assignedUserId: selectedUserId || undefined,
+        userId: selectedUserId || undefined,
         dateFrom,
         dateTo,
-        limit: 500,
       })
-      .then((res) => setJobs(res.data ?? []))
+      .then(setEntries)
       .catch(() => setError(t.errorLoad))
       .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    load();
   }, [selectedUserId, dateFrom, dateTo]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // ── Flatten timeEntries ───────────────────────────────────────────────────
-  const rows = useMemo<TimesheetRow[]>(() => {
-    const result: TimesheetRow[] = [];
-    for (const job of jobs) {
-      for (const entry of job.timeEntries ?? []) {
-        // When manager has selected a specific user, also filter at entry level
-        if (selectedUserId) {
-          const entryUserId =
-            typeof entry.userId === "object"
-              ? getUserId(entry.userId as User)
-              : entry.userId;
-          if (entryUserId !== selectedUserId) continue;
-        }
-        const title =
-          job.title ||
-          (typeof job.serviceId === "object" && job.serviceId
-            ? ((
-                job.serviceId as {
-                  name?: { en?: string; it?: string; es?: string };
-                }
-              ).name?.[lang] ??
-              (
-                job.serviceId as {
-                  name?: { en?: string };
-                }
-              ).name?.en ??
-              "—")
-            : "—");
-
-        result.push({
-          jobId: job._id,
-          jobTitle: title,
-          clockIn: entry.clockIn,
-          clockOut: entry.clockOut ?? null,
-          minutes: calcMinutes(entry),
-          isOpen: !entry.clockOut,
-        });
-      }
-    }
-    result.sort(
-      (a, b) => new Date(b.clockIn).getTime() - new Date(a.clockIn).getTime(),
-    );
-    return result;
-  }, [jobs, selectedUserId, lang]);
+  // ── Sorted rows ───────────────────────────────────────────────────────────
+  const rows = useMemo(
+    () =>
+      [...entries].sort(
+        (a, b) =>
+          new Date(b.clockIn).getTime() - new Date(a.clockIn).getTime(),
+      ),
+    [entries],
+  );
 
   const totalMinutes = useMemo(
-    () => rows.filter((r) => !r.isOpen).reduce((acc, r) => acc + r.minutes, 0),
+    () =>
+      rows
+        .filter((r) => r.clockOut != null && r.duration != null)
+        .reduce((acc, r) => acc + (r.duration ?? 0), 0),
     [rows],
   );
+
+  // ── Edit modal ────────────────────────────────────────────────────────────
+  const [editingEntry, setEditingEntry] = useState<TimesheetEntry | null>(null);
+  const [editClockIn, setEditClockIn] = useState("");
+  const [editClockOut, setEditClockOut] = useState("");
+  const [editSaving, setEditSaving] = useState(false);
+  const [editError, setEditError] = useState("");
+
+  const openEdit = (entry: TimesheetEntry) => {
+    setEditingEntry(entry);
+    setEditClockIn(isoToLocal(entry.clockIn));
+    setEditClockOut(entry.clockOut ? isoToLocal(entry.clockOut) : "");
+    setEditSaving(false);
+    setEditError("");
+  };
+
+  const handleEditSave = async () => {
+    if (!editingEntry) return;
+    setEditSaving(true);
+    setEditError("");
+    try {
+      const payload: TimesheetPatchPayload = {
+        clockIn: localToIso(editClockIn),
+      };
+      if (editClockOut) payload.clockOut = localToIso(editClockOut);
+      await timesheetService.update(
+        editingEntry.jobId,
+        editingEntry.entryId,
+        payload,
+      );
+      setEditingEntry(null);
+      load();
+    } catch {
+      setEditError(t.errorEdit);
+    } finally {
+      setEditSaving(false);
+    }
+  };
+
+  // ── Delete confirm ────────────────────────────────────────────────────────
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
+
+  const handleDelete = async (entry: TimesheetEntry) => {
+    setDeleteLoading(true);
+    setDeleteError("");
+    try {
+      await timesheetService.remove(entry.jobId, entry.entryId);
+      setDeletingId(null);
+      load();
+    } catch {
+      setDeleteError(t.errorDelete);
+      setDeleteLoading(false);
+    }
+  };
+
+  const colCount = isManager ? 8 : 7;
 
   return (
     <div className={styles.page}>
@@ -267,7 +293,6 @@ export default function TimesheetsPage() {
           )}
         </div>
 
-        {/* User picker — managers only */}
         {isManager && (
           <select
             className={styles.filterSelect}
@@ -295,6 +320,7 @@ export default function TimesheetsPage() {
             <thead>
               <tr className={styles.headRow}>
                 <th>{t.colJob}</th>
+                {isManager && <th>{t.colUser}</th>}
                 <th>{t.colDate}</th>
                 <th>{t.colClockedIn}</th>
                 <th>{t.colClockedOut}</th>
@@ -306,17 +332,17 @@ export default function TimesheetsPage() {
             <tbody>
               {rows.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className={styles.empty}>
+                  <td colSpan={colCount} className={styles.empty}>
                     {t.noResults}
                   </td>
                 </tr>
               ) : (
-                rows.map((row, i) => (
-                  <tr
-                    key={`${row.jobId}-${row.clockIn}-${i}`}
-                    className={styles.bodyRow}
-                  >
+                rows.map((row) => (
+                  <tr key={row.entryId} className={styles.bodyRow}>
                     <td className={styles.jobCell}>{row.jobTitle}</td>
+                    {isManager && (
+                      <td className={styles.userCell}>{row.userName}</td>
+                    )}
                     <td className={styles.dateCell}>
                       {formatDate(row.clockIn, locale)}
                     </td>
@@ -327,24 +353,75 @@ export default function TimesheetsPage() {
                       {row.clockOut ? formatTime(row.clockOut, locale) : "—"}
                     </td>
                     <td className={styles.hoursCell}>
-                      {row.isOpen ? "—" : minutesToHHMM(row.minutes)}
+                      {row.clockOut && row.duration != null
+                        ? minutesToHHMM(row.duration)
+                        : "—"}
                     </td>
                     <td>
                       <span
                         className={
-                          row.isOpen ? styles.badgeOpen : styles.badgeClosed
+                          row.clockOut ? styles.badgeClosed : styles.badgeOpen
                         }
                       >
-                        {row.isOpen ? t.statusOpen : t.statusClosed}
+                        {row.clockOut ? t.statusClosed : t.statusOpen}
                       </span>
                     </td>
                     <td>
-                      <button
-                        className={styles.btnView}
-                        onClick={() => navigate(`/jobs/${row.jobId}`)}
-                      >
-                        {t.viewJob}
-                      </button>
+                      <div className={styles.actionsCell}>
+                        <button
+                          className={styles.btnView}
+                          onClick={() => navigate(`/jobs/${row.jobId}`)}
+                        >
+                          {t.viewJob}
+                        </button>
+                        {canEdit && (
+                          <button
+                            className={styles.btnEdit}
+                            onClick={() => openEdit(row)}
+                          >
+                            {t.edit}
+                          </button>
+                        )}
+                        {canDelete &&
+                          (deletingId === row.entryId ? (
+                            <span className={styles.deleteConfirmWrap}>
+                              <span className={styles.deleteConfirmText}>
+                                {t.deleteConfirm}
+                              </span>
+                              <button
+                                className={styles.btnConfirmYes}
+                                disabled={deleteLoading}
+                                onClick={() => handleDelete(row)}
+                              >
+                                {t.confirmYes}
+                              </button>
+                              <button
+                                className={styles.btnConfirmNo}
+                                onClick={() => {
+                                  setDeletingId(null);
+                                  setDeleteError("");
+                                }}
+                              >
+                                {t.confirmNo}
+                              </button>
+                            </span>
+                          ) : (
+                            <button
+                              className={styles.btnDelete}
+                              onClick={() => {
+                                setDeletingId(row.entryId);
+                                setDeleteError("");
+                              }}
+                            >
+                              {t.delete}
+                            </button>
+                          ))}
+                        {deleteError && deletingId === null && (
+                          <span className={styles.inlineError}>
+                            {deleteError}
+                          </span>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))
@@ -361,6 +438,66 @@ export default function TimesheetsPage() {
           <span className={styles.summaryValue}>
             {minutesToHHMM(totalMinutes)}
           </span>
+        </div>
+      )}
+
+      {/* ── Edit modal ── */}
+      {editingEntry && (
+        <div
+          className={styles.modalOverlay}
+          onClick={() => setEditingEntry(null)}
+        >
+          <div
+            className={styles.modal}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className={styles.modalHeader}>
+              <h3 className={styles.modalTitle}>{t.editTitle}</h3>
+              <button
+                className={styles.modalClose}
+                onClick={() => setEditingEntry(null)}
+                aria-label="Close"
+              >
+                ✕
+              </button>
+            </div>
+            <div className={styles.modalBody}>
+              <div className={styles.formGroup}>
+                <label className={styles.formLabel}>{t.editClockIn}</label>
+                <input
+                  type="datetime-local"
+                  className={styles.formInput}
+                  value={editClockIn}
+                  onChange={(e) => setEditClockIn(e.target.value)}
+                />
+              </div>
+              <div className={styles.formGroup}>
+                <label className={styles.formLabel}>{t.editClockOut}</label>
+                <input
+                  type="datetime-local"
+                  className={styles.formInput}
+                  value={editClockOut}
+                  onChange={(e) => setEditClockOut(e.target.value)}
+                />
+              </div>
+              {editError && <p className={styles.modalError}>{editError}</p>}
+            </div>
+            <div className={styles.modalFooter}>
+              <button
+                className={styles.btnModalCancel}
+                onClick={() => setEditingEntry(null)}
+              >
+                {t.confirmNo}
+              </button>
+              <button
+                className={styles.btnModalSave}
+                disabled={editSaving || !editClockIn}
+                onClick={handleEditSave}
+              >
+                {editSaving ? t.saving : t.saveChanges}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
