@@ -179,8 +179,7 @@ export default function TimesheetsPage() {
   const rows = useMemo(
     () =>
       [...entries].sort(
-        (a, b) =>
-          new Date(b.clockIn).getTime() - new Date(a.clockIn).getTime(),
+        (a, b) => new Date(b.clockIn).getTime() - new Date(a.clockIn).getTime(),
       ),
     [entries],
   );
@@ -447,10 +446,7 @@ export default function TimesheetsPage() {
           className={styles.modalOverlay}
           onClick={() => setEditingEntry(null)}
         >
-          <div
-            className={styles.modal}
-            onClick={(e) => e.stopPropagation()}
-          >
+          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
             <div className={styles.modalHeader}>
               <h3 className={styles.modalTitle}>{t.editTitle}</h3>
               <button

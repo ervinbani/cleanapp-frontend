@@ -1254,7 +1254,10 @@ export default function JobDetailPage() {
                   disabled={
                     punching ||
                     job.status === "completed" ||
-                    job.status === "canceled"
+                    job.status === "canceled" ||
+                    (!isClockedIn &&
+                      job.status !== "in_progress" &&
+                      new Date(job.scheduledStart) < new Date())
                   }
                 >
                   {punching
