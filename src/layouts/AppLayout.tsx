@@ -5,6 +5,7 @@ import { useLang } from "../contexts/LangContext";
 import { useTheme } from "../contexts/ThemeContext";
 import { messageService } from "../services/messageService";
 import { deleteTenant, getTenant } from "../services/authService";
+import AiChat from "../components/AiChat";
 import styles from "./AppLayout.module.css";
 
 const navSections = [
@@ -1120,6 +1121,9 @@ export default function AppLayout() {
           </div>
         </div>
       )}
+
+      {/* ── AI Chat Widget ──────────────────────────────── */}
+      <AiChat />
     </div>
   );
 }
