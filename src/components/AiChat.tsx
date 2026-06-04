@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import axios from "axios";
 import { aiService, type AiMessage } from "../services/aiService";
 import styles from "./AiChat.module.css";
 
@@ -37,10 +38,19 @@ export default function AiChat() {
     try {
       const reply = await aiService.chat(newMessages);
       setMessages([...newMessages, { role: "assistant", content: reply }]);
-    } catch {
+    } catch (err: unknown) {
+      let errorMsg = "⚠️ Errore nella risposta. Riprova.";
+      if (axios.isAxiosError(err) && err.response) {
+        if (err.response.status === 429) {
+          errorMsg =
+            "⚠️ Hai superato il limite di richieste AI. Riprova tra qualche minuto.";
+        } else if (err.response.status === 400 && err.response.data?.details?.[0]) {
+          errorMsg = `⚠️ ${err.response.data.details[0].message}`;
+        }
+      }
       setMessages([
         ...newMessages,
-        { role: "assistant", content: "⚠️ Errore nella risposta. Riprova." },
+        { role: "assistant", content: errorMsg },
       ]);
     } finally {
       setLoading(false);
