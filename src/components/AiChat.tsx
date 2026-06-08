@@ -3,11 +3,21 @@ import axios from "axios";
 import { aiService, type AiMessage } from "../services/aiService";
 import styles from "./AiChat.module.css";
 
+const STORAGE_KEY = "ai_session_id";
+
+function stripConfirmationCode(text: string): string {
+  return text.replace(/<!--CONFIRMATION_CODE:[^>]+-->/g, "").trim();
+}
+
 export default function AiChat() {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<AiMessage[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [rateLimited, setRateLimited] = useState(false);
+  const sessionIdRef = useRef<string | null>(
+    localStorage.getItem(STORAGE_KEY),
+  );
   const bottomRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -36,12 +46,19 @@ export default function AiChat() {
     setLoading(true);
 
     try {
-      const reply = await aiService.chat(newMessages);
+      const { reply, sessionId } = await aiService.chat(
+        newMessages,
+        sessionIdRef.current,
+      );
+      sessionIdRef.current = sessionId;
+      localStorage.setItem(STORAGE_KEY, sessionId);
       setMessages([...newMessages, { role: "assistant", content: reply }]);
+      setRateLimited(false);
     } catch (err: unknown) {
       let errorMsg = "⚠️ Errore nella risposta. Riprova.";
       if (axios.isAxiosError(err) && err.response) {
         if (err.response.status === 429) {
+          setRateLimited(true);
           errorMsg =
             "⚠️ Hai superato il limite di richieste AI. Riprova tra qualche minuto.";
         } else if (err.response.status === 400 && err.response.data?.details?.[0]) {
@@ -95,7 +112,7 @@ export default function AiChat() {
                     : styles.bubbleAssistant
                 }`}
               >
-                {msg.content}
+                {msg.role === "assistant" ? stripConfirmationCode(msg.content) : msg.content}
               </div>
             ))}
 
@@ -108,6 +125,11 @@ export default function AiChat() {
             <div ref={bottomRef} />
           </div>
 
+          {rateLimited && (
+            <div className={styles.banner}>
+              ⚠️ Troppe richieste. Riprova tra qualche minuto.
+            </div>
+          )}
           <div className={styles.inputRow}>
             <textarea
               ref={textareaRef}
@@ -117,12 +139,12 @@ export default function AiChat() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              disabled={loading}
+              disabled={loading || rateLimited}
             />
             <button
               className={styles.sendBtn}
               onClick={handleSend}
-              disabled={loading || !input.trim()}
+              disabled={loading || rateLimited || !input.trim()}
               aria-label="Invia"
             >
               ➤

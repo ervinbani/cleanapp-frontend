@@ -124,6 +124,20 @@
   font-style: italic;
 }
 
+/* ─── Rate limit banner ────────────────────────────────────────── */
+.banner {
+  padding: 0.5rem 0.75rem;
+  margin: 0 0.75rem 0.35rem;
+  background-color: #fef3cd;
+  color: #856404;
+  border: 1px solid #ffc107;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  text-align: center;
+  flex-shrink: 0;
+}
+
 /* ─── Input area ───────────────────────────────────────────────── */
 .inputRow {
   display: flex;
