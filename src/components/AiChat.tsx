@@ -15,9 +15,7 @@ export default function AiChat() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [rateLimited, setRateLimited] = useState(false);
-  const sessionIdRef = useRef<string | null>(
-    localStorage.getItem(STORAGE_KEY),
-  );
+  const sessionIdRef = useRef<string | null>(localStorage.getItem(STORAGE_KEY));
   const bottomRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -61,14 +59,14 @@ export default function AiChat() {
           setRateLimited(true);
           errorMsg =
             "⚠️ Hai superato il limite di richieste AI. Riprova tra qualche minuto.";
-        } else if (err.response.status === 400 && err.response.data?.details?.[0]) {
+        } else if (
+          err.response.status === 400 &&
+          err.response.data?.details?.[0]
+        ) {
           errorMsg = `⚠️ ${err.response.data.details[0].message}`;
         }
       }
-      setMessages([
-        ...newMessages,
-        { role: "assistant", content: errorMsg },
-      ]);
+      setMessages([...newMessages, { role: "assistant", content: errorMsg }]);
     } finally {
       setLoading(false);
     }
@@ -98,9 +96,7 @@ export default function AiChat() {
 
           <div className={styles.messages}>
             {messages.length === 0 && !loading && (
-              <p className={styles.empty}>
-                Ciao! Come posso aiutarti?
-              </p>
+              <p className={styles.empty}>Ciao! Come posso aiutarti?</p>
             )}
 
             {messages.map((msg, i) => (
@@ -112,7 +108,9 @@ export default function AiChat() {
                     : styles.bubbleAssistant
                 }`}
               >
-                {msg.role === "assistant" ? stripConfirmationCode(msg.content) : msg.content}
+                {msg.role === "assistant"
+                  ? stripConfirmationCode(msg.content)
+                  : msg.content}
               </div>
             ))}
 
