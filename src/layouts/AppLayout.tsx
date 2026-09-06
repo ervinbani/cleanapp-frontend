@@ -444,10 +444,7 @@ export default function AppLayout() {
                     <div key="products" className={styles.settingsGroup}>
                       <button
                         className={`${styles.settingsToggle} ${isProductsArea ? styles.navItemActive : ""} ${sidebarCollapsed ? styles.navItemIconOnly : ""}`}
-                        onClick={() => {
-                          if (!isProductsArea) navigate("/products");
-                          if (!sidebarCollapsed) setProductsOpen((o) => !o);
-                        }}
+                        onClick={() => setProductsOpen((o) => !o)}
                         title={
                           sidebarCollapsed
                             ? lang === "en"
