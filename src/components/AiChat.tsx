@@ -9,12 +9,22 @@ function stripConfirmationCode(text: string): string {
   return text.replace(/<!--CONFIRMATION_CODE:[^>]+-->/g, "").trim();
 }
 
+function sanitizeMessages(messages: AiMessage[]): AiMessage[] {
+  return messages
+    .map((message) => ({
+      ...message,
+      content: (message.content ?? "").trim(),
+    }))
+    .filter((message) => message.content.length > 0);
+}
+
 export default function AiChat() {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<AiMessage[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [rateLimited, setRateLimited] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const sessionIdRef = useRef<string | null>(localStorage.getItem(STORAGE_KEY));
   const bottomRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -36,21 +46,36 @@ export default function AiChat() {
     if (!text || loading) return;
 
     const newMessages: AiMessage[] = [
-      ...messages,
+      ...sanitizeMessages(messages),
       { role: "user", content: text },
     ];
     setMessages(newMessages);
     setInput("");
     setLoading(true);
+    setError(null);
 
     try {
+      const payload = sanitizeMessages(newMessages);
+      if (payload.length === 0) {
+        throw new Error("No valid AI message to send");
+      }
+
       const { reply, sessionId } = await aiService.chat(
-        newMessages,
+        payload,
         sessionIdRef.current,
       );
+
+      const safeReply = (reply ?? "").trim();
       sessionIdRef.current = sessionId;
       localStorage.setItem(STORAGE_KEY, sessionId);
-      setMessages([...newMessages, { role: "assistant", content: reply }]);
+      setMessages([
+        ...payload,
+        {
+          role: "assistant",
+          content:
+            safeReply || "⚠️ La risposta è vuota. Riprova con un’altra domanda.",
+        },
+      ]);
       setRateLimited(false);
     } catch (err: unknown) {
       let errorMsg = "⚠️ Errore nella risposta. Riprova.";
@@ -66,10 +91,20 @@ export default function AiChat() {
           errorMsg = `⚠️ ${err.response.data.details[0].message}`;
         }
       }
-      setMessages([...newMessages, { role: "assistant", content: errorMsg }]);
+      // Backend/validation errors are surfaced via the `error` banner, never appended to the chat history sent back to the API.
+      setMessages(sanitizeMessages(newMessages));
+      setError(errorMsg);
     } finally {
       setLoading(false);
     }
+  }
+
+  function handleNewSession() {
+    setMessages([]);
+    setError(null);
+    setRateLimited(false);
+    sessionIdRef.current = null;
+    localStorage.removeItem(STORAGE_KEY);
   }
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
@@ -85,6 +120,14 @@ export default function AiChat() {
         <div className={styles.panel}>
           <div className={styles.header}>
             <span>🤖 AI Assistant</span>
+            <button
+              className={styles.closeBtn}
+              onClick={handleNewSession}
+              aria-label="Nuova sessione"
+              title="Nuova sessione"
+            >
+              🔄
+            </button>
             <button
               className={styles.closeBtn}
               onClick={() => setOpen(false)}
@@ -128,6 +171,7 @@ export default function AiChat() {
               ⚠️ Troppe richieste. Riprova tra qualche minuto.
             </div>
           )}
+          {error && <div className={styles.errorBanner}>{error}</div>}
           <div className={styles.inputRow}>
             <textarea
               ref={textareaRef}
@@ -135,7 +179,10 @@ export default function AiChat() {
               rows={1}
               placeholder="Scrivi un messaggio… (Invio per inviare)"
               value={input}
-              onChange={(e) => setInput(e.target.value)}
+              onChange={(e) => {
+                setInput(e.target.value);
+                if (error) setError(null);
+              }}
               onKeyDown={handleKeyDown}
               disabled={loading || rateLimited}
             />

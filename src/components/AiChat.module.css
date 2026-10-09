@@ -138,6 +138,20 @@
   flex-shrink: 0;
 }
 
+/* ─── Error banner ─────────────────────────────────────────────── */
+.errorBanner {
+  padding: 0.5rem 0.75rem;
+  margin: 0 0.75rem 0.35rem;
+  background-color: #f8d7da;
+  color: #842029;
+  border: 1px solid #dc3545;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  text-align: center;
+  flex-shrink: 0;
+}
+
 /* ─── Input area ───────────────────────────────────────────────── */
 .inputRow {
   display: flex;
